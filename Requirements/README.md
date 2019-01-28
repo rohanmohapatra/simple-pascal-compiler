@@ -16,115 +16,126 @@ Session : Jan­May, 
 ### PHASE 1 : LEXICAL ANALYSIS
 
 
-● You will use flex/lex to create a scanner for your programming language.
-● Your scanner will transform  the source file from a stream of bits and bytes into
+1. You will use flex/lex to create a scanner for your programming language.
+2. Your scanner will transform  the source file from a stream of bits and bytes into
 a series of meaningful tokens  containing information that will be used by the
 later stages of the compiler.
-● When writing your scanner, you will need to handle conversions from integer
+3. When writing your scanner, you will need to handle conversions from integer
 and real­valued literals into integer and real ­valued numeric data.  That is, if
 you encounter the  sequence of characters 3.1415E+3, while scanning the input
 you should convert this into a double with this value.  Similarly, when seeing
 137 you should convert it to an  int.
-● Your scanner  should consume any comments from the input stream and ignore
+4. Your scanner  should consume any comments from the input stream and ignore
 them.  If a file ends  with an unterminated comment, the scanner should report
 an error.
-● All token names must start with T_(token­name).
-● The following operators and punctuation characters are used by your selected
+5. All token names must start with T_(token­name).
+6. The following operators and punctuation characters are used by your selected
 Programming language (minimum set):
+```
 + ­ * / % <
 <= > >= = == !=
 &&  ||! ; ,.
 [ ] ( ) { } []
-Note that [, ], and [] are three different tokens and that for the [] operator (used
+```
+
+7. Note that [, ], and [] are three different tokens and that for the [] operator (used
 to  declare a variable of array type), as well as the other two  character
 operators, there must  not be any space in between the two characters.  Each
 single  character operator has a  token type equal to its ASCII value, while the
 multi­character operators have named token types associated with them.  For
 example, the token type for [] is T_Dims, while || has token type T_Or.
-● Scanner implementation:  The  yylval global variable is used to record the
+
+8. Scanner implementation:  The  yylval global variable is used to record the
 value for each lexeme scanned and the  yylloc global records the lexeme
 position (line number and column). The action for  each pattern will update the
 global variables and return the appropriate token code.
-● Your goal at this stage:
-	■ skip over white space;
-	■  recognize all keywords and return the correct token
-	■ recognize punctuation and single  char operators and return the
+
+9. Your goal at this stage:
+    * skip over white space
+	* recognize all keywords and return the correct token
+	* recognize punctuation and single  char operators and return the
 		ASCII value as  the token;
-	■ recognize two  character operators and return the correct token;
-	■ recognize int, double, bool, and string constants, return the correct
+	* recognize two  character operators and return the correct token;
+	* recognize int, double, bool, and string constants, return the correct
 		token and set appropriate field of yylval;
-	■ recognize identifiers, return the correct token and set appropriate
+	* recognize identifiers, return the correct token and set appropriate
 		fields of yylval;
-	■ record the line number and first and last column in yylloc for all
+	* record the line number and first and last column in yylloc for all
 		tokens;
-	■ report lexical errors for improper strings, lengthy identifiers, and
+	* report lexical errors for improper strings, lengthy identifiers, and
 		invalid  characters
-● Recording the position of each lexeme requires you to track the current line
+10. Recording the position of each lexeme requires you to track the current line
 and column  numbers (you will need global variables) and update them as the
 scanner reads the file,  mostly likely incrementing the line count on each
 newline and the column on each  token.
-● For each character that cannot be matched to  any token pattern, report it and
+11. For each character that cannot be matched to  any token pattern, report it and
 continue parsing with the next character.
-● If a string  erroneously contains a newline, report an error and continue at the
+12. If a string  erroneously contains a newline, report an error and continue at the
 beginning of the  next line.
-● If an identifier is longer than the maximum (31 characters), report the  error,
+13. If an identifier is longer than the maximum (31 characters), report the  error,
 truncate the identifier to the first 31 characters (discarding the rest), and
 continue.
 
 
 **SYMBOL TABLE:**
-Scope :
-	❏ Match identifiers’ declaration with uses
-	❏ Visibility of an entity
-	❏ Binding between declaration and uses
-	❏ The scope of an identifier is the portion of a program in which that
+1. Scope :
+	* Match identifiers’ declaration with uses
+	* Visibility of an entity
+	* Binding between declaration and uses
+	* The scope of an identifier is the portion of a program in which that
 		identifier is accessible
-	❏ The same identifier may refer to different things in different parts
+	* The same identifier may refer to different things in different parts
 		of the program:
-	❏ Different scopes for same name don’t overlap
-	❏ An identifier may have restricted scope
+	* Different scopes for same name don’t overlap
+	* An identifier may have restricted scope
 
-	Scoping and Symbol Table :
-	❏ Given a declaration of a name, is there already a declaration of the
+2. Scoping and Symbol Table :
+	* Given a declaration of a name, is there already a declaration of the
 		same name in the current scope, i.e., is it multiply declared?
-	❏ Given a use of a name, to which declaration does it correspond
+	* Given a use of a name, to which declaration does it correspond
 		(using the ”most closely nested” rule), or is it undeclared?
-	❏ Symbol table: a data structure that tracks the current bindings of
+	* Symbol table: a data structure that tracks the current bindings of
 		identifiers (for performing semantic checks and generating code
 		efficiently)
-	❏ large part of semantic analysis consists of tracking
+	* large part of semantic analysis consists of tracking
 		variable/function/type declarations.
-		❏ As we enter each new identifier in our symbol table, we need to
-		record the type information of the declaration.
-		Once all declarations have been processed to build the symbol table, and all uses have
-		been processed, link each ID node in the abstract­syntax tree with the corresponding
-		symbol­table entry.
+		* As we enter each new identifier in our symbol table, we need to
+		    record the type information of the declaration.
+		* Once all declarations have been processed to build the symbol table, and all uses have
+	    	been processed, link each ID node in the abstract­syntax tree with the corresponding
+		    symbol­table entry.
 		
-	It is used by various phases of compiler as follows :­
-		❏ Lexical Analysis: Creates new table entries in the table, example
+3. It is used by various phases of compiler as follows :­
+    * Lexical Analysis: Creates new table entries in the table, example
 		like entries about token.
-		❏ Syntax Analysis: Adds information regarding attribute type, scope,
+	* Syntax Analysis: Adds information regarding attribute type, scope,
 		dimension, line of reference, use, etc in the table.
-		❏ Semantic Analysis: Uses available information in the table to check
+	* Semantic Analysis: Uses available information in the table to check
 		for semantics i.e. to verify that expressions and assignments are
 		semantically correct(type checking) and update it accordingly.
-		❏ Intermediate Code generation: Refers symbol table for knowing
+	* Intermediate Code generation: Refers symbol table for knowing
 		how much and what type of run­time is allocated and table helps in
 		adding temporary variable information.
-		❏ Code Optimization: Uses information present in symbol table for
+	* Code Optimization: Uses information present in symbol table for
 		machine dependent optimization.
 
 
-**Items stored in Symbol table:**
-	❏ Variable names, line number declared, Line number where it is used
+## Items stored in Symbol table:
+
+	* Variable names, line number declared, Line number where it is used
 	(required to get live ranges of a variable), type of a variable, storage
 	required
-	❏ Procedure and function names
-	❏ Literal constants and strings
-	❏ Compiler generated temporaries (used during Intermediate code
+	* Procedure and function names
+	* Literal constants and strings
+	* Compiler generated temporaries (used during Intermediate code
 	generation ­ as we store ICG in the form of quadruples)
-	❏ Labels in source languages
-	**PHASE II : SYNTAX ANALYZER**
+	* Labels in source languages
+
+
+
+#### Phase -2 is not formatted yet.
+
+### PHASE II : SYNTAX ANALYZER
 	● Syntax analysis is only responsible for verifying that the sequence of  tokens
 	forms a valid sentence given the definition of your Programming Language
 	grammar.
