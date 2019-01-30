@@ -1,13 +1,18 @@
 %{
 #include<stdio.h>
 %}
-%x IN_COMMENT
+%x IN_MULTILINE_COMMENT
+%x IN_SINGLELINE_COMMENT
 %%
-<INITIAL>"{*" {BEGIN(IN_COMMENT);printf("THIS SHOULD HAVE BEEN A COMMENT-CENSURED");}
-<IN_COMMENT>"*}"      {BEGIN(INITIAL);}
-<IN_COMMENT>[^*\n]+   ;// eat comment in chunks
-<IN_COMMENT>"*"       ;// eat the lone star
-<IN_COMMENT>\n        yylineno++;
+<INITIAL>"{*" {BEGIN(IN_MULTILINE_COMMENT);printf("THIS SHOULD HAVE BEEN A MULTILINE COMMENT-CENSURED");}
+<INITIAL>"{" {BEGIN(IN_SINGLELINE_COMMENT);printf("THIS SHOULD HAVE BEEN A SINGLELINE COMMENT-CENSURED");}
+<IN_MULTILINE_COMMENT>"*}"      {BEGIN(INITIAL);}
+<IN_MULTILINE_COMMENT>[^*\n]+   ;// eat comment in chunks
+<IN_MULTILINE_COMMENT>"*"       ;// eat the lone star
+<IN_MULTILINE_COMMENT>\n        yylineno++;
+
+<IN_SINGLELINE_COMMENT>"}"      {BEGIN(INITIAL);}
+<IN_SINGLELINE_COMMENT>.    ;
 %%
 void main() {
     yylex();

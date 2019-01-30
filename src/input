@@ -5,4 +5,4 @@ Hey this should turn up
 Really Seriously
 *}
 {* This is a comment But really {* I am sure this is not right syntax *}
-
+{ This is a single line comment and should not turn up}

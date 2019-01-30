@@ -352,8 +352,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 6
-#define YY_END_OF_BUFFER 7
+#define YY_NUM_RULES 9
+#define YY_END_OF_BUFFER 10
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -361,10 +361,10 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[15] =
+static const flex_int16_t yy_accept[19] =
     {   0,
-        0,    0,    0,    0,    7,    6,    6,    3,    5,    4,
-        1,    3,    2,    0
+        0,    0,    0,    0,    0,    0,   10,    9,    2,    4,
+        6,    5,    8,    7,    1,    4,    3,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -404,30 +404,34 @@ static const YY_CHAR yy_meta[6] =
         1,    2,    3,    1,    4
     } ;
 
-static const flex_int16_t yy_base[20] =
+static const flex_int16_t yy_base[25] =
     {   0,
-       16,   15,    0,    2,   18,   21,    0,    0,   21,    0,
-       21,    0,   21,   21,    5,    9,   13,   13,   11
+       23,    8,    0,    2,    4,    8,   11,   30,    0,    0,
+       30,    0,   30,   30,   30,    0,   30,   30,   13,   17,
+       21,    5,   25,    3
     } ;
 
-static const flex_int16_t yy_def[20] =
+static const flex_int16_t yy_def[25] =
     {   0,
-       15,   15,   16,   16,   14,   14,   17,   18,   14,   19,
-       14,   18,   14,    0,   14,   14,   14,   14,   14
+       19,   19,   20,   20,   21,   21,   18,   18,   22,   23,
+       18,   24,   18,   18,   18,   23,   18,    0,   18,   18,
+       18,   18,   18,   18
     } ;
 
-static const flex_int16_t yy_nxt[27] =
+static const flex_int16_t yy_nxt[36] =
     {   0,
-       14,    9,   10,    9,   10,    6,    6,    6,    6,    8,
-        8,    8,    8,   12,   13,   11,   12,   14,    7,    7,
-        5,   14,   14,   14,   14,   14
+       18,   11,   12,   11,   12,    8,   17,   15,   14,    8,
+       18,    9,   14,    8,    8,    8,    8,   10,   10,   10,
+       10,   13,   13,   13,   13,   16,    9,   18,   16,    7,
+       18,   18,   18,   18,   18
     } ;
 
-static const flex_int16_t yy_chk[27] =
+static const flex_int16_t yy_chk[36] =
     {   0,
-        0,    3,    3,    4,    4,   15,   15,   15,   15,   16,
-       16,   16,   16,   18,   19,   17,   18,    5,    2,    1,
-       14,   14,   14,   14,   14,   14
+        0,    3,    3,    4,    4,    5,   24,   22,    5,    6,
+        7,    2,    6,   19,   19,   19,   19,   20,   20,   20,
+       20,   21,   21,   21,   21,   23,    1,    0,   23,   18,
+       18,   18,   18,   18,   18
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -447,12 +451,13 @@ char *yytext;
 #line 1 "remove_comments.lex"
 #line 2 "remove_comments.lex"
 #include<stdio.h>
-#line 451 "remove_comments.c"
+#line 455 "remove_comments.c"
 
-#line 453 "remove_comments.c"
+#line 457 "remove_comments.c"
 
 #define INITIAL 0
-#define IN_COMMENT 1
+#define IN_MULTILINE_COMMENT 1
+#define IN_SINGLELINE_COMMENT 2
 
 #ifndef YY_NO_UNISTD_H
 /* Special case for "unistd.h", since it is non-ANSI. We include it way
@@ -667,9 +672,9 @@ YY_DECL
 		}
 
 	{
-#line 5 "remove_comments.lex"
+#line 6 "remove_comments.lex"
 
-#line 673 "remove_comments.c"
+#line 678 "remove_comments.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -696,13 +701,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 15 )
+				if ( yy_current_state >= 19 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 21 );
+		while ( yy_base[yy_current_state] != 30 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -728,38 +733,54 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 6 "remove_comments.lex"
-{BEGIN(IN_COMMENT);printf("THIS SHOULD HAVE BEEN A COMMENT-CENSURED");}
+#line 7 "remove_comments.lex"
+{BEGIN(IN_MULTILINE_COMMENT);printf("THIS SHOULD HAVE BEEN A MULTILINE COMMENT-CENSURED");}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 7 "remove_comments.lex"
-{BEGIN(INITIAL);}
+#line 8 "remove_comments.lex"
+{BEGIN(IN_SINGLELINE_COMMENT);printf("THIS SHOULD HAVE BEEN A SINGLELINE COMMENT-CENSURED");}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 8 "remove_comments.lex"
-;// eat comment in chunks
+#line 9 "remove_comments.lex"
+{BEGIN(INITIAL);}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 9 "remove_comments.lex"
-;// eat the lone star
+#line 10 "remove_comments.lex"
+;// eat comment in chunks
 	YY_BREAK
 case 5:
-/* rule 5 can match eol */
-YY_RULE_SETUP
-#line 10 "remove_comments.lex"
-yylineno++;
-	YY_BREAK
-case 6:
 YY_RULE_SETUP
 #line 11 "remove_comments.lex"
+;// eat the lone star
+	YY_BREAK
+case 6:
+/* rule 6 can match eol */
+YY_RULE_SETUP
+#line 12 "remove_comments.lex"
+yylineno++;
+	YY_BREAK
+case 7:
+YY_RULE_SETUP
+#line 14 "remove_comments.lex"
+{BEGIN(INITIAL);}
+	YY_BREAK
+case 8:
+YY_RULE_SETUP
+#line 15 "remove_comments.lex"
+;
+	YY_BREAK
+case 9:
+YY_RULE_SETUP
+#line 16 "remove_comments.lex"
 ECHO;
 	YY_BREAK
-#line 761 "remove_comments.c"
+#line 781 "remove_comments.c"
 case YY_STATE_EOF(INITIAL):
-case YY_STATE_EOF(IN_COMMENT):
+case YY_STATE_EOF(IN_MULTILINE_COMMENT):
+case YY_STATE_EOF(IN_SINGLELINE_COMMENT):
 	yyterminate();
 
 	case YY_END_OF_BUFFER:
@@ -1055,7 +1076,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 15 )
+			if ( yy_current_state >= 19 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1083,11 +1104,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 15 )
+		if ( yy_current_state >= 19 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 14);
+	yy_is_jam = (yy_current_state == 18);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1763,7 +1784,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 11 "remove_comments.lex"
+#line 16 "remove_comments.lex"
 
 void main() {
     yylex();
