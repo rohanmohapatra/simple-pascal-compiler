@@ -54,7 +54,8 @@ extern int yydebug;
     T_BEGIN = 264,
     T_END = 265,
     T_CONST = 266,
-    T_IDENTIFIER = 267
+    T_IDENTIFIER = 267,
+    T_DATATYPE = 268
   };
 #endif
 /* Tokens.  */
@@ -68,18 +69,19 @@ extern int yydebug;
 #define T_END 265
 #define T_CONST 266
 #define T_IDENTIFIER 267
+#define T_DATATYPE 268
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 7 "yacc.y" /* yacc.c:1909  */
+#line 8 "yacc.y" /* yacc.c:1909  */
 
-	char *keyword;
 	char *str;
+	char *type;
 
-#line 83 "y.tab.h" /* yacc.c:1909  */
+#line 85 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -87,9 +89,23 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+/* Location type.  */
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE YYLTYPE;
+struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
+
 
 extern YYSTYPE yylval;
-
+extern YYLTYPE yylloc;
 int yyparse (void);
 
 #endif /* !YY_YY_Y_TAB_H_INCLUDED  */
