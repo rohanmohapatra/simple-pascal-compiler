@@ -1,1 +1,2 @@
-./remove_comments < $1 > $2
+# ./remove_comments < $1 > $2
+./compiler

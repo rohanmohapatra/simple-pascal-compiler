@@ -1,8 +1,12 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
+<<<<<<< HEAD
 	#include "y.tab.h"
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
+=======
+	#include "parser.tab.h"
+>>>>>>> saahitya
 %}
 %option yylineno
 
