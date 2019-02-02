@@ -62,14 +62,14 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "yacc.y" /* yacc.c:339  */
+#line 1 "parser.y" /* yacc.c:339  */
 
 	#include<stdio.h>
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
     int successful=1;
 
-#line 73 "y.tab.c" /* yacc.c:339  */
+#line 73 "parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -88,9 +88,9 @@
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+   by #include "parser.tab.h".  */
+#ifndef YY_YY_PARSER_TAB_H_INCLUDED
+# define YY_YY_PARSER_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -135,12 +135,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 8 "yacc.y" /* yacc.c:355  */
+#line 8 "parser.y" /* yacc.c:355  */
 
 	char *str;
 	char *type;
 
-#line 144 "y.tab.c" /* yacc.c:355  */
+#line 144 "parser.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -167,11 +167,11 @@ extern YYSTYPE yylval;
 extern YYLTYPE yylloc;
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_PARSER_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 175 "y.tab.c" /* yacc.c:358  */
+#line 175 "parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1344,7 +1344,7 @@ yyreduce:
   switch (yyn)
     {
       
-#line 1348 "y.tab.c" /* yacc.c:1646  */
+#line 1348 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1579,7 +1579,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 50 "yacc.y" /* yacc.c:1906  */
+#line 50 "parser.y" /* yacc.c:1906  */
 
 
 int yyerror() {
