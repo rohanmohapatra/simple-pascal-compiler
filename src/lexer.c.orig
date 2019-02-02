@@ -1,5 +1,6 @@
+#line 2 "lexer.c"
 
-#line 3 "lex.yy.c"
+#line 4 "lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -521,10 +522,16 @@ char *yytext;
 #line 2 "lexer.lex"
 	#include <stdio.h>
 	#include <string.h>
+<<<<<<< HEAD:src/lex.yy.c
 	#include "y.tab.h"
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
 #line 527 "lex.yy.c"
 #line 528 "lex.yy.c"
+=======
+	#include "parser.tab.h"
+#line 503 "lexer.c"
+#line 504 "lexer.c"
+>>>>>>> saahitya:src/lexer.c
 
 #define INITIAL 0
 
@@ -743,7 +750,11 @@ YY_DECL
 	{
 #line 14 "lexer.lex"
 
+<<<<<<< HEAD:src/lex.yy.c
 #line 747 "lex.yy.c"
+=======
+#line 723 "lexer.c"
+>>>>>>> saahitya:src/lexer.c
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -926,7 +937,11 @@ YY_RULE_SETUP
 #line 77 "lexer.lex"
 ECHO;
 	YY_BREAK
+<<<<<<< HEAD:src/lex.yy.c
 #line 930 "lex.yy.c"
+=======
+#line 907 "lexer.c"
+>>>>>>> saahitya:src/lexer.c
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
