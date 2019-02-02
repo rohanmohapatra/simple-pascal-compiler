@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
-	#include "y.tab.h"
+	#include "parser.tab.h"
 %}
 DATATYPES integer|character|real|boolean|string
 IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
