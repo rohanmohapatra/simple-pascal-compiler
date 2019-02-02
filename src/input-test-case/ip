@@ -1,2 +1,8 @@
 program hello;
 uses crt,hello, pokemon;
+const
+type
+hello,testr = integer;
+testtesttesttesttesttesttest,what = real;
+whatis = string;
+one,two,three = boolean;

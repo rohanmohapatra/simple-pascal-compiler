@@ -395,8 +395,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 17
-#define YY_END_OF_BUFFER 18
+#define YY_NUM_RULES 18
+#define YY_END_OF_BUFFER 19
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -406,15 +406,15 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[84] =
     {   0,
-        0,    0,   18,   16,   10,   15,   16,   14,   13,   15,
-       13,   16,   13,   12,   12,   12,   12,   12,   12,   12,
-       12,   12,   12,   12,   12,   16,   10,   13,   12,   12,
-       12,   12,   12,   12,    1,   12,   12,   12,   12,   12,
-       12,   12,   12,   12,   12,   12,   12,    8,   12,   12,
-       12,   12,   12,   12,    4,   12,   12,   12,   12,   12,
-       12,   12,   11,   12,    5,    6,   12,    7,   12,   12,
-        9,   12,   12,   12,    2,   12,   12,   12,   12,   12,
-        3,   12,    0
+        0,    0,   19,   17,   11,   16,   17,   15,   14,   16,
+       14,   10,   14,   13,   13,   13,   13,   13,   13,   13,
+       13,   13,   13,   13,   13,   17,   11,   14,   13,   13,
+       13,   13,   13,   13,    1,   13,   13,   13,   13,   13,
+       13,   13,   13,   13,   13,   13,   13,    8,   13,   13,
+       13,   13,   13,   13,    4,   13,   13,   13,   13,   13,
+       13,   13,   12,   13,    5,    6,   13,    7,   13,   13,
+        9,   13,   13,   13,    2,   13,   13,   13,   13,   13,
+        3,   13,    0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -524,9 +524,9 @@ static yyconst flex_int16_t yy_chk[147] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static yyconst flex_int32_t yy_rule_can_match_eol[18] =
+static yyconst flex_int32_t yy_rule_can_match_eol[19] =
     {   0,
-0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,     };
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -547,8 +547,12 @@ char *yytext;
 	#include <stdio.h>
 	#include <string.h>
 	#include "parser.tab.h"
-	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
-#line 552 "lexer.c"
+	int yyerror();
+	int yycolumn;
+	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
+	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
+    yycolumn += yyleng; 
+#line 556 "lexer.c"
 
 #define INITIAL 0
 
@@ -766,9 +770,9 @@ YY_DECL
 		}
 
 	{
-#line 14 "lexer.lex"
+#line 19 "lexer.lex"
 
-#line 772 "lexer.c"
+#line 776 "lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -837,121 +841,136 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 15 "lexer.lex"
+#line 20 "lexer.lex"
 {	
 	return T_IF;
 }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 19 "lexer.lex"
+#line 24 "lexer.lex"
 {
 	return T_WHILE;
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 23 "lexer.lex"
+#line 28 "lexer.lex"
 {
 	return T_PROGRAM;
 }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 27 "lexer.lex"
+#line 32 "lexer.lex"
 {
 	return T_VAR;
 }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 31 "lexer.lex"
+#line 36 "lexer.lex"
 {
 	return T_TYPE;
 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 35 "lexer.lex"
+#line 40 "lexer.lex"
 {
 	return T_USES;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 39 "lexer.lex"
+#line 44 "lexer.lex"
 {
 	return T_BEGIN;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 43 "lexer.lex"
+#line 48 "lexer.lex"
 {
 	return T_END;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "lexer.lex"
+#line 52 "lexer.lex"
 {
 	return T_CONST;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 51 "lexer.lex"
-{}
+#line 56 "lexer.lex"
+{
+				return T_ASOP;
+}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 53 "lexer.lex"
+#line 60 "lexer.lex"
+{}
+	YY_BREAK
+case 12:
+YY_RULE_SETUP
+#line 62 "lexer.lex"
 {
 	yylval.type = strdup(yytext);
 	return T_DATATYPE;
 }
 	YY_BREAK
-case 12:
+case 13:
 YY_RULE_SETUP
-#line 58 "lexer.lex"
+#line 67 "lexer.lex"
 {
-	yylval.str=strdup(yytext);
+	if(yyleng > 31) {
+		printf("Warning : Identifier Length Greater 31 characters, Truncating Identifier.\n");
+	}
+	char temp[32];
+	strncpy(temp,yytext,31);
+	yylval.str = strdup(temp);
 	return T_IDENTIFIER;
 }
 	YY_BREAK
-case 13:
+case 14:
 YY_RULE_SETUP
-#line 63 "lexer.lex"
+#line 77 "lexer.lex"
 {
 	ECHO;
 	printf("\nOperator Detected\n");
 }
 	YY_BREAK
-case 14:
+case 15:
 YY_RULE_SETUP
-#line 68 "lexer.lex"
+#line 82 "lexer.lex"
 {
 	ECHO;
 	printf("\nParenthesis Detected\n");
 }
 	YY_BREAK
-case 15:
-/* rule 15 can match eol */
-YY_RULE_SETUP
-#line 74 "lexer.lex"
-{ return yytext[0];}
-	YY_BREAK
 case 16:
+/* rule 16 can match eol */
 YY_RULE_SETUP
-#line 75 "lexer.lex"
-{}
+#line 88 "lexer.lex"
+{ 
+	yycolumn = 1;
+	return yytext[0];
+}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 77 "lexer.lex"
+#line 92 "lexer.lex"
+{}
+	YY_BREAK
+case 18:
+YY_RULE_SETUP
+#line 94 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 955 "lexer.c"
+#line 974 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1964,7 +1983,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 77 "lexer.lex"
+#line 94 "lexer.lex"
 
 
 

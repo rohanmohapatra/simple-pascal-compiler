@@ -2,7 +2,11 @@
 	#include <stdio.h>
 	#include <string.h>
 	#include "parser.tab.h"
-	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;
+	int yyerror();
+	int yycolumn;
+	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
+	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
+    yycolumn += yyleng; 
 %}
 %option yylineno
 
@@ -10,6 +14,7 @@ DATATYPES integer|character|real|boolean|string
 IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
 WHITESPACE [ \t]+
 OPERATORS &&|<|<=|>|>=|<>|==|\+|\*|-|\/|\|\|
+ASSIGNMENTOPERATOR =
 PARENTHESIS \(|\)
 %%
 if {	
@@ -48,6 +53,10 @@ const {
 	return T_CONST;
 }
 
+{ASSIGNMENTOPERATOR} {
+				return T_ASOP;
+}
+
 {WHITESPACE} {}
 
 {DATATYPES}	{
@@ -56,7 +65,12 @@ const {
 }
 
 {IDENTIFIER} {
-	yylval.str=strdup(yytext);
+	if(yyleng > 31) {
+		printf("Warning : Identifier Length Greater 31 characters, Truncating Identifier.\n");
+	}
+	char temp[32];
+	strncpy(temp,yytext,31);
+	yylval.str = strdup(temp);
 	return T_IDENTIFIER;
 }
 
@@ -71,7 +85,10 @@ const {
 }
 
 
-"\n"|","|";" { return yytext[0];}
+"\n"|","|";" { 
+	yycolumn = 1;
+	return yytext[0];
+}
 .  {}
 
 %%

@@ -54,8 +54,9 @@ extern int yydebug;
     T_BEGIN = 264,
     T_END = 265,
     T_CONST = 266,
-    T_IDENTIFIER = 267,
-    T_DATATYPE = 268
+    T_ASOP = 267,
+    T_IDENTIFIER = 268,
+    T_DATATYPE = 269
   };
 #endif
 /* Tokens.  */
@@ -68,20 +69,21 @@ extern int yydebug;
 #define T_BEGIN 264
 #define T_END 265
 #define T_CONST 266
-#define T_IDENTIFIER 267
-#define T_DATATYPE 268
+#define T_ASOP 267
+#define T_IDENTIFIER 268
+#define T_DATATYPE 269
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 8 "parser.y" /* yacc.c:1909  */
+#line 16 "parser.y" /* yacc.c:1909  */
 
 	char *str;
 	char *type;
 
-#line 85 "parser.tab.h" /* yacc.c:1909  */
+#line 87 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
