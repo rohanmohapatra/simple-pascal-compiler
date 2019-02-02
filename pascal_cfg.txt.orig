@@ -1,6 +1,16 @@
+<<<<<<< HEAD
 <program> -> <program_heading> <block> .
 
 <program_heading> -> program <identifier>
+=======
+S -> prog_header_block.newlineOrNo.decl_block.newlineOrNo.exec_block
+
+newlineOrNo -> <new line> | EPSILON
+
+prog_header_block ->  pgm_sub_block.newlineOrNo.uses_sub_block
+pgm_sub_block -> "program ".id.";"
+uses_sub_block -> EPSILON | "uses ".id."," | "uses ".id.";".newlineOrNo
+>>>>>>> master
 
 <block> ->  <uses_block><constant_block>
             <type_block><variable_block>
