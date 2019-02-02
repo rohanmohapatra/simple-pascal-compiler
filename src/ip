@@ -1,0 +1,2 @@
+program hello;
+uses crt,hello, pokemon;

@@ -1,8 +1,10 @@
-S -> prog_header_block.<new line>.decl_block.<new line>.exec_block
+S -> prog_header_block.newlineOrNo.decl_block.newlineOrNo.exec_block
 
-prog_header_block ->  pgm_sub_block.<new line>.uses_sub_block
+newlineOrNo -> <new line> | EPSILON
+
+prog_header_block ->  pgm_sub_block.newlineOrNo.uses_sub_block
 pgm_sub_block -> "program ".id.";"
-uses_sub_block -> EPSILON | "uses ".id.";".<new line>.uses_block
+uses_sub_block -> EPSILON | "uses ".id."," | "uses ".id.";".newlineOrNo
 
 decl_block -> glob_const_sub_block.<new line>.glob_var_sub_block
 glob_const_sub_block -> EPSILON //TO COMPLETE 
