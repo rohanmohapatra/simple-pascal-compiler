@@ -1,39 +1,56 @@
-S -> prog_header_block.<new line>.decl_block.<new line>.exec_block
+<program> -> <program_heading> <block> .
 
-prog_header_block ->  pgm_sub_block.<new line>.uses_sub_block
-pgm_sub_block -> "program ".id.";"
-uses_sub_block -> EPSILON | "uses ".id.";".<new line>.uses_block
+<program_heading> -> program <identifier>
 
-decl_block -> glob_const_sub_block.<new line>.glob_var_sub_block
-glob_const_sub_block -> EPSILON //TO COMPLETE 
-glob_var_sub_block -> EPSILON | "var".<new line>.decl_stmts
-decl_stmts -> decl_stmt.<new line>.decl_stmts | decl_stmt
-decl_stmt -> ids." : ".type.";"
+<block> ->  <uses_block><constant_block>
+            <type_block><variable_block>
+            <execution_block>
+            
+<uses_block> -> uses <identifier> ; | empty 
 
-exec_block -> "begin".<new line>.exec_body.<new line>."end"
-exec_body -> assign_stmts.<new line>.exec_body | if_stmt.<new line>.exec_body | while_stmt.<new line>.exec_body i| | EPSILON
+<constant_block> -> const<newline> <const_definition>
+<const_defnition> -> <identifier> = <constant>
+<constant> ->   integer 
+                | boolean 
+                | string
+                
+                
+<type_block> -> type <newline> <type_definition> | empty 
+<type_definition> -> <identifier>  = <type>
 
-assign_stmts -> assign_stmts.<new line>.assign_stmt | assign_stmt
-assign_stmt -> id." := ".value //VALUE IS LIKE NUMBER OR STRING ETC --PLS CHECK UP
-
-if_stmt -> "if ".cond_stmt." then".<new line>exec_body | "if ".cond_stmt." then".<new line>exec_body."else".<new line>.exec_body
-
-while_stmt -> "while ".cond_stmt." do".<new line>.exec_body 
-
-cond_stmt -> expr | expr.op.expr
-op -> "&&" | "||" | "<" | "<=" | ">=" | ">" | "=" | "==" | "+" | "-" | "*" | "/"expr -> id | value | "(".expr.")" | expr.op.expr
-
-value -> char_value | int_value | real_value | bool_value | str_value
-char_value <- "." // DONT KNOW HOW TO SAY ANY CHARACTER
-int_value <- 		//HAVE TO COMPLETE
-real_value <- 
-bool_value <- 
-str_value <- 
-
-ids -> ids.",".id | id
-
-id -> "a..zA..Z"."a-zA-Z0-9"* //to complete and review
-
-type -> "Character" | "Integer" | "Real" | "Boolean" | "String" //restricting it to this and not including complex stuff like subrange and enums
+<variable_block> -> empty | var <new line> <decl_stmts>
+<decl_stmts> -> <decl_stmt> <new line> <decl_stmts> | <decl_stmt>
+<decl_stmt> -> <identifier> : <type> ;
 
 
+<execution_block> -> begin <newline> <exec_body> <newline> end .
+<exec_body> -> <assignment_stmts> <newline> <exec_body>
+                | <if_statement> <newline> <exec_body>
+                | <while_statement> <newline> <exec_body>
+                | empty
+
+<assignment_stmts> -> <assignment_stmts> <newline> 
+                      <assignment_statement> 
+                     | <assignment_stmt>
+                     
+<assigment_stmt> -> <identifier> : = <value>
+
+
+<if_statement> -> if <cond_stmt> then <newline> <exec_body> 
+                    | if <cond_stmt> then <newline> <exec_body> 
+                      else <newline> <exec_body>
+                      
+
+
+<while_statement> -> while <cond_stmt> do <newline> <exec_body>
+
+
+<cond_stmt> -> <expression> 
+                | <expression> <operator> <expression>
+<operator> -> && | || | < | <= | >= | > | = | == | + | - | * | / 
+                <expression> -> <identifier> | <value>
+                | ( <expression> ) 
+                | <expression> <operator> <expression>
+                
+
+<type> -> character | integer | real | boolean | string
