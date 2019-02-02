@@ -1,5 +1,5 @@
 compiler:	parser.tab.c parser.tab.h lexer.c
-	gcc -o compile parser.tab.c lexer.c
+	gcc -o executable/compiler parser.tab.c lexer.c
 parser.tab.c:	parser.y
 	yacc parser.y -d -b "parser"
 parser.tab.h:	parser.y
