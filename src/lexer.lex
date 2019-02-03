@@ -56,7 +56,7 @@ const {
 }
 
 {ASSIGNMENTOPERATOR} {
-				return T_ASOP;
+	return T_ASOP;
 }
 
 {WHITESPACE} {}
