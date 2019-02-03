@@ -10,7 +10,7 @@
 
     //struct typeDefinitionCell {
     //
-    //};
+    //}	
 %}
 %locations
 %union {
@@ -45,7 +45,7 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block
+	uses_block constant_block type_block variable_block //execution_block
 ;
 
 uses_block:
@@ -69,11 +69,19 @@ type_block:
 ;
 
 type_definition:
-	T_IDENTIFIER more_identfiers T_ASOP T_DATATYPE ';' onlyNewLine type_definition | epsilon
+	T_IDENTIFIER more_identifiers T_ASOP T_DATATYPE ';' onlyNewLine type_definition | epsilon
 ;	
 
-more_identfiers:
-	',' T_IDENTIFIER more_identfiers | epsilon
+variable_block:
+	T_VAR onlyNewLine variable_declaration | epsilon
+;
+
+variable_declaration:
+	T_IDENTIFIER more_identifiers T_ASOP T_DATATYPE ':' onlyNewLine variable_declaration | epsilon
+;
+
+more_identifiers:
+	',' T_IDENTIFIER more_identifiers | epsilon
 ;
 
 newlineOrNo:
