@@ -1,13 +1,8 @@
-{What What}
 program hello;
 uses crt,hello, pokemon;
 const
 PI = 3.1415;
-{ Single Comment }
 type
-{* This is
-Multi
-Comment*}
 hello,testr = integer;
 testtesttesttesttesttesttest,what = real;
 whatis = string;

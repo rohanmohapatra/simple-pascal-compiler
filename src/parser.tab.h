@@ -54,23 +54,28 @@ extern int yydebug;
     T_BEGIN = 264,
     T_END = 265,
     T_CONST = 266,
-    T_BOOL_AND = 267,
-    T_BOOL_OR = 268,
-    T_BOOL_NOT = 269,
-    T_REL_LE = 270,
-    T_REL_GE = 271,
-    T_REL_NE = 272,
-    T_SINGLEEQ = 273,
-    T_BIT_LS = 274,
-    T_BIT_RS = 275,
-    T_ASOP = 276,
-    T_ARRAY = 277,
-    T_IDENTIFIER = 278,
-    T_DATATYPE = 279,
-    T_INTVAL = 280,
-    T_FLOATVAL = 281,
-    T_BOOLVAL = 282,
-    T_STRINGVAL = 283
+    T_WRITELN = 267,
+    T_BOOL_AND = 268,
+    T_BOOL_OR = 269,
+    T_BOOL_NOT = 270,
+    T_REL_LE = 271,
+    T_REL_GE = 272,
+    T_REL_NE = 273,
+    T_SINGLEEQ = 274,
+    T_BIT_LS = 275,
+    T_BIT_RS = 276,
+    T_ASOP = 277,
+    T_AS_PE = 278,
+    T_AS_SE = 279,
+    T_AS_MULE = 280,
+    T_AS_DIVE = 281,
+    T_ARRAY = 282,
+    T_IDENTIFIER = 283,
+    T_DATATYPE = 284,
+    T_INTVAL = 285,
+    T_FLOATVAL = 286,
+    T_BOOLVAL = 287,
+    T_STRINGVAL = 288
   };
 #endif
 /* Tokens.  */
@@ -83,37 +88,42 @@ extern int yydebug;
 #define T_BEGIN 264
 #define T_END 265
 #define T_CONST 266
-#define T_BOOL_AND 267
-#define T_BOOL_OR 268
-#define T_BOOL_NOT 269
-#define T_REL_LE 270
-#define T_REL_GE 271
-#define T_REL_NE 272
-#define T_SINGLEEQ 273
-#define T_BIT_LS 274
-#define T_BIT_RS 275
-#define T_ASOP 276
-#define T_ARRAY 277
-#define T_IDENTIFIER 278
-#define T_DATATYPE 279
-#define T_INTVAL 280
-#define T_FLOATVAL 281
-#define T_BOOLVAL 282
-#define T_STRINGVAL 283
+#define T_WRITELN 267
+#define T_BOOL_AND 268
+#define T_BOOL_OR 269
+#define T_BOOL_NOT 270
+#define T_REL_LE 271
+#define T_REL_GE 272
+#define T_REL_NE 273
+#define T_SINGLEEQ 274
+#define T_BIT_LS 275
+#define T_BIT_RS 276
+#define T_ASOP 277
+#define T_AS_PE 278
+#define T_AS_SE 279
+#define T_AS_MULE 280
+#define T_AS_DIVE 281
+#define T_ARRAY 282
+#define T_IDENTIFIER 283
+#define T_DATATYPE 284
+#define T_INTVAL 285
+#define T_FLOATVAL 286
+#define T_BOOLVAL 287
+#define T_STRINGVAL 288
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 16 "parser.y" /* yacc.c:1909  */
+#line 18 "parser.y" /* yacc.c:1909  */
 
 	char *str;
 	char *type;
 	int intval;
 	float floatval;
 
-#line 117 "parser.tab.h" /* yacc.c:1909  */
+#line 127 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

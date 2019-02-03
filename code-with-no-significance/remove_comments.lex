@@ -30,6 +30,3 @@ MULTILINECOMMENTEND "*|"
 <IN_SINGLELINE_COMMENT>.    ;
 
 %%
-void main() {
-    yylex();
-}
