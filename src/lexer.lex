@@ -6,7 +6,17 @@
 	int yycolumn;
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
 	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
-    yycolumn += yyleng; 
+    yycolumn += yyleng;
+
+	struct var_info {
+		char *var_name;
+		YYLTYPE var_decl_loc;
+		struct YYLTYPE var_used_locs[10];
+		int no_used;
+		char *type;
+		int scope_level;
+	};
+
 %}
 %option yylineno
 
@@ -19,7 +29,7 @@ PARENTHESIS \(|\)
 INTVAL [0-9]+
 FLOATVAL [0-9]+\.[0-9]+
 %%
-if {	
+if {
 	return T_IF;
 }
 
@@ -28,6 +38,7 @@ while {
 }
 
 program {
+	printf("%d\n", yylineno);
 	return T_PROGRAM;
 }
 
@@ -62,7 +73,6 @@ const {
 {WHITESPACE} {}
 
 {DATATYPES}	{
-	yylval.type = strdup(yytext);
 	return T_DATATYPE;
 }
 
