@@ -16,6 +16,8 @@
 %union {
 	char *str;
 	char *type;
+	int intval;
+	float floatval;
 }
 %start startPascal
 %token T_USES 
@@ -30,10 +32,12 @@
 %token T_ASOP
 %token <str> T_IDENTIFIER
 %token <type> T_DATATYPE
+%token <intval> T_INTVAL
+%token <floatval> T_FLOATVAL
 
 %%
 startPascal:
-	program
+	newlineOrNo program
 ;
 
 program:
@@ -49,11 +53,11 @@ block:
 ;
 
 uses_block:
-	T_USES T_IDENTIFIER ',' more_libs | T_USES T_IDENTIFIER ';' newlineOrNo | epsilon
+	T_USES T_IDENTIFIER more_libs ';' newlineOrNo | epsilon
 ;
 
 more_libs:
-	T_IDENTIFIER ',' more_libs | T_IDENTIFIER ';' newlineOrNo
+	',' T_IDENTIFIER more_libs | epsilon
 ;
 
 constant_block:
@@ -61,7 +65,11 @@ constant_block:
 ;
 
 const_definition:
-	';' newlineOrNo | epsilon
+	T_IDENTIFIER T_ASOP some_numeric_type ';' newlineOrNo more_const_definition
+;
+
+more_const_definition:
+	T_IDENTIFIER T_ASOP some_numeric_type ';' newlineOrNo more_const_definition | epsilon
 ;
 
 type_block:
@@ -69,11 +77,11 @@ type_block:
 ;
 
 type_definition:
-	T_IDENTIFIER more_identfiers T_ASOP T_DATATYPE ';' onlyNewLine type_definition | epsilon
+	T_IDENTIFIER more_identifiers T_ASOP T_DATATYPE ';' onlyNewLine type_definition | epsilon
 ;	
 
-more_identfiers:
-	',' T_IDENTIFIER more_identfiers | epsilon
+more_identifiers:
+	',' T_IDENTIFIER more_identifiers | epsilon
 ;
 
 newlineOrNo:
@@ -82,6 +90,10 @@ newlineOrNo:
 
 onlyNewLine:
 	'\n'
+;
+
+some_numeric_type:
+	T_INTVAL | T_FLOATVAL
 ;
 
 epsilon:
