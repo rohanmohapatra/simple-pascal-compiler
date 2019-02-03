@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
-	#include "y.tab.h"
+	#include "parser.tab.h"
 	int yyerror();
 	int yycolumn;
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
@@ -56,7 +56,7 @@ const {
 }
 
 {ASSIGNMENTOPERATOR} {
-				return T_ASOP;
+	return T_ASOP;
 }
 
 {WHITESPACE} {}
