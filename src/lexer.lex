@@ -23,12 +23,44 @@
 DATATYPES integer|character|real|boolean|string
 IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
 WHITESPACE [ \t]+
-OPERATORS &&|<|<=|>|>=|<>|==|\+|\*|-|\/|\|\|
-ASSIGNMENTOPERATOR =
+PUNCTUATION ;|,
+SINGLE_CHAR_OPERATORS <|>|\+|\*|-|\/|\&|\||\~|\!
+MODULO %|mod
+MULTI_CHAR_OPERATORS and|or|not|<=|>=|<>|>>|<<|:=
 PARENTHESIS \(|\)
+SINGLE_EQ =
 INTVAL [0-9]+
 FLOATVAL [0-9]+\.[0-9]+
+BOOLVAL true|false
+STRINGVAL \".*\"
 %%
+{INTVAL} {
+	yylval.intval = atoi(yytext);
+	return T_INTVAL;
+}
+
+{FLOATVAL} {
+	yylval.floatval = atof(yytext);
+	return T_FLOATVAL;
+}
+
+{BOOLVAL} {
+	if(strcmp(yytext,"true")==0) {
+		yylval.intval=1;
+	}
+	else {
+		yylval.intval=0;
+	}
+	return T_BOOLVAL;
+}
+
+{STRINGVAL} {
+	char temp[yyleng-2];
+	//skip starting and ending quote and copy only string content
+	strncpy(temp,yytext+1,yyleng-2);
+	yylval.str=strdup(temp);
+	return T_STRINGVAL;	
+}
 if {
 	return T_IF;
 }
@@ -66,9 +98,10 @@ const {
 	return T_CONST;
 }
 
-{ASSIGNMENTOPERATOR} {
-	return T_ASOP;
+array {
+	return T_ARRAY;	
 }
+
 
 {WHITESPACE} {}
 
@@ -86,27 +119,57 @@ const {
 	return T_IDENTIFIER;
 }
 
-{OPERATORS}	{
-	ECHO;
-	printf("\nOperator Detected\n");
+{SINGLE_CHAR_OPERATORS}	{
+	return yytext[0];
+}
+
+{MODULO} {
+	return '%';
+}
+
+{SINGLE_EQ} {
+	return T_SINGLEEQ;
+}
+
+{MULTI_CHAR_OPERATORS} {
+	if(strcmp(yytext,"and")==0) {
+		return T_BOOL_AND;
+	}
+	else if(strcmp(yytext,"or")==0) {
+		return T_BOOL_OR;
+	}
+	else if(strcmp(yytext,"not")==0) {
+		return T_BOOL_NOT;
+	}
+	else if(strcmp(yytext,"<=")==0) {
+		return T_REL_LE;
+	}
+	else if(strcmp(yytext,">=")==0) {
+		return T_REL_GE;
+	}
+	else if(strcmp(yytext,"<>")==0) {
+		return T_REL_NE;
+	}
+	else if(strcmp(yytext,">>")==0) {
+		return T_BIT_RS;
+	}
+	else if(strcmp(yytext,"<<")==0) {
+		return T_BIT_LS;
+	}
+	else if(strcmp(yytext,":=")==0) {
+		return T_ASOP;
+	}
 }
 
 {PARENTHESIS} {
-	ECHO;
-	printf("\nParenthesis Detected\n");
+	return yytext[0];
 }
 
-{INTVAL} {
-	yylval.intval = atoi(yytext);
-	return T_INTVAL;
+{PUNCTUATION} {
+	return yytext[0];
 }
 
-{FLOATVAL} {
-	yylval.floatval = atof(yytext);
-	return T_FLOATVAL;
-}
-
-"\n"|","|";" { 
+"\n" { 
 	yycolumn = 1;
 	return yytext[0];
 }
@@ -114,7 +177,6 @@ const {
 
 %%
 
-int yywrap()
-{
+int yywrap() {
 	return 1;
 }

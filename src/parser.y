@@ -19,7 +19,9 @@
 	int intval;
 	float floatval;
 }
+
 %start startPascal
+
 %token T_USES 
 %token T_WHILE
 %token T_PROGRAM
@@ -29,11 +31,29 @@
 %token T_BEGIN
 %token T_END
 %token T_CONST
+
+%token T_BOOL_AND
+%token T_BOOL_OR
+%token T_BOOL_NOT
+
+%token T_REL_LE
+%token T_REL_GE
+%token T_REL_NE
+%token T_SINGLEEQ
+
+%token T_BIT_LS
+%token T_BIT_RS
+
 %token T_ASOP
+
+%token T_ARRAY
 %token <str> T_IDENTIFIER
 %token <type> T_DATATYPE
+
 %token <intval> T_INTVAL
 %token <floatval> T_FLOATVAL
+%token <intval> T_BOOLVAL
+%token <str> T_STRINGVAL
 
 %%
 startPascal:
@@ -65,11 +85,11 @@ constant_block:
 ;
 
 const_definition:
-	T_IDENTIFIER T_ASOP some_numeric_type ';' newlineOrNo more_const_definition
+	T_IDENTIFIER T_SINGLEEQ some_numeric_type ';' newlineOrNo more_const_definition
 ;
 
 more_const_definition:
-	T_IDENTIFIER T_ASOP some_numeric_type ';' newlineOrNo more_const_definition | epsilon
+	T_IDENTIFIER T_SINGLEEQ some_numeric_type ';' newlineOrNo more_const_definition | epsilon
 ;
 
 type_block:
@@ -77,7 +97,7 @@ type_block:
 ;
 
 type_definition:
-	T_IDENTIFIER more_identifiers T_ASOP T_DATATYPE ';' onlyNewLine type_definition | epsilon
+	T_IDENTIFIER more_identifiers T_SINGLEEQ T_DATATYPE ';' onlyNewLine type_definition | epsilon
 ;	
 
 variable_block:
@@ -99,6 +119,25 @@ newlineOrNo:
 onlyNewLine:
 	'\n'
 ;
+
+operator:
+	arithmetic_ops|relational_ops|boolean_ops|bitwise_ops
+;
+
+arithmetic_ops:
+	'+'|'*'|'/'|'-'|'%'
+;
+
+relational_ops:
+	T_SINGLEEQ|'>'|'<'|T_REL_LE|T_REL_GE|T_REL_NE
+;
+
+boolean_ops:
+	T_BOOL_AND|T_BOOL_OR|T_BOOL_NOT
+;
+
+bitwise_ops:
+	'&'|'|'|'~'|'!'|T_BIT_LS|T_BIT_RS
 
 some_numeric_type:
 	T_INTVAL | T_FLOATVAL
