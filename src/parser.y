@@ -211,7 +211,7 @@ int main(int argc,char* argv[]) {
 	}
 
 	char extension[8] = ".output";
-	char outputfile[20] = "output/";
+	char outputfile[30] = "output/";
 
 	/*To Create Output File*/
 	char *ptr = strtok(argv[1], "/");

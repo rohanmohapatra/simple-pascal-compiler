@@ -1,4 +1,3 @@
-{What What}
 program hello;
 uses crt,hello, pokemon;
 const
