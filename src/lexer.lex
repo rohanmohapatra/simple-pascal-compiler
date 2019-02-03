@@ -26,6 +26,8 @@ WHITESPACE [ \t]+
 OPERATORS &&|<|<=|>|>=|<>|==|\+|\*|-|\/|\|\|
 ASSIGNMENTOPERATOR =
 PARENTHESIS \(|\)
+INTVAL [0-9]+
+FLOATVAL [0-9]+\.[0-9]+
 %%
 if {
 	return T_IF;
@@ -94,6 +96,15 @@ const {
 	printf("\nParenthesis Detected\n");
 }
 
+{INTVAL} {
+	yylval.intval = atoi(yytext);
+	return T_INTVAL;
+}
+
+{FLOATVAL} {
+	yylval.floatval = atof(yytext);
+	return T_FLOATVAL;
+}
 
 "\n"|","|";" { 
 	yycolumn = 1;
