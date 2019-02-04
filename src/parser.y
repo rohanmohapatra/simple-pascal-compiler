@@ -40,7 +40,6 @@
 %token T_REL_GE
 %token T_REL_NE
 %token T_SINGLEEQ
-
 %token T_BIT_LS
 %token T_BIT_RS
 
@@ -93,7 +92,7 @@ more_const_definition:
 ;
 
 type_block:
-	T_TYPE newlineOrNo type_definition | epsilon
+	T_TYPE onlyNewLine type_definition | epsilon
 ;
 
 type_definition:
@@ -105,7 +104,7 @@ variable_block:
 ;
 
 variable_declaration:
-	T_IDENTIFIER more_identifiers T_ASOP T_DATATYPE ':' onlyNewLine variable_declaration | epsilon
+	T_IDENTIFIER more_identifiers ':' T_DATATYPE ';' onlyNewLine variable_declaration | epsilon
 ;
 
 more_identifiers:

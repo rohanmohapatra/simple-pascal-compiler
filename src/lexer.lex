@@ -11,8 +11,8 @@
 	struct var_info {
 		char *var_name;
 		YYLTYPE var_decl_loc;
-		struct YYLTYPE var_used_locs[10];
-		int no_used;
+		// struct YYLTYPE var_used_locs[10];
+		// int no_used;
 		char *type;
 		int scope_level;
 	};
@@ -23,7 +23,7 @@
 DATATYPES integer|character|real|boolean|string
 IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
 WHITESPACE [ \t]+
-PUNCTUATION ;|,
+PUNCTUATION ;|,|:
 SINGLE_CHAR_OPERATORS <|>|\+|\*|-|\/|\&|\||\~|\!
 MODULO %|mod
 MULTI_CHAR_OPERATORS and|or|not|<=|>=|<>|>>|<<|:=
@@ -70,7 +70,6 @@ while {
 }
 
 program {
-	printf("%d\n", yylineno);
 	return T_PROGRAM;
 }
 

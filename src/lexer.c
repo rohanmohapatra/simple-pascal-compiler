@@ -407,7 +407,7 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[111] =
     {   0,
         0,    0,   27,   25,   15,   24,   18,   25,   19,   22,
-       23,    1,   25,   18,   20,   18,   17,   17,   17,   17,
+       23,    1,   23,   18,   20,   18,   17,   17,   17,   17,
        17,   17,   17,   17,   17,   17,   17,   17,   17,   17,
        17,   17,   17,   15,    0,    4,    0,    1,   21,   17,
        17,   17,   17,   17,   17,   17,   17,   17,    5,   17,
@@ -577,8 +577,8 @@ char *yytext;
 	struct var_info {
 		char *var_name;
 		YYLTYPE var_decl_loc;
-		struct YYLTYPE var_used_locs[10];
-		int no_used;
+		// struct YYLTYPE var_used_locs[10];
+		// int no_used;
 		char *type;
 		int scope_level;
 	};
@@ -928,74 +928,73 @@ case 7:
 YY_RULE_SETUP
 #line 72 "lexer.lex"
 {
-	printf("%d\n", yylineno);
 	return T_PROGRAM;
 }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 77 "lexer.lex"
+#line 76 "lexer.lex"
 {
 	return T_VAR;
 }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 81 "lexer.lex"
+#line 80 "lexer.lex"
 {
 	return T_TYPE;
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 85 "lexer.lex"
+#line 84 "lexer.lex"
 {
 	return T_USES;
 }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 89 "lexer.lex"
+#line 88 "lexer.lex"
 {
 	return T_BEGIN;
 }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 93 "lexer.lex"
+#line 92 "lexer.lex"
 {
 	return T_END;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 97 "lexer.lex"
+#line 96 "lexer.lex"
 {
 	return T_CONST;
 }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 101 "lexer.lex"
+#line 100 "lexer.lex"
 {
 	return T_ARRAY;	
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 106 "lexer.lex"
+#line 105 "lexer.lex"
 {}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 108 "lexer.lex"
+#line 107 "lexer.lex"
 {
 	return T_DATATYPE;
 }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 112 "lexer.lex"
+#line 111 "lexer.lex"
 {
 	if(yyleng > 31) {
 		printf("Warning : Identifier Length Greater 31 characters, Truncating Identifier.\n");
@@ -1008,28 +1007,28 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 122 "lexer.lex"
+#line 121 "lexer.lex"
 {
 	return yytext[0];
 }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 126 "lexer.lex"
+#line 125 "lexer.lex"
 {
 	return '%';
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 130 "lexer.lex"
+#line 129 "lexer.lex"
 {
 	return T_SINGLEEQ;
 }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 134 "lexer.lex"
+#line 133 "lexer.lex"
 {
 	if(strcmp(yytext,"and")==0) {
 		return T_BOOL_AND;
@@ -1062,14 +1061,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 164 "lexer.lex"
+#line 163 "lexer.lex"
 {
 	return yytext[0];
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 168 "lexer.lex"
+#line 167 "lexer.lex"
 {
 	return yytext[0];
 }
@@ -1077,7 +1076,7 @@ YY_RULE_SETUP
 case 24:
 /* rule 24 can match eol */
 YY_RULE_SETUP
-#line 172 "lexer.lex"
+#line 171 "lexer.lex"
 { 
 	yycolumn = 1;
 	return yytext[0];
@@ -1085,15 +1084,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 176 "lexer.lex"
+#line 175 "lexer.lex"
 {}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 178 "lexer.lex"
+#line 177 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 1097 "lexer.c"
+#line 1096 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2106,7 +2105,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 178 "lexer.lex"
+#line 177 "lexer.lex"
 
 
 
