@@ -2,6 +2,7 @@
 	#include<stdio.h>
 	#include <time.h> //link with -lrt
 	#include <string.h>
+	#include <uthash.h>
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
 	int successful=1;
@@ -12,7 +13,27 @@
     int yylex(void);
     //struct typeDefinitionCell {
     //
-    //}	
+    //}
+	char *var_name_stack[10];
+	int var_name_stack_top = -1;
+	
+	// struct var_info {
+	// 	char var_name[31];
+	// 	// YYLTYPE var_decl_loc;
+	// 	char type[10];
+	// 	int scope_level;
+	// };
+
+	struct symbol_table {
+		char var_name[31];
+		// struct var_info var;
+		// YYLTYPE var_decl_loc;
+		char type[10];
+		int scope_level;
+		UT_hash_handle hh;
+	};
+
+	struct symbol_table *SYMBOL_TABLE = NULL;
 %}
 %locations
 %union {
@@ -71,7 +92,7 @@ program:
 ;
 
 prog_heading:
-	T_PROGRAM T_IDENTIFIER ';' newlineOrNo 
+	T_PROGRAM T_IDENTIFIER ';' newlineOrNo
 ;
 
 block:
@@ -103,7 +124,7 @@ type_block:
 ;
 
 type_definition:
-	T_IDENTIFIER more_identifiers T_SINGLEEQ T_DATATYPE ';' onlyNewLine type_definition | epsilon
+	T_IDENTIFIER more_type_identifiers T_SINGLEEQ T_DATATYPE ';' onlyNewLine type_definition | epsilon
 ;	
 
 variable_block:
@@ -111,12 +132,57 @@ variable_block:
 ;
 
 variable_declaration:
-	T_IDENTIFIER more_identifiers ':' T_DATATYPE ';' onlyNewLine variable_declaration | epsilon
+	T_IDENTIFIER 
+	{
+		var_name_stack_top++;
+		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+		printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
+		printf("top of stack: %d\n", var_name_stack_top);
+	}
+	more_var_identifiers ':' T_DATATYPE
+	{
+		printf("Hit the type part of line %s\n", yylval.type);
+		for(int i = 0; i <= var_name_stack_top; i++)
+		{
+			struct symbol_table *s = NULL;
+			HASH_FIND_STR(SYMBOL_TABLE, var_name_stack[i], s);
+			if(!s)
+			{
+				printf("Inserting variable %s in symbol table\n", var_name_stack[i]);
+				s = malloc(sizeof(struct symbol_table));
+				// s->var_name = strdup(var_name_stack[i]);
+				strcpy(s->var_name, var_name_stack[i]);
+				strcpy(s->type, yylval.type);
+				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+			}
+			else
+			{
+				printf("Variable already declared with %s type\n", s->type);
+			}
+			var_name_stack[i] = NULL;
+		}
+		var_name_stack_top = -1;
+
+	}
+	';' onlyNewLine variable_declaration
+	| epsilon
 ;
 
-more_identifiers:
-	',' T_IDENTIFIER more_identifiers | epsilon
+more_type_identifiers:
+	',' T_IDENTIFIER more_type_identifiers | epsilon
 ;
+
+more_var_identifiers:
+	',' T_IDENTIFIER
+	{
+		var_name_stack_top++;
+		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+		printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
+		printf("top of stack: %d\n", var_name_stack_top);
+	}
+	more_var_identifiers | epsilon
+;
+
 
 execution_block:
 	T_BEGIN onlyNewLine execution_body newlineOrNo T_END '.'
