@@ -12,7 +12,8 @@ testtesttesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
 var
-a,b,c:string;
+a,b,c, a:string;
+one,two,three, a:boolean;
 begin
 	a:=10;
 	b+=20;
