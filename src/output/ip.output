@@ -1,5 +1,5 @@
 program hello;
-uses crt;
+uses crt,hello, pokemon;
 const
 PI = 3.1415;
 type
