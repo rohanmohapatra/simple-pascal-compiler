@@ -587,6 +587,7 @@ char *yytext;
 	#include <stdio.h>
 	#include <string.h>
 	#include "parser.tab.h"
+	#include "../uthash/src/uthash.h"
 	int yyerror();
 	int yycolumn;
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
@@ -603,7 +604,7 @@ char *yytext;
 
 
 
-#line 607 "lexer.c"
+#line 608 "lexer.c"
 
 #define INITIAL 0
 #define IN_MULTILINE_COMMENT 1
@@ -823,10 +824,10 @@ YY_DECL
 		}
 
 	{
-#line 39 "lexer.lex"
+#line 40 "lexer.lex"
 
 
-#line 830 "lexer.c"
+#line 831 "lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -895,50 +896,50 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 41 "lexer.lex"
+#line 42 "lexer.lex"
 {BEGIN(IN_MULTILINE_COMMENT);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 43 "lexer.lex"
+#line 44 "lexer.lex"
 {BEGIN(IN_SINGLELINE_COMMENT);}
 	YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 45 "lexer.lex"
+#line 46 "lexer.lex"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 47 "lexer.lex"
+#line 48 "lexer.lex"
 ;// eat comment in chunks
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 49 "lexer.lex"
+#line 50 "lexer.lex"
 ;// eat the lone star
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 51 "lexer.lex"
+#line 52 "lexer.lex"
 ;
 	YY_BREAK
 case 7:
 /* rule 7 can match eol */
 YY_RULE_SETUP
-#line 53 "lexer.lex"
+#line 54 "lexer.lex"
 {BEGIN(INITIAL);}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 55 "lexer.lex"
+#line 56 "lexer.lex"
 ;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 59 "lexer.lex"
+#line 60 "lexer.lex"
 {
 	yylval.intval = atoi(yytext);
 	ECHO;
@@ -947,7 +948,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 65 "lexer.lex"
+#line 66 "lexer.lex"
 {
 	yylval.floatval = atof(yytext);
 	ECHO;
@@ -956,7 +957,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 71 "lexer.lex"
+#line 72 "lexer.lex"
 {
 	if(strcmp(yytext,"true")==0) {
 		yylval.intval=1;
@@ -970,7 +971,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 82 "lexer.lex"
+#line 83 "lexer.lex"
 {
 	char temp[yyleng-2];
 	//skip starting and ending quote and copy only string content
@@ -982,7 +983,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 90 "lexer.lex"
+#line 91 "lexer.lex"
 {
 	ECHO;
  return T_IF;
@@ -990,7 +991,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 95 "lexer.lex"
+#line 96 "lexer.lex"
 {
 	ECHO;
  return T_WHILE;
@@ -998,7 +999,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 100 "lexer.lex"
+#line 101 "lexer.lex"
 {
 	ECHO;
  return T_PROGRAM;
@@ -1006,7 +1007,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 105 "lexer.lex"
+#line 106 "lexer.lex"
 {
 	ECHO;
  return T_VAR;
@@ -1014,7 +1015,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 110 "lexer.lex"
+#line 111 "lexer.lex"
 {
 	ECHO;
  return T_TYPE;
@@ -1022,7 +1023,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 115 "lexer.lex"
+#line 116 "lexer.lex"
 {
 	ECHO;
  return T_USES;
@@ -1030,7 +1031,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 120 "lexer.lex"
+#line 121 "lexer.lex"
 {
 	ECHO;
  return T_BEGIN;
@@ -1038,7 +1039,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 125 "lexer.lex"
+#line 126 "lexer.lex"
 {
 	ECHO;
  return T_END;
@@ -1046,7 +1047,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 130 "lexer.lex"
+#line 131 "lexer.lex"
 {
 	ECHO;
  return T_CONST;
@@ -1054,7 +1055,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 135 "lexer.lex"
+#line 136 "lexer.lex"
 {
 	ECHO;
  return T_ARRAY;	
@@ -1062,7 +1063,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 140 "lexer.lex"
+#line 141 "lexer.lex"
 {
 	ECHO;
 	return T_WRITELN;
@@ -1070,22 +1071,23 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 146 "lexer.lex"
+#line 147 "lexer.lex"
 {ECHO;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 148 "lexer.lex"
+#line 149 "lexer.lex"
 {
+	yylval.type = strdup(yytext);
 	ECHO;
  return T_DATATYPE;
 }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 153 "lexer.lex"
+#line 155 "lexer.lex"
 {
-	if(yyleng > 31) {
+	if(yyleng >= 31) {
 		printf("Warning : Identifier Length Greater 31 characters, Truncating Identifier.\n");
 	}
 	char temp[32];
@@ -1097,7 +1099,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 164 "lexer.lex"
+#line 166 "lexer.lex"
 {
 	ECHO;
  return yytext[0];
@@ -1105,7 +1107,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 169 "lexer.lex"
+#line 171 "lexer.lex"
 {
 	ECHO;
  return '%';
@@ -1113,7 +1115,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 174 "lexer.lex"
+#line 176 "lexer.lex"
 {
 	ECHO;
  return T_SINGLEEQ;
@@ -1121,7 +1123,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 179 "lexer.lex"
+#line 181 "lexer.lex"
 {
 	if(strcmp(yytext,"and")==0) {
 		ECHO;
@@ -1179,7 +1181,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 234 "lexer.lex"
+#line 236 "lexer.lex"
 {
 	ECHO;
  return yytext[0];
@@ -1187,7 +1189,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 239 "lexer.lex"
+#line 241 "lexer.lex"
 {
 	ECHO;
  return yytext[0];
@@ -1196,7 +1198,7 @@ YY_RULE_SETUP
 case 33:
 /* rule 33 can match eol */
 YY_RULE_SETUP
-#line 244 "lexer.lex"
+#line 246 "lexer.lex"
 { 
 	yycolumn = 1;
 	ECHO;
@@ -1205,15 +1207,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 250 "lexer.lex"
+#line 252 "lexer.lex"
 {}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 252 "lexer.lex"
+#line 254 "lexer.lex"
 ECHO;
 	YY_BREAK
-#line 1217 "lexer.c"
+#line 1219 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(IN_MULTILINE_COMMENT):
 case YY_STATE_EOF(IN_SINGLELINE_COMMENT):
@@ -2228,7 +2230,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 252 "lexer.lex"
+#line 254 "lexer.lex"
 
 
 
