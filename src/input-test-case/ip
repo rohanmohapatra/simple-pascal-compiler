@@ -8,3 +8,5 @@ hello,testr = integer;
 testtesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
+var
+a,b,c:string;
