@@ -64,7 +64,7 @@ program:
 ;
 
 prog_heading:
-	T_PROGRAM T_IDENTIFIER ';' newlineOrNo 
+	T_PROGRAM T_IDENTIFIER ';' newlineOrNo
 ;
 
 block:
@@ -104,7 +104,8 @@ variable_block:
 ;
 
 variable_declaration:
-	T_IDENTIFIER more_identifiers ':' T_DATATYPE ';' onlyNewLine variable_declaration | epsilon
+	T_IDENTIFIER more_identifiers ':' T_DATATYPE ';' onlyNewLine variable_declaration {}
+	| epsilon
 ;
 
 more_identifiers:
