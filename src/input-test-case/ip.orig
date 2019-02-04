@@ -11,11 +11,14 @@ hello,testr = integer;
 testtesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
+<<<<<<< HEAD
 var
 a,b,c:string;
+=======
 begin
-	a:=10;
-	b+=20;
-	c := (a+b);
-	writeln("Printable");
+a:=10;
+b+=20;
+c := (a+b);
+writeln("Printable");
 end.
+>>>>>>> rohan-mohapatra

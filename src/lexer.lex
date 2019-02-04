@@ -8,7 +8,6 @@
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
 	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
     yycolumn += yyleng;
-
 	struct var_info {
 		char var_name[31];
 		YYLTYPE var_decl_loc;
@@ -25,13 +24,17 @@
 %}
 %option yylineno
 
+%x IN_MULTILINE_COMMENT
+%x IN_SINGLELINE_COMMENT
+
+
 DATATYPES integer|character|real|boolean|string
 IDENTIFIER [a-zA-Z][a-zA-Z0-9]*
 WHITESPACE [ \t]+
-PUNCTUATION ;|,|:
+PUNCTUATION ;|,|:|.
 SINGLE_CHAR_OPERATORS <|>|\+|\*|-|\/|\&|\||\~|\!
 MODULO %|mod
-MULTI_CHAR_OPERATORS and|or|not|<=|>=|<>|>>|<<|:=
+MULTI_CHAR_OPERATORS and|or|not|<=|>=|<>|>>|<<|:=|\+=|-=|\*=|\/=
 PARENTHESIS \(|\)
 SINGLE_EQ =
 INTVAL [0-9]+
@@ -39,14 +42,35 @@ FLOATVAL [0-9]+\.[0-9]+
 BOOLVAL true|false
 STRINGVAL \".*\"
 %%
+
+<INITIAL>"{*" {BEGIN(IN_MULTILINE_COMMENT);}
+
+<INITIAL>"{" {BEGIN(IN_SINGLELINE_COMMENT);}
+
+<IN_MULTILINE_COMMENT>"*}\n"      {BEGIN(INITIAL);}
+
+<IN_MULTILINE_COMMENT>[^*\n]+   ;// eat comment in chunks
+
+<IN_MULTILINE_COMMENT>"*"       ;// eat the lone star
+
+<IN_MULTILINE_COMMENT>\n        ;
+
+<IN_SINGLELINE_COMMENT>"}\n"     {BEGIN(INITIAL);}
+
+<IN_SINGLELINE_COMMENT>.   		;
+
+
+
 {INTVAL} {
 	yylval.intval = atoi(yytext);
-	return T_INTVAL;
+	ECHO;
+ return T_INTVAL;
 }
 
 {FLOATVAL} {
 	yylval.floatval = atof(yytext);
-	return T_FLOATVAL;
+	ECHO;
+ return T_FLOATVAL;
 }
 
 {BOOLVAL} {
@@ -56,7 +80,8 @@ STRINGVAL \".*\"
 	else {
 		yylval.intval=0;
 	}
-	return T_BOOLVAL;
+	ECHO;
+ return T_BOOLVAL;
 }
 
 {STRINGVAL} {
@@ -64,53 +89,70 @@ STRINGVAL \".*\"
 	//skip starting and ending quote and copy only string content
 	strncpy(temp,yytext+1,yyleng-2);
 	yylval.str=strdup(temp);
-	return T_STRINGVAL;	
+	ECHO;
+ return T_STRINGVAL;	
 }
 if {
-	return T_IF;
+	ECHO;
+ return T_IF;
 }
 
 while {
-	return T_WHILE;
+	ECHO;
+ return T_WHILE;
 }
 
 program {
-	return T_PROGRAM;
+	ECHO;
+ return T_PROGRAM;
 }
 
 var {
-	return T_VAR;
+	ECHO;
+ return T_VAR;
 }
 
 type {
-	return T_TYPE;
+	ECHO;
+ return T_TYPE;
 }
 
 uses {
-	return T_USES;
+	ECHO;
+ return T_USES;
 }
 
 begin {
-	return T_BEGIN;
+	ECHO;
+ return T_BEGIN;
 }
 
 end {
-	return T_END;
+	ECHO;
+ return T_END;
 }
 
 const {
-	return T_CONST;
+	ECHO;
+ return T_CONST;
 }
 
 array {
-	return T_ARRAY;	
+	ECHO;
+ return T_ARRAY;	
+}
+
+writeln {
+	ECHO;
+	return T_WRITELN;
 }
 
 
-{WHITESPACE} {}
+{WHITESPACE} {ECHO;}
 
 {DATATYPES}	{
-	return T_DATATYPE;
+	ECHO;
+ return T_DATATYPE;
 }
 
 {IDENTIFIER} {
@@ -120,67 +162,99 @@ array {
 	char temp[32];
 	strncpy(temp,yytext,31);
 	yylval.str = strdup(temp);
-	return T_IDENTIFIER;
+	ECHO;
+ return T_IDENTIFIER;
 }
 
 {SINGLE_CHAR_OPERATORS}	{
-	return yytext[0];
+	ECHO;
+ return yytext[0];
 }
 
 {MODULO} {
-	return '%';
+	ECHO;
+ return '%';
 }
 
 {SINGLE_EQ} {
-	return T_SINGLEEQ;
+	ECHO;
+ return T_SINGLEEQ;
 }
 
 {MULTI_CHAR_OPERATORS} {
 	if(strcmp(yytext,"and")==0) {
-		return T_BOOL_AND;
+		ECHO;
+ return T_BOOL_AND;
 	}
 	else if(strcmp(yytext,"or")==0) {
-		return T_BOOL_OR;
+		ECHO;
+ return T_BOOL_OR;
 	}
 	else if(strcmp(yytext,"not")==0) {
-		return T_BOOL_NOT;
+		ECHO;
+ return T_BOOL_NOT;
 	}
 	else if(strcmp(yytext,"<=")==0) {
-		return T_REL_LE;
+		ECHO;
+ return T_REL_LE;
 	}
 	else if(strcmp(yytext,">=")==0) {
-		return T_REL_GE;
+		ECHO;
+ return T_REL_GE;
 	}
 	else if(strcmp(yytext,"<>")==0) {
-		return T_REL_NE;
+		ECHO;
+ return T_REL_NE;
 	}
 	else if(strcmp(yytext,">>")==0) {
-		return T_BIT_RS;
+		ECHO;
+ return T_BIT_RS;
 	}
 	else if(strcmp(yytext,"<<")==0) {
-		return T_BIT_LS;
+		ECHO;
+ return T_BIT_LS;
 	}
 	else if(strcmp(yytext,":=")==0) {
-		return T_ASOP;
+		ECHO;
+ return T_ASOP;
+	}
+	else if(strcmp(yytext,"+=")==0) {
+		ECHO;
+ return T_AS_PE;
+	}
+	else if(strcmp(yytext,"-=")==0) {
+		ECHO;
+ return T_AS_SE;
+	}
+	else if(strcmp(yytext,"*=")==0) {
+		ECHO;
+ return T_AS_MULE; //MultiplyEqual
+	}
+	else if(strcmp(yytext,"/=")==0) {
+		ECHO;
+ return T_AS_DIVE;
 	}
 }
 
 {PARENTHESIS} {
-	return yytext[0];
+	ECHO;
+ return yytext[0];
 }
 
 {PUNCTUATION} {
-	return yytext[0];
+	ECHO;
+ return yytext[0];
 }
 
 "\n" { 
 	yycolumn = 1;
-	return yytext[0];
+	ECHO;
+ return yytext[0];
 }
 .  {}
 
 %%
 
 int yywrap() {
-	return 1;
+ return 1;
 }
