@@ -4,16 +4,18 @@ const
 PI = 3.1415;
 type
 hello,testr = integer;
-testtesttesttesttesttesttesttest,what = real;
+testtesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
+<<<<<<< Updated upstream
+=======
 var
 a,b,c, a:string;
 one,two,three, a:boolean;
-test : real;
+>>>>>>> Stashed changes
 begin
-	a:=10;
-	b+=20;
-	c := (a+b);
-	writeln("Printable");
+a:=10;
+b+=20;
+c := (a+b);
+writeln("Printable");
 end.

@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	#include <string.h>
 	#include "parser.tab.h"
-	#include <uthash.h>
+	#include "../uthash/src/uthash.h"
 	int yyerror();
 	int yycolumn;
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
