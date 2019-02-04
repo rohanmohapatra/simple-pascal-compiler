@@ -8,18 +8,19 @@
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
 	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
     yycolumn += yyleng;
-	struct var_info {
-		char var_name[31];
-		YYLTYPE var_decl_loc;
-		char type[10];
-		int scope_level;
-	};
+
+	// struct var_info {
+	// 	char var_name[31];
+	// 	YYLTYPE var_decl_loc;
+	// 	char type[10];
+	// 	int scope_level;
+	// };
 	
-	struct symbol_table {
-		char var_name[31];
-		struct var_info var;
-		UT_hash_handle hh;
-	};
+	// struct symbol_table {
+	// 	char var_name[31];
+	// 	struct var_info var;
+	// 	UT_hash_handle hh;
+	// };
 
 %}
 %option yylineno
@@ -151,6 +152,7 @@ writeln {
 {WHITESPACE} {ECHO;}
 
 {DATATYPES}	{
+	yylval.type = strdup(yytext);
 	ECHO;
  return T_DATATYPE;
 }
