@@ -10,3 +10,5 @@
 -[=] is 'relational equality' operator, and also used as assignment operator in type and var blocks
 
 -[!, |] both are 'binary or'
+
+-PASCAL Strings has been changed from '' to "" [Addition by Rohan Rajesh]

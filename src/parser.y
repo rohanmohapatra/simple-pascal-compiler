@@ -1,13 +1,15 @@
 %{
 	#include<stdio.h>
 	#include <time.h> //link with -lrt
+	#include <string.h>
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
 	int successful=1;
     int yyerror();
     extern FILE *yyin;
+    extern FILE *yyout;
     double time_elapsed(struct timespec *start, struct timespec *end);
-
+    int yylex(void);
     //struct typeDefinitionCell {
     //
     //}	
@@ -31,6 +33,7 @@
 %token T_BEGIN
 %token T_END
 %token T_CONST
+%token T_WRITELN
 
 %token T_BOOL_AND
 %token T_BOOL_OR
@@ -44,6 +47,10 @@
 %token T_BIT_RS
 
 %token T_ASOP
+%token T_AS_PE
+%token T_AS_SE
+%token T_AS_MULE
+%token T_AS_DIVE
 
 %token T_ARRAY
 %token <str> T_IDENTIFIER
@@ -68,7 +75,7 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block variable_block //execution_block
+	uses_block constant_block type_block variable_block execution_block
 ;
 
 uses_block:
@@ -111,6 +118,33 @@ more_identifiers:
 	',' T_IDENTIFIER more_identifiers | epsilon
 ;
 
+execution_block:
+	T_BEGIN onlyNewLine execution_body newlineOrNo T_END '.'
+;
+
+execution_body:
+	assignment_statements execution_body
+	| print_statements execution_body
+	| epsilon
+;
+
+print_statements:
+	T_WRITELN '(' T_STRINGVAL ')' ';'
+;
+
+assignment_statements:
+	assignment_statement ';' newlineOrNo assignment_statements
+	| epsilon
+;
+
+assignment_statement:
+	T_IDENTIFIER assignment_ops expression
+;
+
+value:
+	T_INTVAL | T_FLOATVAL | T_BOOLVAL | T_STRINGVAL
+;
+
 newlineOrNo:
 	'\n'|
 ;
@@ -119,8 +153,18 @@ onlyNewLine:
 	'\n'
 ;
 
+expression:
+	T_IDENTIFIER
+	| value
+	| '(' expression ')'
+	| expression operator expression
+
 operator:
 	arithmetic_ops|relational_ops|boolean_ops|bitwise_ops
+;
+
+assignment_ops:
+	T_ASOP | T_AS_PE | T_AS_SE | T_AS_MULE | T_AS_DIVE
 ;
 
 arithmetic_ops:
@@ -164,6 +208,24 @@ int main(int argc,char* argv[]) {
 	else {
 		yyin = stdin;
 	}
+
+	char extension[8] = ".output";
+	char outputfile[30] = "output/";
+
+	/*To Create Output File*/
+	char *ptr = strtok(argv[1], "/");
+	char *inputfile; 
+	while(ptr != NULL)
+	{
+		inputfile = strdup(ptr);
+		ptr = strtok(NULL, "/");
+	}
+
+	strcat(outputfile,inputfile);
+	strcat(outputfile,extension);
+
+	yyout = (FILE*)fopen(outputfile,"w+");
+	/*End Create Output File*/
 
 	clock_gettime(CLOCK_REALTIME, &start);
 	yyparse();
