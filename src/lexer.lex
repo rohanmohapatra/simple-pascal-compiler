@@ -151,7 +151,7 @@ writeln {
 }
 
 {IDENTIFIER} {
-	if(yyleng > 31) {
+	if(yyleng >= 31) {
 		printf("Warning : Identifier Length Greater 31 characters, Truncating Identifier.\n");
 	}
 	char temp[32];

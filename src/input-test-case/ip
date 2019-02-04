@@ -8,7 +8,7 @@ type
 Multi
 Comment*}
 hello,testr = integer;
-testtesttesttesttesttesttest,what = real;
+testtesttesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
 var
