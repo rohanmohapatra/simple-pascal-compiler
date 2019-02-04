@@ -4,12 +4,16 @@ const
 PI = 3.1415;
 type
 hello,testr = integer;
-testtesttesttesttesttesttest,what = real;
+testtesttesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
+var
+a,b,c, a:string;
+one,two,three, a:boolean;
+test : real;
 begin
-a:=10;
-b+=20;
-c := (a+b);
-writeln("Printable");
+	a:=10;
+	b+=20;
+	c := (a+b);
+	writeln("Printable");
 end.

@@ -90,17 +90,18 @@
 	// };
 
 	struct symbol_table {
-		char var_name[31];
+		char var_name[31]; //Holds the Name of the Identifier
 		// struct var_info var;
 		// YYLTYPE var_decl_loc;
-		char type[10];
+		char type[10]; //Holds the DataType of Identifier
 		int scope_level;
-		UT_hash_handle hh;
+		int current_size; //Size of the Symbol Table
+		UT_hash_handle hh; //Hash Structure for Optimized Access
 	};
 
-	struct symbol_table *SYMBOL_TABLE = NULL;
+	struct symbol_table *SYMBOL_TABLE = NULL; /*Generic Symbol Table*/
 
-#line 104 "parser.tab.c" /* yacc.c:339  */
+#line 105 "parser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -206,14 +207,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 39 "parser.y" /* yacc.c:355  */
+#line 40 "parser.y" /* yacc.c:355  */
 
 	char *str;
 	char *type;
 	int intval;
 	float floatval;
 
-#line 217 "parser.tab.c" /* yacc.c:355  */
+#line 218 "parser.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -244,7 +245,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 248 "parser.tab.c" /* yacc.c:358  */
+#line 249 "parser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -546,15 +547,15 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    88,    88,    92,    96,   100,   104,   104,   108,   108,
-     112,   112,   116,   120,   120,   124,   124,   128,   128,   132,
-     132,   137,   144,   136,   169,   173,   173,   178,   177,   184,
-     189,   193,   194,   195,   199,   203,   204,   208,   212,   212,
-     212,   212,   216,   216,   220,   224,   225,   226,   227,   230,
-     230,   230,   230,   234,   234,   234,   234,   234,   238,   238,
-     238,   238,   238,   242,   242,   242,   242,   242,   242,   246,
-     246,   246,   250,   250,   250,   250,   250,   250,   253,   253,
-     256
+       0,    89,    89,    93,    97,   101,   105,   105,   109,   109,
+     113,   113,   117,   121,   121,   125,   125,   129,   129,   133,
+     133,   138,   145,   137,   170,   174,   174,   179,   178,   185,
+     190,   194,   195,   196,   200,   204,   205,   209,   213,   213,
+     213,   213,   217,   217,   221,   225,   226,   227,   228,   231,
+     231,   231,   231,   235,   235,   235,   235,   235,   239,   239,
+     239,   239,   239,   243,   243,   243,   243,   243,   243,   247,
+     247,   247,   251,   251,   251,   251,   251,   251,   254,   254,
+     257
 };
 #endif
 
@@ -1526,58 +1527,58 @@ yyreduce:
   switch (yyn)
     {
         case 21:
-#line 137 "parser.y" /* yacc.c:1646  */
+#line 138 "parser.y" /* yacc.c:1646  */
     {
 		var_name_stack_top++;
 		var_name_stack[var_name_stack_top] = strdup(yylval.str);
-		printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
-		printf("top of stack: %d\n", var_name_stack_top);
+		//printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
+		//printf("top of stack: %d\n", var_name_stack_top);
 	}
-#line 1537 "parser.tab.c" /* yacc.c:1646  */
+#line 1538 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 144 "parser.y" /* yacc.c:1646  */
+#line 145 "parser.y" /* yacc.c:1646  */
     {
-		printf("Hit the type part of line %s\n", yylval.type);
+		//printf("Hit the type part of line %s\n", yylval.type);
 		for(int i = 0; i <= var_name_stack_top; i++)
 		{
 			struct symbol_table *s = NULL;
 			HASH_FIND_STR(SYMBOL_TABLE, var_name_stack[i], s);
 			if(!s)
 			{
-				printf("Inserting variable %s in symbol table\n", var_name_stack[i]);
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_name_stack[i]);
 				s = malloc(sizeof(struct symbol_table));
-				// s->var_name = strdup(var_name_stack[i]);
 				strcpy(s->var_name, var_name_stack[i]);
 				strcpy(s->type, yylval.type);
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				SYMBOL_TABLE->current_size++;
 			}
 			else
 			{
-				printf("Variable already declared with %s type\n", s->type);
+				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
 			}
 			var_name_stack[i] = NULL;
 		}
 		var_name_stack_top = -1;
 
 	}
-#line 1566 "parser.tab.c" /* yacc.c:1646  */
+#line 1567 "parser.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 178 "parser.y" /* yacc.c:1646  */
+#line 179 "parser.y" /* yacc.c:1646  */
     {
 		var_name_stack_top++;
 		var_name_stack[var_name_stack_top] = strdup(yylval.str);
-		printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
-		printf("top of stack: %d\n", var_name_stack_top);
+		//printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
+		//printf("top of stack: %d\n", var_name_stack_top);
 	}
-#line 1577 "parser.tab.c" /* yacc.c:1646  */
+#line 1578 "parser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1581 "parser.tab.c" /* yacc.c:1646  */
+#line 1582 "parser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1812,7 +1813,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 259 "parser.y" /* yacc.c:1906  */
+#line 260 "parser.y" /* yacc.c:1906  */
 
 
 int yyerror() {
@@ -1858,6 +1859,13 @@ int main(int argc,char* argv[]) {
 		printf("Compiled Successfully\n");
 		printf("Took : %lf seconds\n", time_elapsed(&start, &end));
 	}
+	printf("Symbol Table Current Size:%d\n",SYMBOL_TABLE->current_size);
+
+	struct symbol_table *s;
+	int i=0;
+    for(s=SYMBOL_TABLE,i=0; s != NULL,i<SYMBOL_TABLE->current_size; s=s->hh.next,i++) {
+        printf("Index : %d\t Identifier : %s\t DataType : %s\n",i,s->var_name,s->type);
+    }
 }
 
 double time_elapsed(struct timespec *start, struct timespec *end) {
