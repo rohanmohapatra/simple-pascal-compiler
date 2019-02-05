@@ -30,7 +30,7 @@
 		// YYLTYPE var_decl_loc;
 		char type[10]; //Holds the DataType of Identifier
 		int scope_level;
-		int current_size; //Size of the Symbol Table
+		//int current_size; //Size of the Symbol Table
 		UT_hash_handle hh; //Hash Structure for Optimized Access
 	};
 
@@ -155,7 +155,7 @@ variable_declaration:
 				strcpy(s->var_name, var_name_stack[i]);
 				strcpy(s->type, yylval.type);
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
-				SYMBOL_TABLE->current_size++;
+				//SYMBOL_TABLE->current_size++;
 			}
 			else
 			{
@@ -272,13 +272,17 @@ int main(int argc,char* argv[]) {
 
 	if (argc>1) {
 		yyin = fopen(argv[1],"r");
+		if(yyin == NULL) {
+			perror("Error ");
+			exit(1);
+		}
 	}
 	else {
 		yyin = stdin;
 	}
 
 	char extension[8] = ".output";
-	char outputfile[30] = "output/";
+	char outputfile[40] = "output/";
 
 	/*To Create Output File*/
 	char *ptr = strtok(argv[1], "/");
@@ -302,11 +306,11 @@ int main(int argc,char* argv[]) {
 		printf("Compiled Successfully\n");
 		printf("Took : %lf seconds\n", time_elapsed(&start, &end));
 	}
-	printf("Symbol Table Current Size:%d\n",SYMBOL_TABLE->current_size);
+	printf("Symbol Table Current Size:%d\n",HASH_COUNT(SYMBOL_TABLE));
 
 	struct symbol_table *s;
 	int i=0;
-    for(s=SYMBOL_TABLE,i=0; s != NULL,i<SYMBOL_TABLE->current_size; s=s->hh.next,i++) {
+    for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
         printf("Index : %d\t Identifier : %s\t DataType : %s\n",i,s->var_name,s->type);
     }
 }
