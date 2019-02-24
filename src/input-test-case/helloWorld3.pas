@@ -11,5 +11,7 @@ begin
 end;
 
 begin
+	for i:= 1 to 10 do writeln("Hello");
+	while (x>0) do x:=5;
 	writeln("Hello, World!");
 end. 
