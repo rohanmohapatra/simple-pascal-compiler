@@ -56,6 +56,8 @@
 %token T_END
 %token T_CONST
 %token T_WRITELN
+%token T_PROCEDURE
+%token T_FUNCTION
 
 %token T_BOOL_AND
 %token T_BOOL_OR
@@ -86,23 +88,23 @@
 
 %%
 startPascal:
-	newlineOrNo program
+	 program
 ;
 
 program:
-	prog_heading block 
+	prog_heading block '.'
 ;
 
 prog_heading:
-	T_PROGRAM T_IDENTIFIER ';' newlineOrNo
+	T_PROGRAM T_IDENTIFIER ';' 
 ;
 
 block:
-	uses_block constant_block type_block variable_block execution_block
+	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
 ;
 
 uses_block:
-	T_USES T_IDENTIFIER more_libs ';' newlineOrNo | epsilon
+	T_USES T_IDENTIFIER more_libs ';'  | epsilon
 ;
 
 more_libs:
@@ -110,27 +112,27 @@ more_libs:
 ;
 
 constant_block:
-	T_CONST onlyNewLine const_definition | epsilon 
+	T_CONST  const_definition | epsilon 
 ;
 
 const_definition:
-	T_IDENTIFIER T_SINGLEEQ some_numeric_type ';' newlineOrNo more_const_definition
+	T_IDENTIFIER T_SINGLEEQ some_numeric_type ';'  more_const_definition
 ;
 
 more_const_definition:
-	T_IDENTIFIER T_SINGLEEQ some_numeric_type ';' newlineOrNo more_const_definition | epsilon
+	T_IDENTIFIER T_SINGLEEQ some_numeric_type ';'  more_const_definition | epsilon
 ;
 
 type_block:
-	T_TYPE onlyNewLine type_definition | epsilon
+	T_TYPE  type_definition | epsilon
 ;
 
 type_definition:
-	T_IDENTIFIER more_type_identifiers T_SINGLEEQ T_DATATYPE ';' onlyNewLine type_definition | epsilon
+	T_IDENTIFIER more_type_identifiers T_SINGLEEQ T_DATATYPE ';'  type_definition | epsilon
 ;	
 
 variable_block:
-	T_VAR onlyNewLine variable_declaration | epsilon
+	T_VAR  variable_declaration | epsilon
 ;
 
 variable_declaration:
@@ -166,7 +168,7 @@ variable_declaration:
 		var_name_stack_top = -1;
 
 	}
-	';' onlyNewLine variable_declaration
+	';'  variable_declaration
 	| epsilon
 ;
 
@@ -185,10 +187,40 @@ more_var_identifiers:
 	more_var_identifiers | epsilon
 ;
 
+function_and_procedure_block:
+	function_block function_and_procedure_block 
+	| procedure_block function_and_procedure_block 
+	| epsilon
+;
+
+procedure_block:
+	T_PROCEDURE T_IDENTIFIER ';'  block ';'
+	| T_PROCEDURE T_IDENTIFIER '(' param_list ')' ';'  block ';'
+;
+
+param_list:
+	T_IDENTIFIER ':' T_DATATYPE 
+	| T_IDENTIFIER ':' T_DATATYPE ';' param_list
+	| epsilon
+;
+
+function_block:
+	T_FUNCTION T_IDENTIFIER ':' T_DATATYPE ';'  block ';'
+	| T_FUNCTION T_IDENTIFIER '(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
+;
+
+function_param_list:
+	T_IDENTIFIER more_func_identifiers ':' T_DATATYPE
+	| T_IDENTIFIER more_func_identifiers ':' T_DATATYPE ';' function_param_list
+;
+
+more_func_identifiers:
+	',' T_IDENTIFIER more_func_identifiers | epsilon
+;
 
 execution_block:
-	T_BEGIN onlyNewLine execution_body newlineOrNo T_END '.'
-;
+	T_BEGIN execution_body  T_END 
+;	
 
 execution_body:
 	assignment_statements execution_body
@@ -201,7 +233,7 @@ print_statements:
 ;
 
 assignment_statements:
-	assignment_statement ';' newlineOrNo assignment_statements
+	assignment_statement ';'  assignment_statements
 	| epsilon
 ;
 
@@ -211,14 +243,6 @@ assignment_statement:
 
 value:
 	T_INTVAL | T_FLOATVAL | T_BOOLVAL | T_STRINGVAL
-;
-
-newlineOrNo:
-	'\n'|
-;
-
-onlyNewLine:
-	'\n'
 ;
 
 expression:
