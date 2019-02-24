@@ -158,6 +158,25 @@ writeln {
 	ECHO;
 	return T_WRITELN;
 }
+for {
+	ECHO;
+	return T_FOR;
+}
+
+do {
+	ECHO;
+	return T_DO;
+}
+
+to {
+	ECHO;
+	return T_TO;
+}
+
+downto {
+	ECHO;
+	return T_DOWNTO;
+}
 
 
 {WHITESPACE} {ECHO;}
