@@ -58,6 +58,10 @@
 %token T_WRITELN
 %token T_PROCEDURE
 %token T_FUNCTION
+%token T_FOR
+%token T_DO
+%token T_TO
+%token T_DOWNTO
 
 %token T_BOOL_AND
 %token T_BOOL_OR
@@ -225,7 +229,32 @@ execution_block:
 execution_body:
 	assignment_statements execution_body
 	| print_statements execution_body
+	| structured_statements execution_body
 	| epsilon
+;
+
+structured_statements:
+	conditional_statement ';'
+	| repetitive_statement
+;
+
+conditional_statement:
+;
+
+repetitive_statement:
+	for_statement | while_statement
+;
+
+while_statement :
+	T_WHILE expression T_DO execution_body
+;
+
+for_statement:
+	T_FOR T_IDENTIFIER T_ASOP for_list T_DO execution_body
+
+for_list:
+	expression T_TO expression 
+	| expression T_DOWNTO expression
 ;
 
 print_statements:
