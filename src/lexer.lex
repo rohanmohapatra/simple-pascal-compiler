@@ -93,6 +93,17 @@ STRINGVAL \".*\"
 	ECHO;
  return T_STRINGVAL;	
 }
+
+function {
+	ECHO;
+	return T_FUNCTION;
+}
+
+procedure {
+	ECHO;
+	return T_PROCEDURE;
+}
+
 if {
 	ECHO;
  return T_IF;
@@ -251,7 +262,7 @@ writeln {
 "\n" { 
 	yycolumn = 1;
 	ECHO;
- return yytext[0];
+ //return yytext[0];
 }
 .  {}
 
