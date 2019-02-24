@@ -1,0 +1,13 @@
+program hello;
+uses crt;
+function max(num1,num2: integer): integer;
+var
+      result: integer;
+
+begin
+   max := result;
+end;
+
+begin
+	writeln("Hello, World!");
+end. 

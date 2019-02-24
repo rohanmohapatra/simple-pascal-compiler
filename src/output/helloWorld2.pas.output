@@ -1,0 +1,19 @@
+program hello;
+uses crt;
+procedure drawLine(x:integer); 
+var 
+	counter : integer;
+begin
+	writeln("Hello, World!");
+end;
+function max(num2: integer): integer;
+var
+      result: integer;
+
+begin
+   max := result;
+end;
+
+begin
+	writeln("Hello, World!");
+end. 

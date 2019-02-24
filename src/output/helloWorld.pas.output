@@ -1,5 +1,11 @@
 program hello;
 uses crt;
+procedure drawLine; 
+var 
+	counter : integer;
 begin
-   writeln("Hello, World!");
+	writeln("Hello, World!");
+end;
+begin
+	writeln("Hello, World!");
 end. 
