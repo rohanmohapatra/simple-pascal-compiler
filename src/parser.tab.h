@@ -57,27 +57,31 @@ extern int yydebug;
     T_WRITELN = 267,
     T_PROCEDURE = 268,
     T_FUNCTION = 269,
-    T_BOOL_AND = 270,
-    T_BOOL_OR = 271,
-    T_BOOL_NOT = 272,
-    T_REL_LE = 273,
-    T_REL_GE = 274,
-    T_REL_NE = 275,
-    T_SINGLEEQ = 276,
-    T_BIT_LS = 277,
-    T_BIT_RS = 278,
-    T_ASOP = 279,
-    T_AS_PE = 280,
-    T_AS_SE = 281,
-    T_AS_MULE = 282,
-    T_AS_DIVE = 283,
-    T_ARRAY = 284,
-    T_IDENTIFIER = 285,
-    T_DATATYPE = 286,
-    T_INTVAL = 287,
-    T_FLOATVAL = 288,
-    T_BOOLVAL = 289,
-    T_STRINGVAL = 290
+    T_FOR = 270,
+    T_DO = 271,
+    T_TO = 272,
+    T_DOWNTO = 273,
+    T_BOOL_AND = 274,
+    T_BOOL_OR = 275,
+    T_BOOL_NOT = 276,
+    T_REL_LE = 277,
+    T_REL_GE = 278,
+    T_REL_NE = 279,
+    T_SINGLEEQ = 280,
+    T_BIT_LS = 281,
+    T_BIT_RS = 282,
+    T_ASOP = 283,
+    T_AS_PE = 284,
+    T_AS_SE = 285,
+    T_AS_MULE = 286,
+    T_AS_DIVE = 287,
+    T_ARRAY = 288,
+    T_IDENTIFIER = 289,
+    T_DATATYPE = 290,
+    T_INTVAL = 291,
+    T_FLOATVAL = 292,
+    T_BOOLVAL = 293,
+    T_STRINGVAL = 294
   };
 #endif
 /* Tokens.  */
@@ -93,27 +97,31 @@ extern int yydebug;
 #define T_WRITELN 267
 #define T_PROCEDURE 268
 #define T_FUNCTION 269
-#define T_BOOL_AND 270
-#define T_BOOL_OR 271
-#define T_BOOL_NOT 272
-#define T_REL_LE 273
-#define T_REL_GE 274
-#define T_REL_NE 275
-#define T_SINGLEEQ 276
-#define T_BIT_LS 277
-#define T_BIT_RS 278
-#define T_ASOP 279
-#define T_AS_PE 280
-#define T_AS_SE 281
-#define T_AS_MULE 282
-#define T_AS_DIVE 283
-#define T_ARRAY 284
-#define T_IDENTIFIER 285
-#define T_DATATYPE 286
-#define T_INTVAL 287
-#define T_FLOATVAL 288
-#define T_BOOLVAL 289
-#define T_STRINGVAL 290
+#define T_FOR 270
+#define T_DO 271
+#define T_TO 272
+#define T_DOWNTO 273
+#define T_BOOL_AND 274
+#define T_BOOL_OR 275
+#define T_BOOL_NOT 276
+#define T_REL_LE 277
+#define T_REL_GE 278
+#define T_REL_NE 279
+#define T_SINGLEEQ 280
+#define T_BIT_LS 281
+#define T_BIT_RS 282
+#define T_ASOP 283
+#define T_AS_PE 284
+#define T_AS_SE 285
+#define T_AS_MULE 286
+#define T_AS_DIVE 287
+#define T_ARRAY 288
+#define T_IDENTIFIER 289
+#define T_DATATYPE 290
+#define T_INTVAL 291
+#define T_FLOATVAL 292
+#define T_BOOLVAL 293
+#define T_STRINGVAL 294
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -127,7 +135,7 @@ union YYSTYPE
 	int intval;
 	float floatval;
 
-#line 131 "parser.tab.h" /* yacc.c:1909  */
+#line 139 "parser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
