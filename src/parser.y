@@ -17,6 +17,7 @@
 	char *var_name_stack[10];
 	int var_name_stack_top = -1;
 	
+	char *curr_scope_level = "global";
 	// struct var_info {
 	// 	char var_name[31];
 	// 	// YYLTYPE var_decl_loc;
@@ -29,7 +30,7 @@
 		// struct var_info var;
 		// YYLTYPE var_decl_loc;
 		char type[10]; //Holds the DataType of Identifier
-		int scope_level;
+		char *scope_level;
 		//int current_size; //Size of the Symbol Table
 		UT_hash_handle hh; //Hash Structure for Optimized Access
 	};
@@ -153,13 +154,18 @@ variable_declaration:
 		for(int i = 0; i <= var_name_stack_top; i++)
 		{
 			struct symbol_table *s = NULL;
-			HASH_FIND_STR(SYMBOL_TABLE, var_name_stack[i], s);
+			char var_mang_name[31];
+			strcpy(var_mang_name, var_name_stack[i]);
+			strcat(var_mang_name, "$");
+			strcat(var_mang_name, curr_scope_level);
+			HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
 			if(!s)
 			{
-				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_name_stack[i]);
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
 				s = malloc(sizeof(struct symbol_table));
-				strcpy(s->var_name, var_name_stack[i]);
+				strcat(s->var_name, var_mang_name);
 				strcpy(s->type, yylval.type);
+				s->scope_level = strdup(curr_scope_level);
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
 				//SYMBOL_TABLE->current_size++;
 			}
@@ -198,7 +204,12 @@ function_and_procedure_block:
 ;
 
 procedure_block:
-	T_PROCEDURE T_IDENTIFIER ';'  block ';'
+	T_PROCEDURE T_IDENTIFIER
+	{
+		curr_scope_level = strdup(yylval.str);
+		printf("Entering the procedure %s\n", curr_scope_level);
+	}
+	';'  block ';'
 	| T_PROCEDURE T_IDENTIFIER '(' param_list ')' ';'  block ';'
 ;
 
@@ -209,8 +220,18 @@ param_list:
 ;
 
 function_block:
-	T_FUNCTION T_IDENTIFIER ':' T_DATATYPE ';'  block ';'
-	| T_FUNCTION T_IDENTIFIER '(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
+	T_FUNCTION T_IDENTIFIER
+	{
+		curr_scope_level = strdup(yylval.str);
+		printf("Entering the function %s\n", curr_scope_level);
+	}
+	':' T_DATATYPE ';'  block ';'
+	| T_FUNCTION T_IDENTIFIER 
+	{
+		curr_scope_level = strdup(yylval.str);
+		printf("Entering the function %s\n", curr_scope_level);
+	}
+	'(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
 ;
 
 function_param_list:
@@ -364,7 +385,7 @@ int main(int argc,char* argv[]) {
 	struct symbol_table *s;
 	int i=0;
     for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
-        printf("Index : %d\t Identifier : %s\t DataType : %s\n",i,s->var_name,s->type);
+        printf("Index : %d\t Identifier : %s\t DataType : %s\t ScopeLevel : %s\n",i,s->var_name,s->type, s->scope_level);
     }
 }
 
