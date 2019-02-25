@@ -36,6 +36,34 @@
 	};
 
 	struct symbol_table *SYMBOL_TABLE = NULL; /*Generic Symbol Table*/
+
+	void dump_stack_in_symbol_table(char *type) {
+		for(int i = 0; i <= var_name_stack_top; i++)
+		{
+			struct symbol_table *s = NULL;
+			char var_mang_name[31];
+			strcpy(var_mang_name, var_name_stack[i]);
+			strcat(var_mang_name, "$");
+			strcat(var_mang_name, curr_scope_level);
+			HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+			if(!s)
+			{
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
+				s = malloc(sizeof(struct symbol_table));
+				strcat(s->var_name, var_mang_name);
+				strcpy(s->type, type);
+				s->scope_level = strdup(curr_scope_level);
+				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				//SYMBOL_TABLE->current_size++;
+			}
+			else
+			{
+				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+			}
+			var_name_stack[i] = NULL;
+		}
+		var_name_stack_top = -1;
+	}
 %}
 %locations
 %union {
@@ -151,31 +179,33 @@ variable_declaration:
 	more_var_identifiers ':' T_DATATYPE
 	{
 		//printf("Hit the type part of line %s\n", yylval.type);
-		for(int i = 0; i <= var_name_stack_top; i++)
-		{
-			struct symbol_table *s = NULL;
-			char var_mang_name[31];
-			strcpy(var_mang_name, var_name_stack[i]);
-			strcat(var_mang_name, "$");
-			strcat(var_mang_name, curr_scope_level);
-			HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-			if(!s)
-			{
-				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
-				s = malloc(sizeof(struct symbol_table));
-				strcat(s->var_name, var_mang_name);
-				strcpy(s->type, yylval.type);
-				s->scope_level = strdup(curr_scope_level);
-				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
-				//SYMBOL_TABLE->current_size++;
-			}
-			else
-			{
-				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
-			}
-			var_name_stack[i] = NULL;
-		}
-		var_name_stack_top = -1;
+		dump_stack_in_symbol_table(yylval.type);
+		
+		// for(int i = 0; i <= var_name_stack_top; i++)
+		// {
+		// 	struct symbol_table *s = NULL;
+		// 	char var_mang_name[31];
+		// 	strcpy(var_mang_name, var_name_stack[i]);
+		// 	strcat(var_mang_name, "$");
+		// 	strcat(var_mang_name, curr_scope_level);
+		// 	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		// 	if(!s)
+		// 	{
+		// 		printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
+		// 		s = malloc(sizeof(struct symbol_table));
+		// 		strcat(s->var_name, var_mang_name);
+		// 		strcpy(s->type, yylval.type);
+		// 		s->scope_level = strdup(curr_scope_level);
+		// 		HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+		// 		//SYMBOL_TABLE->current_size++;
+		// 	}
+		// 	else
+		// 	{
+		// 		printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+		// 	}
+		// 	var_name_stack[i] = NULL;
+		// }
+		// var_name_stack_top = -1;
 
 	}
 	';'  variable_declaration
@@ -210,7 +240,12 @@ procedure_block:
 		printf("Entering the procedure %s\n", curr_scope_level);
 	}
 	';'  block ';'
-	| T_PROCEDURE T_IDENTIFIER '(' param_list ')' ';'  block ';'
+	| T_PROCEDURE T_IDENTIFIER 
+	{
+		curr_scope_level = strdup(yylval.str);
+		printf("Entering the function %s\n", curr_scope_level);
+	}
+	'(' param_list ')' ';'  block ';'
 ;
 
 param_list:
@@ -235,12 +270,30 @@ function_block:
 ;
 
 function_param_list:
-	T_IDENTIFIER more_func_identifiers ':' T_DATATYPE
-	| T_IDENTIFIER more_func_identifiers ':' T_DATATYPE ';' function_param_list
+	T_IDENTIFIER 
+	{
+		var_name_stack_top++;
+		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+	}
+	more_func_identifiers ':' T_DATATYPE
+	{
+		dump_stack_in_symbol_table(yylval.type);
+	}
+	| T_IDENTIFIER 
+	{
+		var_name_stack_top++;
+		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+	} 
+	more_func_identifiers ':' T_DATATYPE ';' function_param_list
 ;
 
 more_func_identifiers:
-	',' T_IDENTIFIER more_func_identifiers | epsilon
+	',' T_IDENTIFIER
+	{
+		var_name_stack_top++;
+		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+	}
+	more_func_identifiers | epsilon
 ;
 
 execution_block:
