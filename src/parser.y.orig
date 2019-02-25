@@ -1,6 +1,5 @@
 %{
 	#include<stdio.h>
-	#include<stdlib.h>
 	#include <time.h> //link with -lrt
 	#include <string.h>
 	#include "../uthash/src/uthash.h"
@@ -38,6 +37,7 @@
 
 	struct symbol_table *SYMBOL_TABLE = NULL; /*Generic Symbol Table*/
 
+<<<<<<< HEAD
 	char *type_identifier_stack[10];
 	int type_identifier_top = -1;
 	struct type_table{
@@ -47,7 +47,9 @@
 	};
 	struct type_table *TYPE_TABLE = NULL;
 
-	int dump_stack_in_symbol_table(char *type) {
+
+=======
+	void dump_stack_in_symbol_table(char *type) {
 		for(int i = 0; i <= var_name_stack_top; i++)
 		{
 			struct symbol_table *s = NULL;
@@ -69,14 +71,12 @@
 			else
 			{
 				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
-				return 0;
 			}
 			var_name_stack[i] = NULL;
 		}
 		var_name_stack_top = -1;
-		return 1;
 	}
-
+>>>>>>> master
 %}
 %locations
 %union {
@@ -226,12 +226,7 @@ data_type:
 	
 	{
 		//printf("Hit the type part of line %s\n", yylval.type);
-		int result = dump_stack_in_symbol_table(yylval.type);
-		if(!result){
-			//printf("DumpBck in Variable: %d\n",result);
-			yyerror("Abort: Variable already declared.");
-			exit(1);
-		}
+		dump_stack_in_symbol_table(yylval.type);
 		
 		// for(int i = 0; i <= var_name_stack_top; i++)
 		// {
@@ -262,22 +257,40 @@ data_type:
 	} 
 	| T_IDENTIFIER 
 	{
-		struct type_table *t = NULL;
-		HASH_FIND_STR(TYPE_TABLE,yylval.str,t);
-		//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
-		if(t)
+		//printf("Hit the type part of line %s\n", yylval.str);
+		for(int i = 0; i <= var_name_stack_top; i++)
 		{
-			int result = dump_stack_in_symbol_table(t->actual_type_name);
-			if(!result){
-			yyerror("Abort: Variable already declared.");
-			exit(1);
+			struct symbol_table *s = NULL;
+			HASH_FIND_STR(SYMBOL_TABLE, var_name_stack[i], s);
+			if(!s)
+			{
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_name_stack[i]);
+
+				struct type_table *t = NULL;
+				HASH_FIND_STR(TYPE_TABLE,yylval.str,t);
+				//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
+				if(t)
+				{
+					s = malloc(sizeof(struct symbol_table));
+					strcpy(s->var_name, var_name_stack[i]);
+					strcpy(s->type, t->actual_type_name);
+					HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				}
+				else
+				{
+					printf("Alert : Type %s is not defined.",yylval.str);
+					YYABORT;
+				}
+				
+				//SYMBOL_TABLE->current_size++;
 			}
+			else
+			{
+				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+			}
+			var_name_stack[i] = NULL;
 		}
-		else
-		{
-			printf("Alert : Type %s is not defined.",yylval.str);
-			YYABORT;
-		}
+		var_name_stack_top = -1;
 
 	}
 
@@ -313,13 +326,13 @@ procedure_block:
 	T_PROCEDURE T_IDENTIFIER
 	{
 		curr_scope_level = strdup(yylval.str);
-		printf("Entering the Procedure %s\n", curr_scope_level);
+		printf("Entering the procedure %s\n", curr_scope_level);
 	}
 	';'  block ';'
 	| T_PROCEDURE T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.str);
-		printf("Entering the Procedure %s\n", curr_scope_level);
+		printf("Entering the function %s\n", curr_scope_level);
 	}
 	'(' param_list ')' ';'  block ';'
 ;
@@ -334,12 +347,13 @@ function_block:
 	T_FUNCTION T_IDENTIFIER
 	{
 		curr_scope_level = strdup(yylval.str);
-		printf("Entering the Function %s\n", curr_scope_level);
+		printf("Entering the function %s\n", curr_scope_level);
 	}
 	':' T_DATATYPE ';'  block ';'
 	| T_FUNCTION T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.str);
+		printf("Entering the function %s\n", curr_scope_level);
 	}
 	'(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
 ;
@@ -350,13 +364,9 @@ function_param_list:
 		var_name_stack_top++;
 		var_name_stack[var_name_stack_top] = strdup(yylval.str);
 	}
-	more_func_identifiers ':' T_DATATYPE 
+	more_func_identifiers ':' T_DATATYPE
 	{
-	int result = dump_stack_in_symbol_table(yylval.type);
-	if(!result){
-			yyerror("Abort: Variable already declared.");
-			exit(1);
-		}
+		dump_stack_in_symbol_table(yylval.type);
 	}
 	| T_IDENTIFIER 
 	{
