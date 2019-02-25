@@ -1,0 +1,34 @@
+for(int i = 0; i <= var_name_stack_top; i++)
+		{
+			struct symbol_table *s = NULL;
+			HASH_FIND_STR(SYMBOL_TABLE, var_name_stack[i], s);
+			if(!s)
+			{
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_name_stack[i]);
+
+				struct type_table *t = NULL;
+				HASH_FIND_STR(TYPE_TABLE,yylval.str,t);
+				//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
+				if(t)
+				{
+					s = malloc(sizeof(struct symbol_table));
+					strcpy(s->var_name, var_name_stack[i]);
+					strcpy(s->type, t->actual_type_name);
+					HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				}
+				else
+				{
+					printf("Alert : Type %s is not defined.",yylval.str);
+					YYABORT;
+				}
+				
+				//SYMBOL_TABLE->current_size++;
+			}
+			else
+			{
+				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+			}
+			var_name_stack[i] = NULL;
+		}
+		var_name_stack_top = -1;
+		*/

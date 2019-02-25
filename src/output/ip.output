@@ -10,7 +10,9 @@ one,two,three = boolean;
 var
 a,b,c, a:string;
 one,two,three, a:boolean;
-test : real;
+test : whatis;
+test2 : one;
+test3,test4 : what;
 begin
 	a:=10;
 	b+=20;

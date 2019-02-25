@@ -194,7 +194,7 @@ downto {
 	char temp[32];
 	strncpy(temp,yytext,31);
 	yylval.str = strdup(temp);
-	printf("%s\n", yylval.str);
+	//printf("%s\n", yylval.str);
 	ECHO;
  return T_IDENTIFIER;
 }
