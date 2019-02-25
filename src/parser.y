@@ -517,7 +517,7 @@ int main(int argc,char* argv[]) {
 	struct symbol_table *s;
 	int i=0;
     for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
-        printf("Index : %d\t Identifier : %s\t DataType : %s\t ScopeLevel : %s\n",i,s->var_name,s->type, s->scope_level);
+        printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\n",i,s->var_name,s->type, s->scope_level);
     }
 
 

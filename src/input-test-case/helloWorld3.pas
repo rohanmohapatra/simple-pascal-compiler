@@ -22,7 +22,7 @@ end;
 function min(num1,num2: integer): integer;
 var
 	result : uInteger;
-	num2 : integer;
+	{num2 : integer;}
 
 begin
 	min := result;
