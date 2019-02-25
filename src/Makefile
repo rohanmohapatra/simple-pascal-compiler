@@ -8,6 +8,10 @@ lexer.c:	lexer.lex
 	lex --outfile="lexer.c" lexer.lex
 all:
 	lex --outfile="lexer.c" lexer.lex
-	yacc parser.y -d -b "parser"	
+	yacc parser.y -v -d -b  "parser"	
 	gcc -o executable/compiler parser.tab.c lexer.c -lrt
 	lex --outfile="lexer.c" lexer.lex
+clean:
+	rm lexer.c
+	rm parser.tab.c
+	rm parser.tab.h

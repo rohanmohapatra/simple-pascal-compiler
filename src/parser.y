@@ -35,6 +35,17 @@
 	};
 
 	struct symbol_table *SYMBOL_TABLE = NULL; /*Generic Symbol Table*/
+
+	char *type_identifier_stack[10];
+	int type_identifier_top = -1;
+	struct type_table{
+		char user_defined_name[31];
+		char actual_type_name[31];
+		UT_hash_handle hh;
+	};
+	struct type_table *TYPE_TABLE = NULL;
+
+
 %}
 %locations
 %union {
@@ -90,6 +101,8 @@
 %token <intval> T_BOOLVAL
 %token <str> T_STRINGVAL
 
+%define parse.error verbose
+
 %%
 startPascal:
 	 program
@@ -132,7 +145,33 @@ type_block:
 ;
 
 type_definition:
-	T_IDENTIFIER more_type_identifiers T_SINGLEEQ T_DATATYPE ';'  type_definition | epsilon
+	T_IDENTIFIER 
+	{
+		type_identifier_top++;
+		type_identifier_stack[type_identifier_top] = strdup(yylval.str);
+	}
+	more_type_identifiers T_SINGLEEQ T_DATATYPE 
+	{
+		for(int i = 0; i <= type_identifier_top; i++)
+		{
+			struct type_table *s = NULL;
+			HASH_FIND_STR(TYPE_TABLE, type_identifier_stack[i], s);
+			if(!s)
+			{
+				s = malloc(sizeof(struct type_table));
+				strcpy(s->user_defined_name, type_identifier_stack[i]);
+				strcpy(s->actual_type_name, yylval.type);
+				HASH_ADD_STR( TYPE_TABLE, user_defined_name, s );  /* var_name: name of key field */
+			}
+			else
+			{
+				YYABORT;
+			}
+			type_identifier_stack[i] = NULL;
+		}
+		type_identifier_top = -1;
+	}
+	';'  type_definition | epsilon
 ;	
 
 variable_block:
@@ -147,7 +186,13 @@ variable_declaration:
 		//printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
 		//printf("top of stack: %d\n", var_name_stack_top);
 	}
-	more_var_identifiers ':' T_DATATYPE
+	more_var_identifiers ':' data_type ';'  variable_declaration
+	| epsilon
+;
+
+data_type:
+	T_DATATYPE
+	
 	{
 		//printf("Hit the type part of line %s\n", yylval.type);
 		for(int i = 0; i <= var_name_stack_top; i++)
@@ -171,13 +216,55 @@ variable_declaration:
 		}
 		var_name_stack_top = -1;
 
+	} 
+	| T_IDENTIFIER 
+	{
+		//printf("Hit the type part of line %s\n", yylval.str);
+		for(int i = 0; i <= var_name_stack_top; i++)
+		{
+			struct symbol_table *s = NULL;
+			HASH_FIND_STR(SYMBOL_TABLE, var_name_stack[i], s);
+			if(!s)
+			{
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_name_stack[i]);
+
+				struct type_table *t = NULL;
+				HASH_FIND_STR(TYPE_TABLE,yylval.str,t);
+				//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
+				if(t)
+				{
+					s = malloc(sizeof(struct symbol_table));
+					strcpy(s->var_name, var_name_stack[i]);
+					strcpy(s->type, t->actual_type_name);
+					HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				}
+				else
+				{
+					printf("Alert : Type %s is not defined.",yylval.str);
+					YYABORT;
+				}
+				
+				//SYMBOL_TABLE->current_size++;
+			}
+			else
+			{
+				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+			}
+			var_name_stack[i] = NULL;
+		}
+		var_name_stack_top = -1;
+
 	}
-	';'  variable_declaration
-	| epsilon
-;
+
+
 
 more_type_identifiers:
-	',' T_IDENTIFIER more_type_identifiers | epsilon
+	',' T_IDENTIFIER 
+	{
+		type_identifier_top++;
+		type_identifier_stack[type_identifier_top] = strdup(yylval.str);
+	}
+	more_type_identifiers | epsilon
 ;
 
 more_var_identifiers:
@@ -223,7 +310,7 @@ more_func_identifiers:
 ;
 
 execution_block:
-	T_BEGIN execution_body  T_END 
+	T_BEGIN execution_body T_END 
 ;	
 
 execution_body:
@@ -245,7 +332,7 @@ repetitive_statement:
 	for_statement | while_statement
 ;
 
-while_statement :
+while_statement : 
 	T_WHILE expression T_DO execution_body
 ;
 
@@ -312,8 +399,8 @@ epsilon:
 
 %%
 
-int yyerror() {
-	printf("Invalid Syntax:%d:%d\n",yylloc.first_line,yylloc.first_column);
+int yyerror(const char *message) {
+	printf("\n\nInvalid Syntax:%d:%d Reason being %s\n",yylloc.first_line,yylloc.first_column,message);
 	printf("Compilation Failed\n");
 	successful=0;
 	return 0;
@@ -356,16 +443,24 @@ int main(int argc,char* argv[]) {
 	yyparse();
 	clock_gettime(CLOCK_REALTIME, &end);
 	if(successful){
-		printf("Compiled Successfully\n");
+		printf("\n\nCompiled Successfully\n");
 		printf("Took : %lf seconds\n", time_elapsed(&start, &end));
 	}
-	printf("Symbol Table Current Size:%d\n",HASH_COUNT(SYMBOL_TABLE));
+	printf("\n\nSymbol Table Current Size:%d\n",HASH_COUNT(SYMBOL_TABLE));
 
 	struct symbol_table *s;
 	int i=0;
     for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
         printf("Index : %d\t Identifier : %s\t DataType : %s\n",i,s->var_name,s->type);
     }
+
+
+    /*  TYPE BLOCK
+    struct type_table *t;
+	i=0;
+    for(t=TYPE_TABLE,i=0; t != NULL,i<HASH_COUNT(TYPE_TABLE); t=t->hh.next,i++) {
+        printf("Index : %d\t Identifier : %s\t DataType : %s\n",i,t->user_defined_name,t->actual_type_name);
+    }*/
 }
 
 double time_elapsed(struct timespec *start, struct timespec *end) {
