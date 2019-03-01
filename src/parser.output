@@ -1,24 +1,13 @@
 Terminals unused in grammar
 
-   T_IF
    T_ARRAY
 
 
-Rules useless in parser due to conflicts
-
-   49 $@11: %empty
-
-
-State 55 conflicts: 4 shift/reduce, 1 reduce/reduce
-State 76 conflicts: 4 shift/reduce, 1 reduce/reduce
-State 81 conflicts: 4 shift/reduce, 1 reduce/reduce
-State 82 conflicts: 4 shift/reduce, 1 reduce/reduce
-State 84 conflicts: 6 reduce/reduce
-State 115 conflicts: 1 shift/reduce
-State 128 conflicts: 2 reduce/reduce
-State 131 conflicts: 4 shift/reduce, 1 reduce/reduce
-State 175 conflicts: 20 shift/reduce
-State 191 conflicts: 4 shift/reduce, 1 reduce/reduce
+State 71 conflicts: 6 shift/reduce
+State 129 conflicts: 1 shift/reduce
+State 141 conflicts: 5 shift/reduce
+State 183 conflicts: 20 shift/reduce
+State 194 conflicts: 5 shift/reduce
 
 
 Grammar
@@ -104,156 +93,159 @@ Grammar
 
    47 $@10: %empty
 
-   48 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' T_DATATYPE
+   48 $@11: %empty
 
-   49 $@11: %empty
+   49 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' T_DATATYPE $@11 function_param_continue
 
-   50 function_param_list: T_IDENTIFIER $@11 more_func_identifiers ':' T_DATATYPE ';' function_param_list
+   50 function_param_continue: epsilon
+   51                        | ';' function_param_list
 
-   51 $@12: %empty
+   52 $@12: %empty
 
-   52 more_func_identifiers: ',' T_IDENTIFIER $@12 more_func_identifiers
-   53                      | epsilon
+   53 more_func_identifiers: ',' T_IDENTIFIER $@12 more_func_identifiers
+   54                      | epsilon
 
-   54 execution_block: T_BEGIN execution_body T_END
+   55 execution_block: T_BEGIN execution_body T_END
 
-   55 execution_body: assignment_statements execution_body
-   56               | print_statements execution_body
-   57               | structured_statements execution_body
-   58               | epsilon
+   56 execution_body: execution_body statements
+   57               | epsilon
 
-   59 structured_statements: conditional_statement ';'
-   60                      | repetitive_statement
+   58 statements: assignment_statements
+   59           | print_statements
+   60           | structured_statements
 
-   61 conditional_statement: %empty
+   61 structured_statements: conditional_statement ';'
+   62                      | repetitive_statement
 
-   62 repetitive_statement: for_statement
-   63                     | while_statement
+   63 conditional_statement: T_IF
 
-   64 while_statement: T_WHILE expression T_DO execution_body
+   64 repetitive_statement: for_statement
+   65                     | while_statement
 
-   65 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list T_DO execution_body
+   66 while_statement: T_WHILE expression T_DO statements
 
-   66 for_list: expression T_TO expression
-   67         | expression T_DOWNTO expression
+   67 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list T_DO statements
 
-   68 print_statements: T_WRITELN '(' T_STRINGVAL ')' ';'
+   68 for_list: expression T_TO expression
+   69         | expression T_DOWNTO expression
 
-   69 assignment_statements: assignment_statement ';' assignment_statements
-   70                      | epsilon
+   70 print_statements: T_WRITELN '(' T_STRINGVAL ')' ';'
 
-   71 assignment_statement: T_IDENTIFIER assignment_ops expression
+   71 assignment_statements: assignment_statement ';' assignment_statements
+   72                      | epsilon
 
-   72 value: T_INTVAL
-   73      | T_FLOATVAL
-   74      | T_BOOLVAL
-   75      | T_STRINGVAL
+   73 assignment_statement: T_IDENTIFIER assignment_ops expression
 
-   76 expression: T_IDENTIFIER
-   77           | value
-   78           | '(' expression ')'
-   79           | expression operator expression
+   74 value: T_INTVAL
+   75      | T_FLOATVAL
+   76      | T_BOOLVAL
+   77      | T_STRINGVAL
 
-   80 operator: arithmetic_ops
-   81         | relational_ops
-   82         | boolean_ops
-   83         | bitwise_ops
+   78 expression: T_IDENTIFIER
+   79           | value
+   80           | '(' expression ')'
+   81           | expression operator expression
 
-   84 assignment_ops: T_ASOP
-   85               | T_AS_PE
-   86               | T_AS_SE
-   87               | T_AS_MULE
-   88               | T_AS_DIVE
+   82 operator: arithmetic_ops
+   83         | relational_ops
+   84         | boolean_ops
+   85         | bitwise_ops
 
-   89 arithmetic_ops: '+'
-   90               | '*'
-   91               | '/'
-   92               | '-'
-   93               | '%'
+   86 assignment_ops: T_ASOP
+   87               | T_AS_PE
+   88               | T_AS_SE
+   89               | T_AS_MULE
+   90               | T_AS_DIVE
 
-   94 relational_ops: T_SINGLEEQ
-   95               | '>'
-   96               | '<'
-   97               | T_REL_LE
-   98               | T_REL_GE
-   99               | T_REL_NE
+   91 arithmetic_ops: '+'
+   92               | '*'
+   93               | '/'
+   94               | '-'
+   95               | '%'
 
-  100 boolean_ops: T_BOOL_AND
-  101            | T_BOOL_OR
-  102            | T_BOOL_NOT
+   96 relational_ops: T_SINGLEEQ
+   97               | '>'
+   98               | '<'
+   99               | T_REL_LE
+  100               | T_REL_GE
+  101               | T_REL_NE
 
-  103 bitwise_ops: '&'
-  104            | '|'
-  105            | '~'
-  106            | '!'
-  107            | T_BIT_LS
-  108            | T_BIT_RS
+  102 boolean_ops: T_BOOL_AND
+  103            | T_BOOL_OR
+  104            | T_BOOL_NOT
 
-  109 some_numeric_type: T_INTVAL
-  110                  | T_FLOATVAL
+  105 bitwise_ops: '&'
+  106            | '|'
+  107            | '~'
+  108            | '!'
+  109            | T_BIT_LS
+  110            | T_BIT_RS
 
-  111 epsilon: %empty
+  111 some_numeric_type: T_INTVAL
+  112                  | T_FLOATVAL
+
+  113 epsilon: %empty
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 106
-'%' (37) 93
-'&' (38) 103
-'(' (40) 39 46 68 78
-')' (41) 39 46 68 78
-'*' (42) 90
-'+' (43) 89
-',' (44) 7 28 31 52
-'-' (45) 92
+'!' (33) 108
+'%' (37) 95
+'&' (38) 105
+'(' (40) 39 46 70 80
+')' (41) 39 46 70 80
+'*' (42) 92
+'+' (43) 91
+',' (44) 7 28 31 53
+'-' (45) 94
 '.' (46) 2
-'/' (47) 91
-':' (58) 23 40 41 44 46 48 50
-';' (59) 3 5 11 12 18 23 37 39 41 44 46 50 59 68 69
-'<' (60) 96
-'>' (62) 95
-'|' (124) 104
-'~' (126) 105
+'/' (47) 93
+':' (58) 23 40 41 44 46 49
+';' (59) 3 5 11 12 18 23 37 39 41 44 46 51 61 70 71
+'<' (60) 98
+'>' (62) 97
+'|' (124) 106
+'~' (126) 107
 error (256)
 T_USES (258) 5
-T_WHILE (259) 64
+T_WHILE (259) 66
 T_PROGRAM (260) 3
 T_VAR (261) 20
 T_TYPE (262) 14
-T_IF (263)
-T_BEGIN (264) 54
-T_END (265) 54
+T_IF (263) 63
+T_BEGIN (264) 55
+T_END (265) 55
 T_CONST (266) 9
-T_WRITELN (267) 68
+T_WRITELN (267) 70
 T_PROCEDURE (268) 37 39
 T_FUNCTION (269) 44 46
-T_FOR (270) 65
-T_DO (271) 64 65
-T_TO (272) 66
-T_DOWNTO (273) 67
-T_BOOL_AND (274) 100
-T_BOOL_OR (275) 101
-T_BOOL_NOT (276) 102
-T_REL_LE (277) 97
-T_REL_GE (278) 98
-T_REL_NE (279) 99
-T_SINGLEEQ (280) 11 12 18 94
-T_BIT_LS (281) 107
-T_BIT_RS (282) 108
-T_ASOP (283) 65 84
-T_AS_PE (284) 85
-T_AS_SE (285) 86
-T_AS_MULE (286) 87
-T_AS_DIVE (287) 88
+T_FOR (270) 67
+T_DO (271) 66 67
+T_TO (272) 68
+T_DOWNTO (273) 69
+T_BOOL_AND (274) 102
+T_BOOL_OR (275) 103
+T_BOOL_NOT (276) 104
+T_REL_LE (277) 99
+T_REL_GE (278) 100
+T_REL_NE (279) 101
+T_SINGLEEQ (280) 11 12 18 96
+T_BIT_LS (281) 109
+T_BIT_RS (282) 110
+T_ASOP (283) 67 86
+T_AS_PE (284) 87
+T_AS_SE (285) 88
+T_AS_MULE (286) 89
+T_AS_DIVE (287) 90
 T_ARRAY (288)
-T_IDENTIFIER (289) 3 5 7 11 12 18 23 26 28 31 37 39 40 41 44 46 48
-    50 52 65 71 76
-T_DATATYPE (290) 18 25 40 41 44 46 48 50
-T_INTVAL (291) 72 109
-T_FLOATVAL (292) 73 110
-T_BOOLVAL (293) 74
-T_STRINGVAL (294) 68 75
+T_IDENTIFIER (289) 3 5 7 11 12 18 23 26 28 31 37 39 40 41 44 46 49
+    53 67 73 78
+T_DATATYPE (290) 18 25 40 41 44 46 49
+T_INTVAL (291) 74 111
+T_FLOATVAL (292) 75 112
+T_BOOLVAL (293) 76
+T_STRINGVAL (294) 70 77
 
 
 Nonterminals, with rules where they appear
@@ -319,58 +311,62 @@ $@8 (85)
 $@9 (86)
     on left: 45, on right: 46
 function_param_list (87)
-    on left: 48 50, on right: 46 50
+    on left: 49, on right: 46 51
 $@10 (88)
-    on left: 47, on right: 48
+    on left: 47, on right: 49
 $@11 (89)
-    on left: 49, on right: 50
-more_func_identifiers (90)
-    on left: 52 53, on right: 48 50 52
-$@12 (91)
-    on left: 51, on right: 52
-execution_block (92)
-    on left: 54, on right: 4
-execution_body (93)
-    on left: 55 56 57 58, on right: 54 55 56 57 64 65
-structured_statements (94)
-    on left: 59 60, on right: 57
-conditional_statement (95)
-    on left: 61, on right: 59
-repetitive_statement (96)
-    on left: 62 63, on right: 60
-while_statement (97)
-    on left: 64, on right: 63
-for_statement (98)
-    on left: 65, on right: 62
-for_list (99)
-    on left: 66 67, on right: 65
-print_statements (100)
-    on left: 68, on right: 56
-assignment_statements (101)
-    on left: 69 70, on right: 55 69
-assignment_statement (102)
-    on left: 71, on right: 69
-value (103)
-    on left: 72 73 74 75, on right: 77
-expression (104)
-    on left: 76 77 78 79, on right: 64 66 67 71 78 79
-operator (105)
-    on left: 80 81 82 83, on right: 79
-assignment_ops (106)
-    on left: 84 85 86 87 88, on right: 71
-arithmetic_ops (107)
-    on left: 89 90 91 92 93, on right: 80
-relational_ops (108)
-    on left: 94 95 96 97 98 99, on right: 81
-boolean_ops (109)
-    on left: 100 101 102, on right: 82
-bitwise_ops (110)
-    on left: 103 104 105 106 107 108, on right: 83
-some_numeric_type (111)
-    on left: 109 110, on right: 11 12
-epsilon (112)
-    on left: 111, on right: 6 8 10 13 15 19 21 24 29 32 35 42 53 58
-    70
+    on left: 48, on right: 49
+function_param_continue (90)
+    on left: 50 51, on right: 49
+more_func_identifiers (91)
+    on left: 53 54, on right: 49 53
+$@12 (92)
+    on left: 52, on right: 53
+execution_block (93)
+    on left: 55, on right: 4
+execution_body (94)
+    on left: 56 57, on right: 55 56
+statements (95)
+    on left: 58 59 60, on right: 56 66 67
+structured_statements (96)
+    on left: 61 62, on right: 60
+conditional_statement (97)
+    on left: 63, on right: 61
+repetitive_statement (98)
+    on left: 64 65, on right: 62
+while_statement (99)
+    on left: 66, on right: 65
+for_statement (100)
+    on left: 67, on right: 64
+for_list (101)
+    on left: 68 69, on right: 67
+print_statements (102)
+    on left: 70, on right: 59
+assignment_statements (103)
+    on left: 71 72, on right: 58 71
+assignment_statement (104)
+    on left: 73, on right: 71
+value (105)
+    on left: 74 75 76 77, on right: 79
+expression (106)
+    on left: 78 79 80 81, on right: 66 68 69 73 80 81
+operator (107)
+    on left: 82 83 84 85, on right: 81
+assignment_ops (108)
+    on left: 86 87 88 89 90, on right: 73
+arithmetic_ops (109)
+    on left: 91 92 93 94 95, on right: 82
+relational_ops (110)
+    on left: 96 97 98 99 100 101, on right: 83
+boolean_ops (111)
+    on left: 102 103 104, on right: 84
+bitwise_ops (112)
+    on left: 105 106 107 108 109 110, on right: 85
+some_numeric_type (113)
+    on left: 111 112, on right: 11 12
+epsilon (114)
+    on left: 113, on right: 6 8 10 13 15 19 21 24 29 32 35 42 50 54
+    57 72
 
 
 State 0
@@ -411,7 +407,7 @@ State 4
 
     T_USES  shift, and go to state 7
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     block       go to state 8
     uses_block  go to state 9
@@ -452,7 +448,7 @@ State 9
 
     T_CONST  shift, and go to state 14
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     constant_block  go to state 15
     epsilon         go to state 16
@@ -478,7 +474,7 @@ State 12
 
     ','  shift, and go to state 17
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     more_libs  go to state 18
     epsilon    go to state 19
@@ -506,7 +502,7 @@ State 15
 
     T_TYPE  shift, and go to state 22
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     type_block  go to state 23
     epsilon     go to state 24
@@ -560,7 +556,7 @@ State 22
 
     T_IDENTIFIER  shift, and go to state 28
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     type_definition  go to state 29
     epsilon          go to state 30
@@ -572,7 +568,7 @@ State 23
 
     T_VAR  shift, and go to state 31
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     variable_block  go to state 32
     epsilon         go to state 33
@@ -591,7 +587,7 @@ State 25
 
     ','  shift, and go to state 17
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     more_libs  go to state 34
     epsilon    go to state 19
@@ -643,7 +639,7 @@ State 31
 
     T_IDENTIFIER  shift, and go to state 39
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     variable_declaration  go to state 40
     epsilon               go to state 41
@@ -656,7 +652,7 @@ State 32
     T_PROCEDURE  shift, and go to state 42
     T_FUNCTION   shift, and go to state 43
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     function_and_procedure_block  go to state 44
     procedure_block               go to state 45
@@ -680,16 +676,16 @@ State 34
 
 State 35
 
-  109 some_numeric_type: T_INTVAL .
+  111 some_numeric_type: T_INTVAL .
 
-    $default  reduce using rule 109 (some_numeric_type)
+    $default  reduce using rule 111 (some_numeric_type)
 
 
 State 36
 
-  110 some_numeric_type: T_FLOATVAL .
+  112 some_numeric_type: T_FLOATVAL .
 
-    $default  reduce using rule 110 (some_numeric_type)
+    $default  reduce using rule 112 (some_numeric_type)
 
 
 State 37
@@ -705,7 +701,7 @@ State 38
 
     ','  shift, and go to state 49
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     more_type_identifiers  go to state 50
     epsilon                go to state 51
@@ -766,7 +762,7 @@ State 45
     T_PROCEDURE  shift, and go to state 42
     T_FUNCTION   shift, and go to state 43
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     function_and_procedure_block  go to state 57
     procedure_block               go to state 45
@@ -781,7 +777,7 @@ State 46
     T_PROCEDURE  shift, and go to state 42
     T_FUNCTION   shift, and go to state 43
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     function_and_procedure_block  go to state 58
     procedure_block               go to state 45
@@ -802,7 +798,7 @@ State 48
 
     T_IDENTIFIER  shift, and go to state 59
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     more_const_definition  go to state 60
     epsilon                go to state 61
@@ -835,7 +831,7 @@ State 52
 
     ','  shift, and go to state 64
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
     more_var_identifiers  go to state 65
     epsilon               go to state 66
@@ -867,32 +863,12 @@ State 54
 
 State 55
 
-   54 execution_block: T_BEGIN . execution_body T_END
+   55 execution_block: T_BEGIN . execution_body T_END
 
-    T_WHILE       shift, and go to state 71
-    T_WRITELN     shift, and go to state 72
-    T_FOR         shift, and go to state 73
-    T_IDENTIFIER  shift, and go to state 74
+    $default  reduce using rule 113 (epsilon)
 
-    T_WHILE       [reduce using rule 111 (epsilon)]
-    T_END         reduce using rule 111 (epsilon)
-    T_WRITELN     [reduce using rule 111 (epsilon)]
-    T_FOR         [reduce using rule 111 (epsilon)]
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    ';'           reduce using rule 61 (conditional_statement)
-    ';'           [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 61 (conditional_statement)
-
-    execution_body         go to state 75
-    structured_statements  go to state 76
-    conditional_statement  go to state 77
-    repetitive_statement   go to state 78
-    while_statement        go to state 79
-    for_statement          go to state 80
-    print_statements       go to state 81
-    assignment_statements  go to state 82
-    assignment_statement   go to state 83
-    epsilon                go to state 84
+    execution_body  go to state 71
+    epsilon         go to state 72
 
 
 State 56
@@ -920,7 +896,7 @@ State 59
 
    12 more_const_definition: T_IDENTIFIER . T_SINGLEEQ some_numeric_type ';' more_const_definition
 
-    T_SINGLEEQ  shift, and go to state 85
+    T_SINGLEEQ  shift, and go to state 73
 
 
 State 60
@@ -943,28 +919,28 @@ State 62
 
     $default  reduce using rule 27 ($@4)
 
-    $@4  go to state 86
+    $@4  go to state 74
 
 
 State 63
 
    18 type_definition: T_IDENTIFIER $@1 more_type_identifiers T_SINGLEEQ . T_DATATYPE $@2 ';' type_definition
 
-    T_DATATYPE  shift, and go to state 87
+    T_DATATYPE  shift, and go to state 75
 
 
 State 64
 
    31 more_var_identifiers: ',' . T_IDENTIFIER $@5 more_var_identifiers
 
-    T_IDENTIFIER  shift, and go to state 88
+    T_IDENTIFIER  shift, and go to state 76
 
 
 State 65
 
    23 variable_declaration: T_IDENTIFIER $@3 more_var_identifiers . ':' data_type ';' variable_declaration
 
-    ':'  shift, and go to state 89
+    ':'  shift, and go to state 77
 
 
 State 66
@@ -978,1549 +954,1471 @@ State 67
 
    37 procedure_block: T_PROCEDURE T_IDENTIFIER $@6 . ';' block ';'
 
-    ';'  shift, and go to state 90
+    ';'  shift, and go to state 78
 
 
 State 68
 
    39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 . '(' param_list ')' ';' block ';'
 
-    '('  shift, and go to state 91
+    '('  shift, and go to state 79
 
 
 State 69
 
    44 function_block: T_FUNCTION T_IDENTIFIER $@8 . ':' T_DATATYPE ';' block ';'
 
-    ':'  shift, and go to state 92
+    ':'  shift, and go to state 80
 
 
 State 70
 
    46 function_block: T_FUNCTION T_IDENTIFIER $@9 . '(' function_param_list ')' ':' T_DATATYPE ';' block ';'
 
-    '('  shift, and go to state 93
+    '('  shift, and go to state 81
 
 
 State 71
 
-   64 while_statement: T_WHILE . expression T_DO execution_body
+   55 execution_block: T_BEGIN execution_body . T_END
+   56 execution_body: execution_body . statements
 
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
+    T_WHILE       shift, and go to state 82
+    T_IF          shift, and go to state 83
+    T_END         shift, and go to state 84
+    T_WRITELN     shift, and go to state 85
+    T_FOR         shift, and go to state 86
+    T_IDENTIFIER  shift, and go to state 87
 
-    value       go to state 100
-    expression  go to state 101
+    T_WHILE       [reduce using rule 113 (epsilon)]
+    T_IF          [reduce using rule 113 (epsilon)]
+    T_END         [reduce using rule 113 (epsilon)]
+    T_WRITELN     [reduce using rule 113 (epsilon)]
+    T_FOR         [reduce using rule 113 (epsilon)]
+    T_IDENTIFIER  [reduce using rule 113 (epsilon)]
+
+    statements             go to state 88
+    structured_statements  go to state 89
+    conditional_statement  go to state 90
+    repetitive_statement   go to state 91
+    while_statement        go to state 92
+    for_statement          go to state 93
+    print_statements       go to state 94
+    assignment_statements  go to state 95
+    assignment_statement   go to state 96
+    epsilon                go to state 97
 
 
 State 72
 
-   68 print_statements: T_WRITELN . '(' T_STRINGVAL ')' ';'
+   57 execution_body: epsilon .
 
-    '('  shift, and go to state 102
+    $default  reduce using rule 57 (execution_body)
 
 
 State 73
-
-   65 for_statement: T_FOR . T_IDENTIFIER T_ASOP for_list T_DO execution_body
-
-    T_IDENTIFIER  shift, and go to state 103
-
-
-State 74
-
-   71 assignment_statement: T_IDENTIFIER . assignment_ops expression
-
-    T_ASOP     shift, and go to state 104
-    T_AS_PE    shift, and go to state 105
-    T_AS_SE    shift, and go to state 106
-    T_AS_MULE  shift, and go to state 107
-    T_AS_DIVE  shift, and go to state 108
-
-    assignment_ops  go to state 109
-
-
-State 75
-
-   54 execution_block: T_BEGIN execution_body . T_END
-
-    T_END  shift, and go to state 110
-
-
-State 76
-
-   57 execution_body: structured_statements . execution_body
-
-    T_WHILE       shift, and go to state 71
-    T_WRITELN     shift, and go to state 72
-    T_FOR         shift, and go to state 73
-    T_IDENTIFIER  shift, and go to state 74
-
-    T_WHILE       [reduce using rule 111 (epsilon)]
-    T_END         reduce using rule 111 (epsilon)
-    T_WRITELN     [reduce using rule 111 (epsilon)]
-    T_FOR         [reduce using rule 111 (epsilon)]
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    ';'           reduce using rule 61 (conditional_statement)
-    ';'           [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 61 (conditional_statement)
-
-    execution_body         go to state 111
-    structured_statements  go to state 76
-    conditional_statement  go to state 77
-    repetitive_statement   go to state 78
-    while_statement        go to state 79
-    for_statement          go to state 80
-    print_statements       go to state 81
-    assignment_statements  go to state 82
-    assignment_statement   go to state 83
-    epsilon                go to state 84
-
-
-State 77
-
-   59 structured_statements: conditional_statement . ';'
-
-    ';'  shift, and go to state 112
-
-
-State 78
-
-   60 structured_statements: repetitive_statement .
-
-    $default  reduce using rule 60 (structured_statements)
-
-
-State 79
-
-   63 repetitive_statement: while_statement .
-
-    $default  reduce using rule 63 (repetitive_statement)
-
-
-State 80
-
-   62 repetitive_statement: for_statement .
-
-    $default  reduce using rule 62 (repetitive_statement)
-
-
-State 81
-
-   56 execution_body: print_statements . execution_body
-
-    T_WHILE       shift, and go to state 71
-    T_WRITELN     shift, and go to state 72
-    T_FOR         shift, and go to state 73
-    T_IDENTIFIER  shift, and go to state 74
-
-    T_WHILE       [reduce using rule 111 (epsilon)]
-    T_END         reduce using rule 111 (epsilon)
-    T_WRITELN     [reduce using rule 111 (epsilon)]
-    T_FOR         [reduce using rule 111 (epsilon)]
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    ';'           reduce using rule 61 (conditional_statement)
-    ';'           [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 61 (conditional_statement)
-
-    execution_body         go to state 113
-    structured_statements  go to state 76
-    conditional_statement  go to state 77
-    repetitive_statement   go to state 78
-    while_statement        go to state 79
-    for_statement          go to state 80
-    print_statements       go to state 81
-    assignment_statements  go to state 82
-    assignment_statement   go to state 83
-    epsilon                go to state 84
-
-
-State 82
-
-   55 execution_body: assignment_statements . execution_body
-
-    T_WHILE       shift, and go to state 71
-    T_WRITELN     shift, and go to state 72
-    T_FOR         shift, and go to state 73
-    T_IDENTIFIER  shift, and go to state 74
-
-    T_WHILE       [reduce using rule 111 (epsilon)]
-    T_END         reduce using rule 111 (epsilon)
-    T_WRITELN     [reduce using rule 111 (epsilon)]
-    T_FOR         [reduce using rule 111 (epsilon)]
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    ';'           reduce using rule 61 (conditional_statement)
-    ';'           [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 61 (conditional_statement)
-
-    execution_body         go to state 114
-    structured_statements  go to state 76
-    conditional_statement  go to state 77
-    repetitive_statement   go to state 78
-    while_statement        go to state 79
-    for_statement          go to state 80
-    print_statements       go to state 81
-    assignment_statements  go to state 82
-    assignment_statement   go to state 83
-    epsilon                go to state 84
-
-
-State 83
-
-   69 assignment_statements: assignment_statement . ';' assignment_statements
-
-    ';'  shift, and go to state 115
-
-
-State 84
-
-   58 execution_body: epsilon .
-   70 assignment_statements: epsilon .
-
-    T_WHILE       reduce using rule 58 (execution_body)
-    T_WHILE       [reduce using rule 70 (assignment_statements)]
-    T_END         reduce using rule 58 (execution_body)
-    T_END         [reduce using rule 70 (assignment_statements)]
-    T_WRITELN     reduce using rule 58 (execution_body)
-    T_WRITELN     [reduce using rule 70 (assignment_statements)]
-    T_FOR         reduce using rule 58 (execution_body)
-    T_FOR         [reduce using rule 70 (assignment_statements)]
-    T_IDENTIFIER  reduce using rule 58 (execution_body)
-    T_IDENTIFIER  [reduce using rule 70 (assignment_statements)]
-    ';'           reduce using rule 58 (execution_body)
-    ';'           [reduce using rule 70 (assignment_statements)]
-    $default      reduce using rule 58 (execution_body)
-
-
-State 85
 
    12 more_const_definition: T_IDENTIFIER T_SINGLEEQ . some_numeric_type ';' more_const_definition
 
     T_INTVAL    shift, and go to state 35
     T_FLOATVAL  shift, and go to state 36
 
-    some_numeric_type  go to state 116
+    some_numeric_type  go to state 98
 
 
-State 86
+State 74
 
    28 more_type_identifiers: ',' T_IDENTIFIER $@4 . more_type_identifiers
 
     ','  shift, and go to state 49
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    more_type_identifiers  go to state 117
+    more_type_identifiers  go to state 99
     epsilon                go to state 51
 
 
-State 87
+State 75
 
    18 type_definition: T_IDENTIFIER $@1 more_type_identifiers T_SINGLEEQ T_DATATYPE . $@2 ';' type_definition
 
     $default  reduce using rule 17 ($@2)
 
-    $@2  go to state 118
+    $@2  go to state 100
 
 
-State 88
+State 76
 
    31 more_var_identifiers: ',' T_IDENTIFIER . $@5 more_var_identifiers
 
     $default  reduce using rule 30 ($@5)
 
-    $@5  go to state 119
+    $@5  go to state 101
 
 
-State 89
+State 77
 
    23 variable_declaration: T_IDENTIFIER $@3 more_var_identifiers ':' . data_type ';' variable_declaration
 
-    T_IDENTIFIER  shift, and go to state 120
-    T_DATATYPE    shift, and go to state 121
+    T_IDENTIFIER  shift, and go to state 102
+    T_DATATYPE    shift, and go to state 103
 
-    data_type  go to state 122
+    data_type  go to state 104
 
 
-State 90
+State 78
 
    37 procedure_block: T_PROCEDURE T_IDENTIFIER $@6 ';' . block ';'
 
     T_USES  shift, and go to state 7
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    block       go to state 123
+    block       go to state 105
     uses_block  go to state 9
     epsilon     go to state 10
 
 
-State 91
+State 79
 
    39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' . param_list ')' ';' block ';'
 
-    T_IDENTIFIER  shift, and go to state 124
+    T_IDENTIFIER  shift, and go to state 106
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    param_list  go to state 125
-    epsilon     go to state 126
+    param_list  go to state 107
+    epsilon     go to state 108
 
 
-State 92
+State 80
 
    44 function_block: T_FUNCTION T_IDENTIFIER $@8 ':' . T_DATATYPE ';' block ';'
 
-    T_DATATYPE  shift, and go to state 127
+    T_DATATYPE  shift, and go to state 109
 
 
-State 93
+State 81
 
    46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' . function_param_list ')' ':' T_DATATYPE ';' block ';'
 
-    T_IDENTIFIER  shift, and go to state 128
+    T_IDENTIFIER  shift, and go to state 110
 
-    function_param_list  go to state 129
+    function_param_list  go to state 111
 
 
-State 94
+State 82
 
-   76 expression: T_IDENTIFIER .
+   66 while_statement: T_WHILE . expression T_DO statements
 
-    $default  reduce using rule 76 (expression)
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
 
+    value       go to state 118
+    expression  go to state 119
 
-State 95
 
-   72 value: T_INTVAL .
+State 83
 
-    $default  reduce using rule 72 (value)
+   63 conditional_statement: T_IF .
 
+    $default  reduce using rule 63 (conditional_statement)
 
-State 96
 
-   73 value: T_FLOATVAL .
+State 84
 
-    $default  reduce using rule 73 (value)
+   55 execution_block: T_BEGIN execution_body T_END .
 
+    $default  reduce using rule 55 (execution_block)
 
-State 97
 
-   74 value: T_BOOLVAL .
+State 85
 
-    $default  reduce using rule 74 (value)
+   70 print_statements: T_WRITELN . '(' T_STRINGVAL ')' ';'
 
+    '('  shift, and go to state 120
 
-State 98
 
-   75 value: T_STRINGVAL .
+State 86
 
-    $default  reduce using rule 75 (value)
+   67 for_statement: T_FOR . T_IDENTIFIER T_ASOP for_list T_DO statements
 
+    T_IDENTIFIER  shift, and go to state 121
 
-State 99
 
-   78 expression: '(' . expression ')'
+State 87
 
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
+   73 assignment_statement: T_IDENTIFIER . assignment_ops expression
 
-    value       go to state 100
-    expression  go to state 130
+    T_ASOP     shift, and go to state 122
+    T_AS_PE    shift, and go to state 123
+    T_AS_SE    shift, and go to state 124
+    T_AS_MULE  shift, and go to state 125
+    T_AS_DIVE  shift, and go to state 126
 
+    assignment_ops  go to state 127
 
-State 100
 
-   77 expression: value .
+State 88
 
-    $default  reduce using rule 77 (expression)
-
-
-State 101
-
-   64 while_statement: T_WHILE expression . T_DO execution_body
-   79 expression: expression . operator expression
-
-    T_DO        shift, and go to state 131
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
-
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
-
-
-State 102
-
-   68 print_statements: T_WRITELN '(' . T_STRINGVAL ')' ';'
-
-    T_STRINGVAL  shift, and go to state 157
-
-
-State 103
-
-   65 for_statement: T_FOR T_IDENTIFIER . T_ASOP for_list T_DO execution_body
-
-    T_ASOP  shift, and go to state 158
-
-
-State 104
-
-   84 assignment_ops: T_ASOP .
-
-    $default  reduce using rule 84 (assignment_ops)
-
-
-State 105
-
-   85 assignment_ops: T_AS_PE .
-
-    $default  reduce using rule 85 (assignment_ops)
-
-
-State 106
-
-   86 assignment_ops: T_AS_SE .
-
-    $default  reduce using rule 86 (assignment_ops)
-
-
-State 107
-
-   87 assignment_ops: T_AS_MULE .
-
-    $default  reduce using rule 87 (assignment_ops)
-
-
-State 108
-
-   88 assignment_ops: T_AS_DIVE .
-
-    $default  reduce using rule 88 (assignment_ops)
-
-
-State 109
-
-   71 assignment_statement: T_IDENTIFIER assignment_ops . expression
-
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
-
-    value       go to state 100
-    expression  go to state 159
-
-
-State 110
-
-   54 execution_block: T_BEGIN execution_body T_END .
-
-    $default  reduce using rule 54 (execution_block)
-
-
-State 111
-
-   57 execution_body: structured_statements execution_body .
-
-    $default  reduce using rule 57 (execution_body)
-
-
-State 112
-
-   59 structured_statements: conditional_statement ';' .
-
-    $default  reduce using rule 59 (structured_statements)
-
-
-State 113
-
-   56 execution_body: print_statements execution_body .
+   56 execution_body: execution_body statements .
 
     $default  reduce using rule 56 (execution_body)
 
 
-State 114
+State 89
 
-   55 execution_body: assignment_statements execution_body .
+   60 statements: structured_statements .
 
-    $default  reduce using rule 55 (execution_body)
-
-
-State 115
-
-   69 assignment_statements: assignment_statement ';' . assignment_statements
-
-    T_IDENTIFIER  shift, and go to state 74
-
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 111 (epsilon)
-
-    assignment_statements  go to state 160
-    assignment_statement   go to state 83
-    epsilon                go to state 161
+    $default  reduce using rule 60 (statements)
 
 
-State 116
+State 90
+
+   61 structured_statements: conditional_statement . ';'
+
+    ';'  shift, and go to state 128
+
+
+State 91
+
+   62 structured_statements: repetitive_statement .
+
+    $default  reduce using rule 62 (structured_statements)
+
+
+State 92
+
+   65 repetitive_statement: while_statement .
+
+    $default  reduce using rule 65 (repetitive_statement)
+
+
+State 93
+
+   64 repetitive_statement: for_statement .
+
+    $default  reduce using rule 64 (repetitive_statement)
+
+
+State 94
+
+   59 statements: print_statements .
+
+    $default  reduce using rule 59 (statements)
+
+
+State 95
+
+   58 statements: assignment_statements .
+
+    $default  reduce using rule 58 (statements)
+
+
+State 96
+
+   71 assignment_statements: assignment_statement . ';' assignment_statements
+
+    ';'  shift, and go to state 129
+
+
+State 97
+
+   72 assignment_statements: epsilon .
+
+    $default  reduce using rule 72 (assignment_statements)
+
+
+State 98
 
    12 more_const_definition: T_IDENTIFIER T_SINGLEEQ some_numeric_type . ';' more_const_definition
 
-    ';'  shift, and go to state 162
+    ';'  shift, and go to state 130
 
 
-State 117
+State 99
 
    28 more_type_identifiers: ',' T_IDENTIFIER $@4 more_type_identifiers .
 
     $default  reduce using rule 28 (more_type_identifiers)
 
 
-State 118
+State 100
 
    18 type_definition: T_IDENTIFIER $@1 more_type_identifiers T_SINGLEEQ T_DATATYPE $@2 . ';' type_definition
 
-    ';'  shift, and go to state 163
+    ';'  shift, and go to state 131
 
 
-State 119
+State 101
 
    31 more_var_identifiers: ',' T_IDENTIFIER $@5 . more_var_identifiers
 
     ','  shift, and go to state 64
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    more_var_identifiers  go to state 164
+    more_var_identifiers  go to state 132
     epsilon               go to state 66
 
 
-State 120
+State 102
 
    26 data_type: T_IDENTIFIER .
 
     $default  reduce using rule 26 (data_type)
 
 
-State 121
+State 103
 
    25 data_type: T_DATATYPE .
 
     $default  reduce using rule 25 (data_type)
 
 
-State 122
+State 104
 
    23 variable_declaration: T_IDENTIFIER $@3 more_var_identifiers ':' data_type . ';' variable_declaration
 
-    ';'  shift, and go to state 165
+    ';'  shift, and go to state 133
 
 
-State 123
+State 105
 
    37 procedure_block: T_PROCEDURE T_IDENTIFIER $@6 ';' block . ';'
 
-    ';'  shift, and go to state 166
+    ';'  shift, and go to state 134
 
 
-State 124
+State 106
 
    40 param_list: T_IDENTIFIER . ':' T_DATATYPE
    41           | T_IDENTIFIER . ':' T_DATATYPE ';' param_list
 
-    ':'  shift, and go to state 167
+    ':'  shift, and go to state 135
 
 
-State 125
+State 107
 
    39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' param_list . ')' ';' block ';'
 
-    ')'  shift, and go to state 168
+    ')'  shift, and go to state 136
 
 
-State 126
+State 108
 
    42 param_list: epsilon .
 
     $default  reduce using rule 42 (param_list)
 
 
-State 127
+State 109
 
    44 function_block: T_FUNCTION T_IDENTIFIER $@8 ':' T_DATATYPE . ';' block ';'
 
-    ';'  shift, and go to state 169
+    ';'  shift, and go to state 137
+
+
+State 110
+
+   49 function_param_list: T_IDENTIFIER . $@10 more_func_identifiers ':' T_DATATYPE $@11 function_param_continue
+
+    $default  reduce using rule 47 ($@10)
+
+    $@10  go to state 138
+
+
+State 111
+
+   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list . ')' ':' T_DATATYPE ';' block ';'
+
+    ')'  shift, and go to state 139
+
+
+State 112
+
+   78 expression: T_IDENTIFIER .
+
+    $default  reduce using rule 78 (expression)
+
+
+State 113
+
+   74 value: T_INTVAL .
+
+    $default  reduce using rule 74 (value)
+
+
+State 114
+
+   75 value: T_FLOATVAL .
+
+    $default  reduce using rule 75 (value)
+
+
+State 115
+
+   76 value: T_BOOLVAL .
+
+    $default  reduce using rule 76 (value)
+
+
+State 116
+
+   77 value: T_STRINGVAL .
+
+    $default  reduce using rule 77 (value)
+
+
+State 117
+
+   80 expression: '(' . expression ')'
+
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
+
+    value       go to state 118
+    expression  go to state 140
+
+
+State 118
+
+   79 expression: value .
+
+    $default  reduce using rule 79 (expression)
+
+
+State 119
+
+   66 while_statement: T_WHILE expression . T_DO statements
+   81 expression: expression . operator expression
+
+    T_DO        shift, and go to state 141
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
+
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
+
+
+State 120
+
+   70 print_statements: T_WRITELN '(' . T_STRINGVAL ')' ';'
+
+    T_STRINGVAL  shift, and go to state 167
+
+
+State 121
+
+   67 for_statement: T_FOR T_IDENTIFIER . T_ASOP for_list T_DO statements
+
+    T_ASOP  shift, and go to state 168
+
+
+State 122
+
+   86 assignment_ops: T_ASOP .
+
+    $default  reduce using rule 86 (assignment_ops)
+
+
+State 123
+
+   87 assignment_ops: T_AS_PE .
+
+    $default  reduce using rule 87 (assignment_ops)
+
+
+State 124
+
+   88 assignment_ops: T_AS_SE .
+
+    $default  reduce using rule 88 (assignment_ops)
+
+
+State 125
+
+   89 assignment_ops: T_AS_MULE .
+
+    $default  reduce using rule 89 (assignment_ops)
+
+
+State 126
+
+   90 assignment_ops: T_AS_DIVE .
+
+    $default  reduce using rule 90 (assignment_ops)
+
+
+State 127
+
+   73 assignment_statement: T_IDENTIFIER assignment_ops . expression
+
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
+
+    value       go to state 118
+    expression  go to state 169
 
 
 State 128
 
-   48 function_param_list: T_IDENTIFIER . $@10 more_func_identifiers ':' T_DATATYPE
-   50                    | T_IDENTIFIER . $@11 more_func_identifiers ':' T_DATATYPE ';' function_param_list
+   61 structured_statements: conditional_statement ';' .
 
-    ','       reduce using rule 47 ($@10)
-    ','       [reduce using rule 49 ($@11)]
-    ':'       reduce using rule 47 ($@10)
-    ':'       [reduce using rule 49 ($@11)]
-    $default  reduce using rule 47 ($@10)
-
-    $@10  go to state 170
-    $@11  go to state 171
+    $default  reduce using rule 61 (structured_statements)
 
 
 State 129
 
-   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list . ')' ':' T_DATATYPE ';' block ';'
+   71 assignment_statements: assignment_statement ';' . assignment_statements
 
-    ')'  shift, and go to state 172
+    T_IDENTIFIER  shift, and go to state 87
+
+    T_IDENTIFIER  [reduce using rule 113 (epsilon)]
+    $default      reduce using rule 113 (epsilon)
+
+    assignment_statements  go to state 170
+    assignment_statement   go to state 96
+    epsilon                go to state 97
 
 
 State 130
-
-   78 expression: '(' expression . ')'
-   79           | expression . operator expression
-
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    ')'         shift, and go to state 173
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
-
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
-
-
-State 131
-
-   64 while_statement: T_WHILE expression T_DO . execution_body
-
-    T_WHILE       shift, and go to state 71
-    T_WRITELN     shift, and go to state 72
-    T_FOR         shift, and go to state 73
-    T_IDENTIFIER  shift, and go to state 74
-
-    T_WHILE       [reduce using rule 111 (epsilon)]
-    T_END         reduce using rule 111 (epsilon)
-    T_WRITELN     [reduce using rule 111 (epsilon)]
-    T_FOR         [reduce using rule 111 (epsilon)]
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    ';'           reduce using rule 61 (conditional_statement)
-    ';'           [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 61 (conditional_statement)
-
-    execution_body         go to state 174
-    structured_statements  go to state 76
-    conditional_statement  go to state 77
-    repetitive_statement   go to state 78
-    while_statement        go to state 79
-    for_statement          go to state 80
-    print_statements       go to state 81
-    assignment_statements  go to state 82
-    assignment_statement   go to state 83
-    epsilon                go to state 84
-
-
-State 132
-
-  100 boolean_ops: T_BOOL_AND .
-
-    $default  reduce using rule 100 (boolean_ops)
-
-
-State 133
-
-  101 boolean_ops: T_BOOL_OR .
-
-    $default  reduce using rule 101 (boolean_ops)
-
-
-State 134
-
-  102 boolean_ops: T_BOOL_NOT .
-
-    $default  reduce using rule 102 (boolean_ops)
-
-
-State 135
-
-   97 relational_ops: T_REL_LE .
-
-    $default  reduce using rule 97 (relational_ops)
-
-
-State 136
-
-   98 relational_ops: T_REL_GE .
-
-    $default  reduce using rule 98 (relational_ops)
-
-
-State 137
-
-   99 relational_ops: T_REL_NE .
-
-    $default  reduce using rule 99 (relational_ops)
-
-
-State 138
-
-   94 relational_ops: T_SINGLEEQ .
-
-    $default  reduce using rule 94 (relational_ops)
-
-
-State 139
-
-  107 bitwise_ops: T_BIT_LS .
-
-    $default  reduce using rule 107 (bitwise_ops)
-
-
-State 140
-
-  108 bitwise_ops: T_BIT_RS .
-
-    $default  reduce using rule 108 (bitwise_ops)
-
-
-State 141
-
-   89 arithmetic_ops: '+' .
-
-    $default  reduce using rule 89 (arithmetic_ops)
-
-
-State 142
-
-   90 arithmetic_ops: '*' .
-
-    $default  reduce using rule 90 (arithmetic_ops)
-
-
-State 143
-
-   91 arithmetic_ops: '/' .
-
-    $default  reduce using rule 91 (arithmetic_ops)
-
-
-State 144
-
-   92 arithmetic_ops: '-' .
-
-    $default  reduce using rule 92 (arithmetic_ops)
-
-
-State 145
-
-   93 arithmetic_ops: '%' .
-
-    $default  reduce using rule 93 (arithmetic_ops)
-
-
-State 146
-
-   95 relational_ops: '>' .
-
-    $default  reduce using rule 95 (relational_ops)
-
-
-State 147
-
-   96 relational_ops: '<' .
-
-    $default  reduce using rule 96 (relational_ops)
-
-
-State 148
-
-  103 bitwise_ops: '&' .
-
-    $default  reduce using rule 103 (bitwise_ops)
-
-
-State 149
-
-  104 bitwise_ops: '|' .
-
-    $default  reduce using rule 104 (bitwise_ops)
-
-
-State 150
-
-  105 bitwise_ops: '~' .
-
-    $default  reduce using rule 105 (bitwise_ops)
-
-
-State 151
-
-  106 bitwise_ops: '!' .
-
-    $default  reduce using rule 106 (bitwise_ops)
-
-
-State 152
-
-   79 expression: expression operator . expression
-
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
-
-    value       go to state 100
-    expression  go to state 175
-
-
-State 153
-
-   80 operator: arithmetic_ops .
-
-    $default  reduce using rule 80 (operator)
-
-
-State 154
-
-   81 operator: relational_ops .
-
-    $default  reduce using rule 81 (operator)
-
-
-State 155
-
-   82 operator: boolean_ops .
-
-    $default  reduce using rule 82 (operator)
-
-
-State 156
-
-   83 operator: bitwise_ops .
-
-    $default  reduce using rule 83 (operator)
-
-
-State 157
-
-   68 print_statements: T_WRITELN '(' T_STRINGVAL . ')' ';'
-
-    ')'  shift, and go to state 176
-
-
-State 158
-
-   65 for_statement: T_FOR T_IDENTIFIER T_ASOP . for_list T_DO execution_body
-
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
-
-    for_list    go to state 177
-    value       go to state 100
-    expression  go to state 178
-
-
-State 159
-
-   71 assignment_statement: T_IDENTIFIER assignment_ops expression .
-   79 expression: expression . operator expression
-
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
-
-    $default  reduce using rule 71 (assignment_statement)
-
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
-
-
-State 160
-
-   69 assignment_statements: assignment_statement ';' assignment_statements .
-
-    $default  reduce using rule 69 (assignment_statements)
-
-
-State 161
-
-   70 assignment_statements: epsilon .
-
-    $default  reduce using rule 70 (assignment_statements)
-
-
-State 162
 
    12 more_const_definition: T_IDENTIFIER T_SINGLEEQ some_numeric_type ';' . more_const_definition
 
     T_IDENTIFIER  shift, and go to state 59
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    more_const_definition  go to state 179
+    more_const_definition  go to state 171
     epsilon                go to state 61
 
 
-State 163
+State 131
 
    18 type_definition: T_IDENTIFIER $@1 more_type_identifiers T_SINGLEEQ T_DATATYPE $@2 ';' . type_definition
 
     T_IDENTIFIER  shift, and go to state 28
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    type_definition  go to state 180
+    type_definition  go to state 172
     epsilon          go to state 30
 
 
-State 164
+State 132
 
    31 more_var_identifiers: ',' T_IDENTIFIER $@5 more_var_identifiers .
 
     $default  reduce using rule 31 (more_var_identifiers)
 
 
-State 165
+State 133
 
    23 variable_declaration: T_IDENTIFIER $@3 more_var_identifiers ':' data_type ';' . variable_declaration
 
     T_IDENTIFIER  shift, and go to state 39
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    variable_declaration  go to state 181
+    variable_declaration  go to state 173
     epsilon               go to state 41
 
 
-State 166
+State 134
 
    37 procedure_block: T_PROCEDURE T_IDENTIFIER $@6 ';' block ';' .
 
     $default  reduce using rule 37 (procedure_block)
 
 
-State 167
+State 135
 
    40 param_list: T_IDENTIFIER ':' . T_DATATYPE
    41           | T_IDENTIFIER ':' . T_DATATYPE ';' param_list
 
-    T_DATATYPE  shift, and go to state 182
+    T_DATATYPE  shift, and go to state 174
 
 
-State 168
+State 136
 
    39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' param_list ')' . ';' block ';'
 
-    ';'  shift, and go to state 183
+    ';'  shift, and go to state 175
 
 
-State 169
+State 137
 
    44 function_block: T_FUNCTION T_IDENTIFIER $@8 ':' T_DATATYPE ';' . block ';'
 
     T_USES  shift, and go to state 7
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    block       go to state 184
+    block       go to state 176
     uses_block  go to state 9
     epsilon     go to state 10
 
 
-State 170
+State 138
 
-   48 function_param_list: T_IDENTIFIER $@10 . more_func_identifiers ':' T_DATATYPE
+   49 function_param_list: T_IDENTIFIER $@10 . more_func_identifiers ':' T_DATATYPE $@11 function_param_continue
 
-    ','  shift, and go to state 185
+    ','  shift, and go to state 177
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    more_func_identifiers  go to state 186
-    epsilon                go to state 187
-
-
-State 171
-
-   50 function_param_list: T_IDENTIFIER $@11 . more_func_identifiers ':' T_DATATYPE ';' function_param_list
-
-    ','  shift, and go to state 185
-
-    $default  reduce using rule 111 (epsilon)
-
-    more_func_identifiers  go to state 188
-    epsilon                go to state 187
+    more_func_identifiers  go to state 178
+    epsilon                go to state 179
 
 
-State 172
+State 139
 
    46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' . ':' T_DATATYPE ';' block ';'
 
-    ':'  shift, and go to state 189
+    ':'  shift, and go to state 180
 
 
-State 173
+State 140
 
-   78 expression: '(' expression ')' .
+   80 expression: '(' expression . ')'
+   81           | expression . operator expression
 
-    $default  reduce using rule 78 (expression)
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    ')'         shift, and go to state 181
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
 
-
-State 174
-
-   64 while_statement: T_WHILE expression T_DO execution_body .
-
-    $default  reduce using rule 64 (while_statement)
-
-
-State 175
-
-   79 expression: expression . operator expression
-   79           | expression operator expression .
-
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
-
-    T_BOOL_AND  [reduce using rule 79 (expression)]
-    T_BOOL_OR   [reduce using rule 79 (expression)]
-    T_BOOL_NOT  [reduce using rule 79 (expression)]
-    T_REL_LE    [reduce using rule 79 (expression)]
-    T_REL_GE    [reduce using rule 79 (expression)]
-    T_REL_NE    [reduce using rule 79 (expression)]
-    T_SINGLEEQ  [reduce using rule 79 (expression)]
-    T_BIT_LS    [reduce using rule 79 (expression)]
-    T_BIT_RS    [reduce using rule 79 (expression)]
-    '+'         [reduce using rule 79 (expression)]
-    '*'         [reduce using rule 79 (expression)]
-    '/'         [reduce using rule 79 (expression)]
-    '-'         [reduce using rule 79 (expression)]
-    '%'         [reduce using rule 79 (expression)]
-    '>'         [reduce using rule 79 (expression)]
-    '<'         [reduce using rule 79 (expression)]
-    '&'         [reduce using rule 79 (expression)]
-    '|'         [reduce using rule 79 (expression)]
-    '~'         [reduce using rule 79 (expression)]
-    '!'         [reduce using rule 79 (expression)]
-    $default    reduce using rule 79 (expression)
-
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
 
 
-State 176
+State 141
 
-   68 print_statements: T_WRITELN '(' T_STRINGVAL ')' . ';'
+   66 while_statement: T_WHILE expression T_DO . statements
 
-    ';'  shift, and go to state 190
+    T_WHILE       shift, and go to state 82
+    T_IF          shift, and go to state 83
+    T_WRITELN     shift, and go to state 85
+    T_FOR         shift, and go to state 86
+    T_IDENTIFIER  shift, and go to state 87
 
+    T_WHILE       [reduce using rule 113 (epsilon)]
+    T_IF          [reduce using rule 113 (epsilon)]
+    T_WRITELN     [reduce using rule 113 (epsilon)]
+    T_FOR         [reduce using rule 113 (epsilon)]
+    T_IDENTIFIER  [reduce using rule 113 (epsilon)]
+    $default      reduce using rule 113 (epsilon)
 
-State 177
-
-   65 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list . T_DO execution_body
-
-    T_DO  shift, and go to state 191
-
-
-State 178
-
-   66 for_list: expression . T_TO expression
-   67         | expression . T_DOWNTO expression
-   79 expression: expression . operator expression
-
-    T_TO        shift, and go to state 192
-    T_DOWNTO    shift, and go to state 193
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
-
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
+    statements             go to state 182
+    structured_statements  go to state 89
+    conditional_statement  go to state 90
+    repetitive_statement   go to state 91
+    while_statement        go to state 92
+    for_statement          go to state 93
+    print_statements       go to state 94
+    assignment_statements  go to state 95
+    assignment_statement   go to state 96
+    epsilon                go to state 97
 
 
-State 179
+State 142
+
+  102 boolean_ops: T_BOOL_AND .
+
+    $default  reduce using rule 102 (boolean_ops)
+
+
+State 143
+
+  103 boolean_ops: T_BOOL_OR .
+
+    $default  reduce using rule 103 (boolean_ops)
+
+
+State 144
+
+  104 boolean_ops: T_BOOL_NOT .
+
+    $default  reduce using rule 104 (boolean_ops)
+
+
+State 145
+
+   99 relational_ops: T_REL_LE .
+
+    $default  reduce using rule 99 (relational_ops)
+
+
+State 146
+
+  100 relational_ops: T_REL_GE .
+
+    $default  reduce using rule 100 (relational_ops)
+
+
+State 147
+
+  101 relational_ops: T_REL_NE .
+
+    $default  reduce using rule 101 (relational_ops)
+
+
+State 148
+
+   96 relational_ops: T_SINGLEEQ .
+
+    $default  reduce using rule 96 (relational_ops)
+
+
+State 149
+
+  109 bitwise_ops: T_BIT_LS .
+
+    $default  reduce using rule 109 (bitwise_ops)
+
+
+State 150
+
+  110 bitwise_ops: T_BIT_RS .
+
+    $default  reduce using rule 110 (bitwise_ops)
+
+
+State 151
+
+   91 arithmetic_ops: '+' .
+
+    $default  reduce using rule 91 (arithmetic_ops)
+
+
+State 152
+
+   92 arithmetic_ops: '*' .
+
+    $default  reduce using rule 92 (arithmetic_ops)
+
+
+State 153
+
+   93 arithmetic_ops: '/' .
+
+    $default  reduce using rule 93 (arithmetic_ops)
+
+
+State 154
+
+   94 arithmetic_ops: '-' .
+
+    $default  reduce using rule 94 (arithmetic_ops)
+
+
+State 155
+
+   95 arithmetic_ops: '%' .
+
+    $default  reduce using rule 95 (arithmetic_ops)
+
+
+State 156
+
+   97 relational_ops: '>' .
+
+    $default  reduce using rule 97 (relational_ops)
+
+
+State 157
+
+   98 relational_ops: '<' .
+
+    $default  reduce using rule 98 (relational_ops)
+
+
+State 158
+
+  105 bitwise_ops: '&' .
+
+    $default  reduce using rule 105 (bitwise_ops)
+
+
+State 159
+
+  106 bitwise_ops: '|' .
+
+    $default  reduce using rule 106 (bitwise_ops)
+
+
+State 160
+
+  107 bitwise_ops: '~' .
+
+    $default  reduce using rule 107 (bitwise_ops)
+
+
+State 161
+
+  108 bitwise_ops: '!' .
+
+    $default  reduce using rule 108 (bitwise_ops)
+
+
+State 162
+
+   81 expression: expression operator . expression
+
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
+
+    value       go to state 118
+    expression  go to state 183
+
+
+State 163
+
+   82 operator: arithmetic_ops .
+
+    $default  reduce using rule 82 (operator)
+
+
+State 164
+
+   83 operator: relational_ops .
+
+    $default  reduce using rule 83 (operator)
+
+
+State 165
+
+   84 operator: boolean_ops .
+
+    $default  reduce using rule 84 (operator)
+
+
+State 166
+
+   85 operator: bitwise_ops .
+
+    $default  reduce using rule 85 (operator)
+
+
+State 167
+
+   70 print_statements: T_WRITELN '(' T_STRINGVAL . ')' ';'
+
+    ')'  shift, and go to state 184
+
+
+State 168
+
+   67 for_statement: T_FOR T_IDENTIFIER T_ASOP . for_list T_DO statements
+
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
+
+    for_list    go to state 185
+    value       go to state 118
+    expression  go to state 186
+
+
+State 169
+
+   73 assignment_statement: T_IDENTIFIER assignment_ops expression .
+   81 expression: expression . operator expression
+
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
+
+    $default  reduce using rule 73 (assignment_statement)
+
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
+
+
+State 170
+
+   71 assignment_statements: assignment_statement ';' assignment_statements .
+
+    $default  reduce using rule 71 (assignment_statements)
+
+
+State 171
 
    12 more_const_definition: T_IDENTIFIER T_SINGLEEQ some_numeric_type ';' more_const_definition .
 
     $default  reduce using rule 12 (more_const_definition)
 
 
-State 180
+State 172
 
    18 type_definition: T_IDENTIFIER $@1 more_type_identifiers T_SINGLEEQ T_DATATYPE $@2 ';' type_definition .
 
     $default  reduce using rule 18 (type_definition)
 
 
-State 181
+State 173
 
    23 variable_declaration: T_IDENTIFIER $@3 more_var_identifiers ':' data_type ';' variable_declaration .
 
     $default  reduce using rule 23 (variable_declaration)
 
 
-State 182
+State 174
 
    40 param_list: T_IDENTIFIER ':' T_DATATYPE .
    41           | T_IDENTIFIER ':' T_DATATYPE . ';' param_list
 
-    ';'  shift, and go to state 194
+    ';'  shift, and go to state 187
 
     $default  reduce using rule 40 (param_list)
 
 
-State 183
+State 175
 
    39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' param_list ')' ';' . block ';'
 
     T_USES  shift, and go to state 7
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    block       go to state 195
+    block       go to state 188
     uses_block  go to state 9
     epsilon     go to state 10
 
 
-State 184
+State 176
 
    44 function_block: T_FUNCTION T_IDENTIFIER $@8 ':' T_DATATYPE ';' block . ';'
 
-    ';'  shift, and go to state 196
+    ';'  shift, and go to state 189
+
+
+State 177
+
+   53 more_func_identifiers: ',' . T_IDENTIFIER $@12 more_func_identifiers
+
+    T_IDENTIFIER  shift, and go to state 190
+
+
+State 178
+
+   49 function_param_list: T_IDENTIFIER $@10 more_func_identifiers . ':' T_DATATYPE $@11 function_param_continue
+
+    ':'  shift, and go to state 191
+
+
+State 179
+
+   54 more_func_identifiers: epsilon .
+
+    $default  reduce using rule 54 (more_func_identifiers)
+
+
+State 180
+
+   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' . T_DATATYPE ';' block ';'
+
+    T_DATATYPE  shift, and go to state 192
+
+
+State 181
+
+   80 expression: '(' expression ')' .
+
+    $default  reduce using rule 80 (expression)
+
+
+State 182
+
+   66 while_statement: T_WHILE expression T_DO statements .
+
+    $default  reduce using rule 66 (while_statement)
+
+
+State 183
+
+   81 expression: expression . operator expression
+   81           | expression operator expression .
+
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
+
+    T_BOOL_AND  [reduce using rule 81 (expression)]
+    T_BOOL_OR   [reduce using rule 81 (expression)]
+    T_BOOL_NOT  [reduce using rule 81 (expression)]
+    T_REL_LE    [reduce using rule 81 (expression)]
+    T_REL_GE    [reduce using rule 81 (expression)]
+    T_REL_NE    [reduce using rule 81 (expression)]
+    T_SINGLEEQ  [reduce using rule 81 (expression)]
+    T_BIT_LS    [reduce using rule 81 (expression)]
+    T_BIT_RS    [reduce using rule 81 (expression)]
+    '+'         [reduce using rule 81 (expression)]
+    '*'         [reduce using rule 81 (expression)]
+    '/'         [reduce using rule 81 (expression)]
+    '-'         [reduce using rule 81 (expression)]
+    '%'         [reduce using rule 81 (expression)]
+    '>'         [reduce using rule 81 (expression)]
+    '<'         [reduce using rule 81 (expression)]
+    '&'         [reduce using rule 81 (expression)]
+    '|'         [reduce using rule 81 (expression)]
+    '~'         [reduce using rule 81 (expression)]
+    '!'         [reduce using rule 81 (expression)]
+    $default    reduce using rule 81 (expression)
+
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
+
+
+State 184
+
+   70 print_statements: T_WRITELN '(' T_STRINGVAL ')' . ';'
+
+    ';'  shift, and go to state 193
 
 
 State 185
 
-   52 more_func_identifiers: ',' . T_IDENTIFIER $@12 more_func_identifiers
+   67 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list . T_DO statements
 
-    T_IDENTIFIER  shift, and go to state 197
+    T_DO  shift, and go to state 194
 
 
 State 186
 
-   48 function_param_list: T_IDENTIFIER $@10 more_func_identifiers . ':' T_DATATYPE
+   68 for_list: expression . T_TO expression
+   69         | expression . T_DOWNTO expression
+   81 expression: expression . operator expression
 
-    ':'  shift, and go to state 198
+    T_TO        shift, and go to state 195
+    T_DOWNTO    shift, and go to state 196
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
+
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
 
 
 State 187
 
-   53 more_func_identifiers: epsilon .
+   41 param_list: T_IDENTIFIER ':' T_DATATYPE ';' . param_list
 
-    $default  reduce using rule 53 (more_func_identifiers)
+    T_IDENTIFIER  shift, and go to state 106
+
+    $default  reduce using rule 113 (epsilon)
+
+    param_list  go to state 197
+    epsilon     go to state 108
 
 
 State 188
 
-   50 function_param_list: T_IDENTIFIER $@11 more_func_identifiers . ':' T_DATATYPE ';' function_param_list
+   39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' param_list ')' ';' block . ';'
 
-    ':'  shift, and go to state 199
+    ';'  shift, and go to state 198
 
 
 State 189
-
-   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' . T_DATATYPE ';' block ';'
-
-    T_DATATYPE  shift, and go to state 200
-
-
-State 190
-
-   68 print_statements: T_WRITELN '(' T_STRINGVAL ')' ';' .
-
-    $default  reduce using rule 68 (print_statements)
-
-
-State 191
-
-   65 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list T_DO . execution_body
-
-    T_WHILE       shift, and go to state 71
-    T_WRITELN     shift, and go to state 72
-    T_FOR         shift, and go to state 73
-    T_IDENTIFIER  shift, and go to state 74
-
-    T_WHILE       [reduce using rule 111 (epsilon)]
-    T_END         reduce using rule 111 (epsilon)
-    T_WRITELN     [reduce using rule 111 (epsilon)]
-    T_FOR         [reduce using rule 111 (epsilon)]
-    T_IDENTIFIER  [reduce using rule 111 (epsilon)]
-    ';'           reduce using rule 61 (conditional_statement)
-    ';'           [reduce using rule 111 (epsilon)]
-    $default      reduce using rule 61 (conditional_statement)
-
-    execution_body         go to state 201
-    structured_statements  go to state 76
-    conditional_statement  go to state 77
-    repetitive_statement   go to state 78
-    while_statement        go to state 79
-    for_statement          go to state 80
-    print_statements       go to state 81
-    assignment_statements  go to state 82
-    assignment_statement   go to state 83
-    epsilon                go to state 84
-
-
-State 192
-
-   66 for_list: expression T_TO . expression
-
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
-
-    value       go to state 100
-    expression  go to state 202
-
-
-State 193
-
-   67 for_list: expression T_DOWNTO . expression
-
-    T_IDENTIFIER  shift, and go to state 94
-    T_INTVAL      shift, and go to state 95
-    T_FLOATVAL    shift, and go to state 96
-    T_BOOLVAL     shift, and go to state 97
-    T_STRINGVAL   shift, and go to state 98
-    '('           shift, and go to state 99
-
-    value       go to state 100
-    expression  go to state 203
-
-
-State 194
-
-   41 param_list: T_IDENTIFIER ':' T_DATATYPE ';' . param_list
-
-    T_IDENTIFIER  shift, and go to state 124
-
-    $default  reduce using rule 111 (epsilon)
-
-    param_list  go to state 204
-    epsilon     go to state 126
-
-
-State 195
-
-   39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' param_list ')' ';' block . ';'
-
-    ';'  shift, and go to state 205
-
-
-State 196
 
    44 function_block: T_FUNCTION T_IDENTIFIER $@8 ':' T_DATATYPE ';' block ';' .
 
     $default  reduce using rule 44 (function_block)
 
 
-State 197
+State 190
 
-   52 more_func_identifiers: ',' T_IDENTIFIER . $@12 more_func_identifiers
+   53 more_func_identifiers: ',' T_IDENTIFIER . $@12 more_func_identifiers
 
-    $default  reduce using rule 51 ($@12)
+    $default  reduce using rule 52 ($@12)
 
-    $@12  go to state 206
-
-
-State 198
-
-   48 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' . T_DATATYPE
-
-    T_DATATYPE  shift, and go to state 207
+    $@12  go to state 199
 
 
-State 199
+State 191
 
-   50 function_param_list: T_IDENTIFIER $@11 more_func_identifiers ':' . T_DATATYPE ';' function_param_list
+   49 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' . T_DATATYPE $@11 function_param_continue
 
-    T_DATATYPE  shift, and go to state 208
+    T_DATATYPE  shift, and go to state 200
 
 
-State 200
+State 192
 
    46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' T_DATATYPE . ';' block ';'
 
-    ';'  shift, and go to state 209
+    ';'  shift, and go to state 201
 
 
-State 201
+State 193
 
-   65 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list T_DO execution_body .
+   70 print_statements: T_WRITELN '(' T_STRINGVAL ')' ';' .
 
-    $default  reduce using rule 65 (for_statement)
-
-
-State 202
-
-   66 for_list: expression T_TO expression .
-   79 expression: expression . operator expression
-
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
-
-    $default  reduce using rule 66 (for_list)
-
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
+    $default  reduce using rule 70 (print_statements)
 
 
-State 203
+State 194
 
-   67 for_list: expression T_DOWNTO expression .
-   79 expression: expression . operator expression
+   67 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list T_DO . statements
 
-    T_BOOL_AND  shift, and go to state 132
-    T_BOOL_OR   shift, and go to state 133
-    T_BOOL_NOT  shift, and go to state 134
-    T_REL_LE    shift, and go to state 135
-    T_REL_GE    shift, and go to state 136
-    T_REL_NE    shift, and go to state 137
-    T_SINGLEEQ  shift, and go to state 138
-    T_BIT_LS    shift, and go to state 139
-    T_BIT_RS    shift, and go to state 140
-    '+'         shift, and go to state 141
-    '*'         shift, and go to state 142
-    '/'         shift, and go to state 143
-    '-'         shift, and go to state 144
-    '%'         shift, and go to state 145
-    '>'         shift, and go to state 146
-    '<'         shift, and go to state 147
-    '&'         shift, and go to state 148
-    '|'         shift, and go to state 149
-    '~'         shift, and go to state 150
-    '!'         shift, and go to state 151
+    T_WHILE       shift, and go to state 82
+    T_IF          shift, and go to state 83
+    T_WRITELN     shift, and go to state 85
+    T_FOR         shift, and go to state 86
+    T_IDENTIFIER  shift, and go to state 87
 
-    $default  reduce using rule 67 (for_list)
+    T_WHILE       [reduce using rule 113 (epsilon)]
+    T_IF          [reduce using rule 113 (epsilon)]
+    T_WRITELN     [reduce using rule 113 (epsilon)]
+    T_FOR         [reduce using rule 113 (epsilon)]
+    T_IDENTIFIER  [reduce using rule 113 (epsilon)]
+    $default      reduce using rule 113 (epsilon)
 
-    operator        go to state 152
-    arithmetic_ops  go to state 153
-    relational_ops  go to state 154
-    boolean_ops     go to state 155
-    bitwise_ops     go to state 156
+    statements             go to state 202
+    structured_statements  go to state 89
+    conditional_statement  go to state 90
+    repetitive_statement   go to state 91
+    while_statement        go to state 92
+    for_statement          go to state 93
+    print_statements       go to state 94
+    assignment_statements  go to state 95
+    assignment_statement   go to state 96
+    epsilon                go to state 97
 
 
-State 204
+State 195
+
+   68 for_list: expression T_TO . expression
+
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
+
+    value       go to state 118
+    expression  go to state 203
+
+
+State 196
+
+   69 for_list: expression T_DOWNTO . expression
+
+    T_IDENTIFIER  shift, and go to state 112
+    T_INTVAL      shift, and go to state 113
+    T_FLOATVAL    shift, and go to state 114
+    T_BOOLVAL     shift, and go to state 115
+    T_STRINGVAL   shift, and go to state 116
+    '('           shift, and go to state 117
+
+    value       go to state 118
+    expression  go to state 204
+
+
+State 197
 
    41 param_list: T_IDENTIFIER ':' T_DATATYPE ';' param_list .
 
     $default  reduce using rule 41 (param_list)
 
 
-State 205
+State 198
 
    39 procedure_block: T_PROCEDURE T_IDENTIFIER $@7 '(' param_list ')' ';' block ';' .
 
     $default  reduce using rule 39 (procedure_block)
 
 
-State 206
+State 199
 
-   52 more_func_identifiers: ',' T_IDENTIFIER $@12 . more_func_identifiers
+   53 more_func_identifiers: ',' T_IDENTIFIER $@12 . more_func_identifiers
 
-    ','  shift, and go to state 185
+    ','  shift, and go to state 177
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    more_func_identifiers  go to state 210
-    epsilon                go to state 187
-
-
-State 207
-
-   48 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' T_DATATYPE .
-
-    $default  reduce using rule 48 (function_param_list)
+    more_func_identifiers  go to state 205
+    epsilon                go to state 179
 
 
-State 208
+State 200
 
-   50 function_param_list: T_IDENTIFIER $@11 more_func_identifiers ':' T_DATATYPE . ';' function_param_list
+   49 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' T_DATATYPE . $@11 function_param_continue
 
-    ';'  shift, and go to state 211
+    $default  reduce using rule 48 ($@11)
+
+    $@11  go to state 206
 
 
-State 209
+State 201
 
    46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' T_DATATYPE ';' . block ';'
 
     T_USES  shift, and go to state 7
 
-    $default  reduce using rule 111 (epsilon)
+    $default  reduce using rule 113 (epsilon)
 
-    block       go to state 212
+    block       go to state 207
     uses_block  go to state 9
     epsilon     go to state 10
 
 
+State 202
+
+   67 for_statement: T_FOR T_IDENTIFIER T_ASOP for_list T_DO statements .
+
+    $default  reduce using rule 67 (for_statement)
+
+
+State 203
+
+   68 for_list: expression T_TO expression .
+   81 expression: expression . operator expression
+
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
+
+    $default  reduce using rule 68 (for_list)
+
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
+
+
+State 204
+
+   69 for_list: expression T_DOWNTO expression .
+   81 expression: expression . operator expression
+
+    T_BOOL_AND  shift, and go to state 142
+    T_BOOL_OR   shift, and go to state 143
+    T_BOOL_NOT  shift, and go to state 144
+    T_REL_LE    shift, and go to state 145
+    T_REL_GE    shift, and go to state 146
+    T_REL_NE    shift, and go to state 147
+    T_SINGLEEQ  shift, and go to state 148
+    T_BIT_LS    shift, and go to state 149
+    T_BIT_RS    shift, and go to state 150
+    '+'         shift, and go to state 151
+    '*'         shift, and go to state 152
+    '/'         shift, and go to state 153
+    '-'         shift, and go to state 154
+    '%'         shift, and go to state 155
+    '>'         shift, and go to state 156
+    '<'         shift, and go to state 157
+    '&'         shift, and go to state 158
+    '|'         shift, and go to state 159
+    '~'         shift, and go to state 160
+    '!'         shift, and go to state 161
+
+    $default  reduce using rule 69 (for_list)
+
+    operator        go to state 162
+    arithmetic_ops  go to state 163
+    relational_ops  go to state 164
+    boolean_ops     go to state 165
+    bitwise_ops     go to state 166
+
+
+State 205
+
+   53 more_func_identifiers: ',' T_IDENTIFIER $@12 more_func_identifiers .
+
+    $default  reduce using rule 53 (more_func_identifiers)
+
+
+State 206
+
+   49 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' T_DATATYPE $@11 . function_param_continue
+
+    ';'  shift, and go to state 208
+
+    $default  reduce using rule 113 (epsilon)
+
+    function_param_continue  go to state 209
+    epsilon                  go to state 210
+
+
+State 207
+
+   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' T_DATATYPE ';' block . ';'
+
+    ';'  shift, and go to state 211
+
+
+State 208
+
+   51 function_param_continue: ';' . function_param_list
+
+    T_IDENTIFIER  shift, and go to state 110
+
+    function_param_list  go to state 212
+
+
+State 209
+
+   49 function_param_list: T_IDENTIFIER $@10 more_func_identifiers ':' T_DATATYPE $@11 function_param_continue .
+
+    $default  reduce using rule 49 (function_param_list)
+
+
 State 210
 
-   52 more_func_identifiers: ',' T_IDENTIFIER $@12 more_func_identifiers .
+   50 function_param_continue: epsilon .
 
-    $default  reduce using rule 52 (more_func_identifiers)
+    $default  reduce using rule 50 (function_param_continue)
 
 
 State 211
 
-   50 function_param_list: T_IDENTIFIER $@11 more_func_identifiers ':' T_DATATYPE ';' . function_param_list
+   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' T_DATATYPE ';' block ';' .
 
-    T_IDENTIFIER  shift, and go to state 128
-
-    function_param_list  go to state 213
+    $default  reduce using rule 46 (function_block)
 
 
 State 212
 
-   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' T_DATATYPE ';' block . ';'
+   51 function_param_continue: ';' function_param_list .
 
-    ';'  shift, and go to state 214
-
-
-State 213
-
-   50 function_param_list: T_IDENTIFIER $@11 more_func_identifiers ':' T_DATATYPE ';' function_param_list .
-
-    $default  reduce using rule 50 (function_param_list)
-
-
-State 214
-
-   46 function_block: T_FUNCTION T_IDENTIFIER $@9 '(' function_param_list ')' ':' T_DATATYPE ';' block ';' .
-
-    $default  reduce using rule 46 (function_block)
+    $default  reduce using rule 51 (function_param_continue)

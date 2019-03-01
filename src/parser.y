@@ -68,7 +68,7 @@
 			}
 			else
 			{
-				printf("Warning : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+				printf("Error : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
 				return 0;
 			}
 			var_name_stack[i] = NULL;
@@ -358,12 +358,12 @@ function_param_list:
 			exit(1);
 		}
 	}
-	| T_IDENTIFIER 
-	{
-		var_name_stack_top++;
-		var_name_stack[var_name_stack_top] = strdup(yylval.str);
-	} 
-	more_func_identifiers ':' T_DATATYPE ';' function_param_list
+	function_param_continue
+;
+
+function_param_continue :
+	epsilon
+	| ';' function_param_list
 ;
 
 more_func_identifiers:
@@ -380,11 +380,15 @@ execution_block:
 ;	
 
 execution_body:
-	assignment_statements execution_body
-	| print_statements execution_body
-	| structured_statements execution_body
+	execution_body statements 
 	| epsilon
 ;
+
+statements : 
+	assignment_statements
+	| print_statements
+	| structured_statements
+;	
 
 structured_statements:
 	conditional_statement ';'
@@ -392,6 +396,7 @@ structured_statements:
 ;
 
 conditional_statement:
+	T_IF
 ;
 
 repetitive_statement:
@@ -399,11 +404,11 @@ repetitive_statement:
 ;
 
 while_statement : 
-	T_WHILE expression T_DO execution_body
+	T_WHILE expression T_DO statements
 ;
 
 for_statement:
-	T_FOR T_IDENTIFIER T_ASOP for_list T_DO execution_body
+	T_FOR T_IDENTIFIER T_ASOP for_list T_DO statements
 
 for_list:
 	expression T_TO expression 
@@ -432,7 +437,7 @@ expression:
 	| value
 	| '(' expression ')'
 	| expression operator expression
-
+;
 operator:
 	arithmetic_ops|relational_ops|boolean_ops|bitwise_ops
 ;
@@ -511,15 +516,17 @@ int main(int argc,char* argv[]) {
 	if(successful){
 		printf("\n\nCompiled Successfully\n");
 		printf("Took : %lf seconds\n", time_elapsed(&start, &end));
+
+		printf("\n\nSymbol Table Current Size:%d\n",HASH_COUNT(SYMBOL_TABLE));
+
+		struct symbol_table *s;
+		int i=0;
+	    for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
+	        printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\n",i,s->var_name,s->type, s->scope_level);
+	    }
+
 	}
-	printf("\n\nSymbol Table Current Size:%d\n",HASH_COUNT(SYMBOL_TABLE));
-
-	struct symbol_table *s;
-	int i=0;
-    for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
-        printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\n",i,s->var_name,s->type, s->scope_level);
-    }
-
+	
 
     /*  TYPE BLOCK
     struct type_table *t;
