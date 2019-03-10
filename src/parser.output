@@ -1,5 +1,7 @@
 Terminals unused in grammar
 
+   T_ELSE
+   T_THEN
    T_ARRAY
 
 
@@ -214,157 +216,159 @@ T_PROGRAM (260) 3
 T_VAR (261) 20
 T_TYPE (262) 14
 T_IF (263) 63
-T_BEGIN (264) 55
-T_END (265) 55
-T_CONST (266) 9
-T_WRITELN (267) 70
-T_PROCEDURE (268) 37 39
-T_FUNCTION (269) 44 46
-T_FOR (270) 67
-T_DO (271) 66 67
-T_TO (272) 68
-T_DOWNTO (273) 69
-T_BOOL_AND (274) 102
-T_BOOL_OR (275) 103
-T_BOOL_NOT (276) 104
-T_REL_LE (277) 99
-T_REL_GE (278) 100
-T_REL_NE (279) 101
-T_SINGLEEQ (280) 11 12 18 96
-T_BIT_LS (281) 109
-T_BIT_RS (282) 110
-T_ASOP (283) 67 86
-T_AS_PE (284) 87
-T_AS_SE (285) 88
-T_AS_MULE (286) 89
-T_AS_DIVE (287) 90
-T_ARRAY (288)
-T_IDENTIFIER (289) 3 5 7 11 12 18 23 26 28 31 37 39 40 41 44 46 49
+T_ELSE (264)
+T_THEN (265)
+T_BEGIN (266) 55
+T_END (267) 55
+T_CONST (268) 9
+T_WRITELN (269) 70
+T_PROCEDURE (270) 37 39
+T_FUNCTION (271) 44 46
+T_FOR (272) 67
+T_DO (273) 66 67
+T_TO (274) 68
+T_DOWNTO (275) 69
+T_BOOL_AND (276) 102
+T_BOOL_OR (277) 103
+T_BOOL_NOT (278) 104
+T_REL_LE (279) 99
+T_REL_GE (280) 100
+T_REL_NE (281) 101
+T_SINGLEEQ (282) 11 12 18 96
+T_BIT_LS (283) 109
+T_BIT_RS (284) 110
+T_ASOP (285) 67 86
+T_AS_PE (286) 87
+T_AS_SE (287) 88
+T_AS_MULE (288) 89
+T_AS_DIVE (289) 90
+T_ARRAY (290)
+T_IDENTIFIER (291) 3 5 7 11 12 18 23 26 28 31 37 39 40 41 44 46 49
     53 67 73 78
-T_DATATYPE (290) 18 25 40 41 44 46 49
-T_INTVAL (291) 74 111
-T_FLOATVAL (292) 75 112
-T_BOOLVAL (293) 76
-T_STRINGVAL (294) 70 77
+T_DATATYPE (292) 18 25 40 41 44 46 49
+T_INTVAL (293) 74 111
+T_FLOATVAL (294) 75 112
+T_BOOLVAL (295) 76
+T_STRINGVAL (296) 70 77
 
 
 Nonterminals, with rules where they appear
 
-$accept (57)
+$accept (59)
     on left: 0
-startPascal (58)
+startPascal (60)
     on left: 1, on right: 0
-program (59)
+program (61)
     on left: 2, on right: 1
-prog_heading (60)
+prog_heading (62)
     on left: 3, on right: 2
-block (61)
+block (63)
     on left: 4, on right: 2 37 39 44 46
-uses_block (62)
+uses_block (64)
     on left: 5 6, on right: 4
-more_libs (63)
+more_libs (65)
     on left: 7 8, on right: 5 7
-constant_block (64)
+constant_block (66)
     on left: 9 10, on right: 4
-const_definition (65)
+const_definition (67)
     on left: 11, on right: 9
-more_const_definition (66)
+more_const_definition (68)
     on left: 12 13, on right: 11 12
-type_block (67)
+type_block (69)
     on left: 14 15, on right: 4
-type_definition (68)
+type_definition (70)
     on left: 18 19, on right: 14 18
-$@1 (69)
+$@1 (71)
     on left: 16, on right: 18
-$@2 (70)
+$@2 (72)
     on left: 17, on right: 18
-variable_block (71)
+variable_block (73)
     on left: 20 21, on right: 4
-variable_declaration (72)
+variable_declaration (74)
     on left: 23 24, on right: 20 23
-$@3 (73)
+$@3 (75)
     on left: 22, on right: 23
-data_type (74)
+data_type (76)
     on left: 25 26, on right: 23
-more_type_identifiers (75)
+more_type_identifiers (77)
     on left: 28 29, on right: 18 28
-$@4 (76)
+$@4 (78)
     on left: 27, on right: 28
-more_var_identifiers (77)
+more_var_identifiers (79)
     on left: 31 32, on right: 23 31
-$@5 (78)
+$@5 (80)
     on left: 30, on right: 31
-function_and_procedure_block (79)
+function_and_procedure_block (81)
     on left: 33 34 35, on right: 4 33 34
-procedure_block (80)
+procedure_block (82)
     on left: 37 39, on right: 34
-$@6 (81)
+$@6 (83)
     on left: 36, on right: 37
-$@7 (82)
+$@7 (84)
     on left: 38, on right: 39
-param_list (83)
+param_list (85)
     on left: 40 41 42, on right: 39 41
-function_block (84)
+function_block (86)
     on left: 44 46, on right: 33
-$@8 (85)
+$@8 (87)
     on left: 43, on right: 44
-$@9 (86)
+$@9 (88)
     on left: 45, on right: 46
-function_param_list (87)
+function_param_list (89)
     on left: 49, on right: 46 51
-$@10 (88)
+$@10 (90)
     on left: 47, on right: 49
-$@11 (89)
+$@11 (91)
     on left: 48, on right: 49
-function_param_continue (90)
+function_param_continue (92)
     on left: 50 51, on right: 49
-more_func_identifiers (91)
+more_func_identifiers (93)
     on left: 53 54, on right: 49 53
-$@12 (92)
+$@12 (94)
     on left: 52, on right: 53
-execution_block (93)
+execution_block (95)
     on left: 55, on right: 4
-execution_body (94)
+execution_body (96)
     on left: 56 57, on right: 55 56
-statements (95)
+statements (97)
     on left: 58 59 60, on right: 56 66 67
-structured_statements (96)
+structured_statements (98)
     on left: 61 62, on right: 60
-conditional_statement (97)
+conditional_statement (99)
     on left: 63, on right: 61
-repetitive_statement (98)
+repetitive_statement (100)
     on left: 64 65, on right: 62
-while_statement (99)
+while_statement (101)
     on left: 66, on right: 65
-for_statement (100)
+for_statement (102)
     on left: 67, on right: 64
-for_list (101)
+for_list (103)
     on left: 68 69, on right: 67
-print_statements (102)
+print_statements (104)
     on left: 70, on right: 59
-assignment_statements (103)
+assignment_statements (105)
     on left: 71 72, on right: 58 71
-assignment_statement (104)
+assignment_statement (106)
     on left: 73, on right: 71
-value (105)
+value (107)
     on left: 74 75 76 77, on right: 79
-expression (106)
+expression (108)
     on left: 78 79 80 81, on right: 66 68 69 73 80 81
-operator (107)
+operator (109)
     on left: 82 83 84 85, on right: 81
-assignment_ops (108)
+assignment_ops (110)
     on left: 86 87 88 89 90, on right: 73
-arithmetic_ops (109)
+arithmetic_ops (111)
     on left: 91 92 93 94 95, on right: 82
-relational_ops (110)
+relational_ops (112)
     on left: 96 97 98 99 100 101, on right: 83
-boolean_ops (111)
+boolean_ops (113)
     on left: 102 103 104, on right: 84
-bitwise_ops (112)
+bitwise_ops (114)
     on left: 105 106 107 108 109 110, on right: 85
-some_numeric_type (113)
+some_numeric_type (115)
     on left: 111 112, on right: 11 12
-epsilon (114)
+epsilon (116)
     on left: 113, on right: 6 8 10 13 15 19 21 24 29 32 35 42 50 54
     57 72
 

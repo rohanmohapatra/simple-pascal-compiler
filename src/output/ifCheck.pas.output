@@ -1,0 +1,11 @@
+program hello;
+uses crt;
+type
+   uReal = real;
+   uString = string;
+   uInteger = integer;
+
+begin
+   
+   a := 100;
+   if (

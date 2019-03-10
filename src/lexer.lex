@@ -109,6 +109,16 @@ if {
  return T_IF;
 }
 
+then {
+	ECHO;
+	return T_THEN;
+}
+
+else {
+	ECHO;
+	return T_ELSE;
+}
+
 while {
 	ECHO;
  return T_WHILE;
