@@ -33,8 +33,11 @@
 		char type[10]; //Holds the DataType of Identifier
 		char *scope_level;
 		//int current_size; //Size of the Symbol Table
+		int line_no;
+		int col_no;
 		UT_hash_handle hh; //Hash Structure for Optimized Access
 	};
+
 
 	struct symbol_table *SYMBOL_TABLE = NULL; /*Generic Symbol Table*/
 
@@ -47,7 +50,7 @@
 	};
 	struct type_table *TYPE_TABLE = NULL;
 
-	int dump_stack_in_symbol_table(char *type) {
+	int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 		for(int i = 0; i <= var_name_stack_top; i++)
 		{
 			struct symbol_table *s = NULL;
@@ -63,6 +66,8 @@
 				strcat(s->var_name, var_mang_name);
 				strcpy(s->type, type);
 				s->scope_level = strdup(curr_scope_level);
+				s->line_no = line_no;
+				s->col_no = col_no;
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
 				//SYMBOL_TABLE->current_size++;
 			}
@@ -76,6 +81,7 @@
 		var_name_stack_top = -1;
 		return 1;
 	}
+
 
 %}
 %locations
@@ -228,7 +234,7 @@ data_type:
 	
 	{
 		//printf("Hit the type part of line %s\n", yylval.type);
-		int result = dump_stack_in_symbol_table(yylval.type);
+		int result = dump_stack_in_symbol_table(yylval.type, yylloc.first_line, yylloc.first_column);
 		if(!result){
 			//printf("DumpBck in Variable: %d\n",result);
 			yyerror("Abort: Variable already declared.");
@@ -269,7 +275,7 @@ data_type:
 		//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
 		if(t)
 		{
-			int result = dump_stack_in_symbol_table(t->actual_type_name);
+			int result = dump_stack_in_symbol_table(t->actual_type_name, yylloc.first_line, yylloc.first_column);
 			if(!result){
 			yyerror("Abort: Variable already declared.");
 			exit(1);
@@ -354,7 +360,7 @@ function_param_list:
 	}
 	more_func_identifiers ':' T_DATATYPE 
 	{
-	int result = dump_stack_in_symbol_table(yylval.type);
+	int result = dump_stack_in_symbol_table(yylval.type, yylloc.first_line, yylloc.first_column);
 	if(!result){
 			yyerror("Abort: Variable already declared.");
 			exit(1);
@@ -540,7 +546,7 @@ int main(int argc,char* argv[]) {
 		struct symbol_table *s;
 		int i=0;
 	    for(s=SYMBOL_TABLE,i=0; s != NULL,i<HASH_COUNT(SYMBOL_TABLE); s=s->hh.next,i++) {
-	        printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\n",i,s->var_name,s->type, s->scope_level);
+	        printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\t Line_no : %-10d\t Col_no : %-10d\n",i,s->var_name,s->type, s->scope_level, s->line_no, s->col_no);
 	    }
 
 	}
