@@ -8,8 +8,8 @@ testtesttesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
 var
-a,b,c, a:string;
-one,two,three, a:boolean;
+a,b,c:string;
+one,two,three:boolean;
 test : whatis;
 test2 : one;
 test3,test4 : what;

@@ -4,11 +4,9 @@ type
 	uReal = real;
 	uString = string;
 	uInteger = integer;
-{* Here the main program block starts *}
 function max(num1,num2: integer): integer;
 var
-   {* local variable declaration *}
-   result: integer;
+      result: integer;
    function mMac: string;
    var 
    		inMMac : string;
