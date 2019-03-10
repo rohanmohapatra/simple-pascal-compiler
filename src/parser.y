@@ -94,6 +94,8 @@
 %token T_VAR
 %token T_TYPE
 %token T_IF
+%token T_THEN
+%token T_ELSE
 %token T_BEGIN
 %token T_END
 %token T_CONST
@@ -387,11 +389,24 @@ execution_body:
 ;
 
 structured_statements:
-	conditional_statement ';'
+	conditional_statement
 	| repetitive_statement
 ;
 
 conditional_statement:
+	T_IF '(' boolean_expression ')' T_THEN execution_body if_then_follow
+;
+
+if_then_follow:
+	else_if_block | else_block | epsilon
+;
+
+else_if_block:
+	T_ELSE conditional_statement
+;
+
+else_block:
+	T_ELSE execution_body
 ;
 
 repetitive_statement:
@@ -432,6 +447,10 @@ expression:
 	| value
 	| '(' expression ')'
 	| expression operator expression
+
+boolean_expression:
+	expression relational_ops expression
+;
 
 operator:
 	arithmetic_ops|relational_ops|boolean_ops|bitwise_ops
