@@ -4,7 +4,8 @@ type
    uReal = real;
    uString = string;
    uInteger = integer;
-
+var
+   a : integer;
 begin
    
    a := 100;

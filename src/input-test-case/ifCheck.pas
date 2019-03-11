@@ -5,7 +5,8 @@ type
    uString = string;
    uInteger = integer;
 {* Here the main program block starts *}
-
+var
+   a : integer;
 begin
    
    a := 100;
