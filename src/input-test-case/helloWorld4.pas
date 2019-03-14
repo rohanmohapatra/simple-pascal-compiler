@@ -8,6 +8,7 @@ type
 var
 	i : integer;
 	x : integer;
+	y : array [9...25] of boolean;
 function max(num1,num2: integer): integer;
 var
    {* local variable declaration *}
@@ -28,12 +29,12 @@ begin
 end;
 
 begin
-		x:=2+x;
+		x:=x+2;
 	for i:= 1 to 10 
 	do 
 		writeln("Hello");
 		x:=4;
-	{while (x>0) do x:=5;}
+	while (x>0) do x:=5;
 	writeln("Hello, World!");
 
 end. 

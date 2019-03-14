@@ -90,6 +90,9 @@
 				else if(strcmp(type,"boolean")==0){
 					s->var_value.int_value = 0;
 				}
+				else if(strcmp(type,"array")==0){
+					strcpy(s->var_value.string_value, "00000x54");
+				}
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
 				//SYMBOL_TABLE->current_size++;
 			}
@@ -184,6 +187,7 @@
 %token T_FOR
 %token T_DO
 %token T_TO
+%token T_OF
 %token T_DOWNTO
 
 %token T_BOOL_AND
@@ -205,6 +209,8 @@
 %token T_AS_DIVE
 
 %token T_ARRAY
+
+%token T_INDEXTYPE
 %token <str> T_IDENTIFIER
 %token <type> T_DATATYPE
 
@@ -336,8 +342,19 @@ data_type:
 		}
 
 	}
+	| T_ARRAY '['T_INDEXTYPE']' T_OF T_DATATYPE
+	{
+		//printf("Hit the type part of line %s\n", yylval.type);
+		int result = dump_stack_in_symbol_table("array", yylloc.first_line, yylloc.first_column);
+		if(!result){
+			//printf("DumpBck in Variable: %d\n",result);
+			yyerror("Abort: Variable already declared.");
+			exit(1);
+		}
 
+	}
 
+;
 
 more_type_identifiers:
 	',' T_IDENTIFIER 
@@ -394,7 +411,6 @@ function_block:
 	}
 	':' T_DATATYPE ';'  block ';' 
 	{
-		printf("in Here\n");
 		strcpy(curr_scope_level,"global");
 
 	}
@@ -507,7 +523,7 @@ assignment_statement:
 		//printf("Variable Being Checked : %s ",yylval.str);
 		if(!check_valid_identifier(yylval.str)){
 			char error[1000];
-			printf("Scope Level : %s ",curr_scope_level);
+			//printf("Scope Level : %s ",curr_scope_level);
 			sprintf(error,"Abort: Variable %s is not declared.",yylval.str);
 			yyerror(error);
 			exit(1);
@@ -526,7 +542,6 @@ assignment_statement:
 value:
 	T_INTVAL 
 	{
-		$<intval>$ = $<intval>1;
 		struct symbol_table *s = NULL;
 		char var_mang_name[31];
 		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
@@ -623,9 +638,9 @@ expression:
 			$<intval>$ = variable_value.int_value;
 		}
 	} 
-	| value {printf("Here%d\n",$<intval>1);$<intval>$ = $<intval>1;}
+	| value 
 	| '(' expression ')' 
-	| expression {printf("Here%d\n",$<intval>1);} operator {printf("Here%s\n",$<str>2);} expression 
+	| expression operator expression 
 	{
 		printf("%d and %d and %s\n",$<intval>1,$<intval>3,$<str>2);
 		$<intval>$ = solution($<intval>1,$<intval>3,$<str>2);
@@ -756,6 +771,9 @@ int main(int argc,char* argv[]) {
 				}
 				else if(strcmp(s->type,"boolean")==0){
 					printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\t Line_no : %-10d\t Col_no : %-10d Value:%-10d\n",i,s->var_name,s->type, s->scope_level, s->line_no, s->col_no, s->var_value.int_value );
+				}
+				else {
+					printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\t Line_no : %-10d\t Col_no : %-10d Value:%-10s\n",i,s->var_name,s->type, s->scope_level, s->line_no, s->col_no, s->var_value.string_value );
 				}
 
 	        //printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\t Line_no : %-10d\t Col_no : %-10d\n",i,s->var_name,s->type, //s->scope_level, s->line_no, s->col_no, s->var_value );

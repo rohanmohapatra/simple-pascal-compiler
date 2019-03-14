@@ -26,6 +26,6 @@ begin
 	test3:=56.69;
 	a:=a+10;
 	c := (a+b);
-	d := a-c*b;
+	d := a-c+b;
 	writeln("Printable");
 end.
