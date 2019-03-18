@@ -4,7 +4,8 @@ type
    uReal = real;
    uString = string;
    uInteger = integer;
-
+var
+   a : integer;
 begin
    
    a := 100;
@@ -13,7 +14,7 @@ begin
    else if ( a = 20 ) then
       writeln("Value of a is 20");
    
-   else if( a = 30 ) then 
+   else if( a <= 30 ) then 
       writeln("Value of a is 30");
    
    else

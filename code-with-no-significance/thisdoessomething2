@@ -1,0 +1,21 @@
+{
+		struct symbol_table *s = NULL;
+		char var_mang_name[31];
+		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
+		strcat(var_mang_name, "$");
+		strcat(var_mang_name, curr_scope_level);
+		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		if(s)
+		{
+			struct symbol_table *temp = NULL;
+			struct symbol_table *r = NULL;
+			temp = malloc(sizeof(struct symbol_table));
+			strcat(temp->var_name, var_mang_name);
+			strcpy(temp->type, s->type);
+			temp->scope_level = s->scope_level;
+			temp->line_no = s->line_no;
+			temp->col_no = s->col_no;
+			temp->var_value.int_value = yylval.intval;
+			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
+		}
+	}

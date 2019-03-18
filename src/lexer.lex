@@ -36,12 +36,13 @@ PUNCTUATION ;|,|:|.
 SINGLE_CHAR_OPERATORS <|>|\+|\*|-|\/|\&|\||\~|\!
 MODULO %|mod
 MULTI_CHAR_OPERATORS and|or|not|<=|>=|<>|>>|<<|:=|\+=|-=|\*=|\/=
-PARENTHESIS \(|\)
+PARENTHESIS \(|\)|\[|\]
 SINGLE_EQ =
 INTVAL [0-9]+
 FLOATVAL [0-9]+\.[0-9]+
 BOOLVAL true|false
 STRINGVAL \".*\"
+INDEXTYPE [0-9]\.\.\.[0-9]+
 %%
 
 <INITIAL>"{*" {BEGIN(IN_MULTILINE_COMMENT);}
@@ -61,6 +62,11 @@ STRINGVAL \".*\"
 <IN_SINGLELINE_COMMENT>.   		;
 
 
+{INDEXTYPE} {
+	ECHO;
+	return T_INDEXTYPE;	
+
+}
 
 {INTVAL} {
 	yylval.intval = atoi(yytext);
@@ -163,7 +169,10 @@ array {
 	ECHO;
  return T_ARRAY;	
 }
-
+of	{
+	ECHO;
+	return T_OF;
+}
 writeln {
 	ECHO;
 	return T_WRITELN;
