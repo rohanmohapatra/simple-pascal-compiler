@@ -157,6 +157,10 @@
 		}
 		return result;
 	}
+
+	struct ast_node *tree;
+	/*Stores the AST Root*/
+	
 	//int update_variable_value(char* var_name,union data )
 
 
@@ -226,19 +230,25 @@
 %left '*' '/'
 %%
 startPascal:
-	 program
+	 program 	{
+	 				//print_tree($<ast>1);
+	 				tree = $<ast>1;
+	 			}
 ;
 
 program:
-	prog_heading block '.'
+	prog_heading block '.'	{$<ast>$ = new_ast_root_node($<ast>1,$<ast>2);}
 ;
 
 prog_heading:
-	T_PROGRAM T_IDENTIFIER ';' 
+	T_PROGRAM T_IDENTIFIER ';'	{$<ast>$ = new_ast_program_node($<str>2);}
 ;
 
 block:
 	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
+	{
+		$<ast>$ = new_ast_block_node($<ast>1,$<ast>2,$<ast>3,$<ast>4,$<ast>5,$<ast>5,$<ast>6);
+	}
 ;
 
 uses_block:
@@ -782,6 +792,10 @@ int main(int argc,char* argv[]) {
 	    }
 
 	}
+
+	printf("\n\nPrinting the Abstract Syntax Tree : \n\n");
+	print_tree(tree);
+
 	
 
     /*  TYPE BLOCK
