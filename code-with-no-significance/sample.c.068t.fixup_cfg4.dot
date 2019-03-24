@@ -1,0 +1,35 @@
+digraph "sample.c.068t.fixup_cfg4" {
+overlap=false;
+subgraph "cluster_main" {
+	style="dashed";
+	color="black";
+	label="main ()";
+	fn_0_basic_block_0 [shape=Mdiamond,style=filled,fillcolor=white,label="ENTRY"];
+
+	fn_0_basic_block_1 [shape=Mdiamond,style=filled,fillcolor=white,label="EXIT"];
+
+	fn_0_basic_block_2 [shape=record,style=filled,fillcolor=lightgrey,label="{ FREQ:0 |\<bb\ 2\>:\l\
+|printf\ (\"Enter\ two\ integers:\ \");\l\
+|scanf\ (\"%d\ %d\",\ &firstNumber,\ &secondNumber);\l\
+|firstNumber.0_4\ =\ firstNumber;\l\
+|secondNumber.1_5\ =\ secondNumber;\l\
+|sumOfTwoNumbers_6\ =\ firstNumber.0_4\ +\ secondNumber.1_5;\l\
+|secondNumber.2_7\ =\ secondNumber;\l\
+|firstNumber.3_8\ =\ firstNumber;\l\
+|printf\ (\"%d\ +\ %d\ =\ %d\",\ firstNumber.3_8,\ secondNumber.2_7,\ sumOfTwoNumbers_6);\l\
+|_10\ =\ 0;\l\
+|firstNumber\ =\{v\}\ \{CLOBBER\};\l\
+|secondNumber\ =\{v\}\ \{CLOBBER\};\l\
+}"];
+
+	fn_0_basic_block_3 [shape=record,style=filled,fillcolor=lightgrey,label="{ FREQ:0 |\<bb\ 3\>:\l\
+|\<L1\>:\l\
+|return\ _10;\l\
+}"];
+
+	fn_0_basic_block_0:s -> fn_0_basic_block_2:n [style="solid,bold",color=blue,weight=100,constraint=true, label="[0%]"];
+	fn_0_basic_block_2:s -> fn_0_basic_block_3:n [style="solid,bold",color=blue,weight=100,constraint=true, label="[0%]"];
+	fn_0_basic_block_3:s -> fn_0_basic_block_1:n [style="solid,bold",color=black,weight=10,constraint=true, label="[0%]"];
+	fn_0_basic_block_0:s -> fn_0_basic_block_1:n [style="invis",constraint=true];
+}
+}

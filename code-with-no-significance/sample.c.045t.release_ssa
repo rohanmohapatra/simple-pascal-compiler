@@ -1,0 +1,39 @@
+
+;; Function main (main, funcdef_no=0, decl_uid=2283, cgraph_uid=0, symbol_order=0)
+
+Released 0 names, 0.00%, removed 0 holes
+main ()
+{
+  int sumOfTwoNumbers;
+  int secondNumber;
+  int firstNumber;
+  int D.2293;
+  int firstNumber.3;
+  int secondNumber.2;
+  int secondNumber.1;
+  int firstNumber.0;
+  int firstNumber.0_4;
+  int secondNumber.1_5;
+  int secondNumber.2_7;
+  int firstNumber.3_8;
+  int _10;
+
+  <bb 2>:
+  printf ("Enter two integers: ");
+  scanf ("%d %d", &firstNumber, &secondNumber);
+  firstNumber.0_4 = firstNumber;
+  secondNumber.1_5 = secondNumber;
+  sumOfTwoNumbers_6 = firstNumber.0_4 + secondNumber.1_5;
+  secondNumber.2_7 = secondNumber;
+  firstNumber.3_8 = firstNumber;
+  printf ("%d + %d = %d", firstNumber.3_8, secondNumber.2_7, sumOfTwoNumbers_6);
+  _10 = 0;
+  firstNumber ={v} {CLOBBER};
+  secondNumber ={v} {CLOBBER};
+
+<L1>:
+  return _10;
+
+}
+
+

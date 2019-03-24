@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 program hello;
 uses crt,hello, pokemon;
 const
@@ -9,17 +8,25 @@ testtesttesttesttesttesttesttest,what = real;
 whatis = string;
 one,two,three = boolean;
 var
-a,b,c:string;
+<<<<<<< Updated upstream
+a,b:integer;
+c:integer;
 one,two,three:boolean;
 test : whatis;
 test2 : one;
 test3,test4 : what;
+d : integer;
+=======
+a,b,c, a:string;
+one,two,three, a:boolean;
+>>>>>>> Stashed changes
 begin
 	a:=10;
 	b+=20;
+	c := "Hello";
+	test3:=56.69;
+	a:=a+10;
 	c := (a+b);
+	d := a-c+b;
 	writeln("Printable");
 end.
-=======
-program hello;
->>>>>>> rohan-talesara

@@ -1,0 +1,21 @@
+
+;; Function main (null)
+;; enabled by -tree-original
+
+
+{
+  int firstNumber;
+  int secondNumber;
+  int sumOfTwoNumbers;
+
+    int firstNumber;
+    int secondNumber;
+    int sumOfTwoNumbers;
+  printf ((const char * restrict) "Enter two integers: ");
+  scanf ((const char * restrict) "%d %d", &firstNumber, &secondNumber);
+  sumOfTwoNumbers = firstNumber + secondNumber;
+  printf ((const char * restrict) "%d + %d = %d", firstNumber, secondNumber, sumOfTwoNumbers);
+  return 0;
+}
+return 0;
+
