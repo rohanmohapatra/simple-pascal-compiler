@@ -167,6 +167,7 @@
 	char *type;
 	int intval;
 	float floatval;
+	struct ast_node * ast;
 }
 
 %start startPascal
