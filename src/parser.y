@@ -4,6 +4,7 @@
 	#include <time.h> //link with -lrt
 	#include <string.h>
 	#include "../uthash/src/uthash.h"
+	#include "ast_handle.h"
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
 	int successful=1;
