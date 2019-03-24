@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#define COUNT 10
+#define COUNT 5
 void padding ( char ch, int n ){
   int i;
   for ( i = 0; i < n*COUNT; i++ )
@@ -48,15 +48,25 @@ void print_initial_tree(struct ast_node *root,int level){
                   printf ( "%s", "Program" );
                   padding ( 45, level );
                   printf ( "%s\n", node->program_name );
-                  
-                  
-                  
                   break;
                 }
     case 'B': {
                   struct ast_block_node *node = (struct ast_block_node*) root;
+                  print_initial_tree(node->uses_node,level+1);
                   padding ( 45, level );
                   printf ( "%s\n", "Block" );
+                  break;
+                }    
+    case 'U': {
+                  struct ast_uses_node *node = (struct ast_uses_node*) root;
+                  padding ( 45, level );
+                  printf ( "%s", "Uses" );
+                  for (int i = 0; i <= node->n_packages; ++i)
+                  {
+                    padding ( 45, level );
+                    printf("%s",node->package_names[i] );
+                  }
+                  printf("\n");
                   break;
                 }    
   }
@@ -109,5 +119,20 @@ struct ast_node *new_ast_program_node (
   char *new_name = malloc(strlen(program_name)+1);
   strcpy(new_name,program_name);
   ast_node->program_name = new_name;
+  return (struct ast_node*) ast_node;
 }
 
+struct ast_node *new_ast_uses_node (
+  int n_args,
+  char **package_names){
+  struct ast_uses_node *ast_node;
+  ast_node = (struct ast_uses_node*) malloc(sizeof(struct ast_uses_node));
+  ast_node->node_type = 'U';
+  ast_node->package_names = package_names;
+  ast_node->n_packages = n_args;
+  for (int i = 0; i <= n_args; ++i)
+  {
+    //printf("%s\n",package_names[i] );
+  }
+  return (struct ast_node*) ast_node;
+}

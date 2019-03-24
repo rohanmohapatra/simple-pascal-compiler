@@ -157,6 +157,15 @@
 		}
 		return result;
 	}
+		/********************************
+	*	For Uses Block 	 			*
+	*	We need to add all packages *
+	*	to a Stack and then send 	*
+	*	as a parameter				*
+	********************************/
+	char *uses_identifier_stack[10];
+	int uses_identifier_top = -1;
+
 
 	struct ast_node *tree;
 	/*Stores the AST Root*/
@@ -252,11 +261,26 @@ block:
 ;
 
 uses_block:
-	T_USES T_IDENTIFIER more_libs ';'  | epsilon
+	T_USES T_IDENTIFIER 
+	{
+		uses_identifier_top++;
+		uses_identifier_stack[uses_identifier_top] = strdup(yylval.str);
+	}
+	more_libs ';'  
+	{
+		$<ast>$ = new_ast_uses_node(uses_identifier_top,uses_identifier_stack);
+	}
+	| epsilon
 ;
 
 more_libs:
-	',' T_IDENTIFIER more_libs | epsilon
+	',' T_IDENTIFIER
+	{
+		uses_identifier_top++;
+		uses_identifier_stack[uses_identifier_top] = strdup(yylval.str);
+	}
+	more_libs 
+	| epsilon
 ;
 
 constant_block:

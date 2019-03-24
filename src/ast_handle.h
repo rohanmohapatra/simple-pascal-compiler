@@ -48,6 +48,15 @@ struct ast_program_node // for Root Node
   char* program_name;
 };
 
+struct ast_uses_node // for Root Node
+{
+  int node_type;
+
+  char** package_names;
+
+  int n_packages;
+};
+
 struct ast_relational_node // for relational operators
 {
   int node_type;
@@ -113,3 +122,6 @@ struct ast_node *new_ast_block_node (
 struct ast_node *new_ast_program_node (
   char* program_name);
 
+struct ast_node *new_ast_uses_node (
+  int n_args,
+  char **package_names);
