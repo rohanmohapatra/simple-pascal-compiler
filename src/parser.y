@@ -813,13 +813,14 @@ int main(int argc,char* argv[]) {
 				}
 
 	        //printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\t Line_no : %-10d\t Col_no : %-10d\n",i,s->var_name,s->type, //s->scope_level, s->line_no, s->col_no, s->var_value );
+				printf("\n\nPrinting the Abstract Syntax Tree : \n\n");
+				print_tree(tree);
+
 	    }
 
 	}
 
-	printf("\n\nPrinting the Abstract Syntax Tree : \n\n");
-	print_tree(tree);
-
+	
 	
 
     /*  TYPE BLOCK
