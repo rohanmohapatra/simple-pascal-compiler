@@ -5,8 +5,14 @@
 #define COUNT 5
 void padding ( char ch, int n ){
   int i;
-  for ( i = 0; i < n*COUNT; i++ )
+  if(ch == 45){
+    for ( i = 0; i < n*COUNT; i++ )
     printf ( "%c", ch );
+  }
+  else {
+    for ( i = 0; i < n; i++ )
+    printf ( "%c", ch );
+  }
 }
 /*
 void structure ( struct node *root, int level ){
@@ -59,13 +65,16 @@ void print_initial_tree(struct ast_node *root,int level){
                 }    
     case 'U': {
                   struct ast_uses_node *node = (struct ast_uses_node*) root;
-                  padding ( 45, level );
-                  printf ( "%s", "Uses" );
+                  
                   for (int i = 0; i <= node->n_packages; ++i)
                   {
+                    padding ('\t', level);
                     padding ( 45, level );
-                    printf("%s",node->package_names[i] );
+                    printf("%s\n",node->package_names[i] );
                   }
+                  //printf("\n");
+                  padding ( 45, level );
+                  printf ( "%s", "Uses" );
                   printf("\n");
                   break;
                 }    

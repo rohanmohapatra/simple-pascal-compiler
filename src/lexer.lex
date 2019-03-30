@@ -3,12 +3,13 @@
 	#include <string.h>
 	#include "parser.tab.h"
 	#include "../uthash/src/uthash.h"
+	#include "var_type.h"
 	int yyerror();
 	int yycolumn;
 	#define YY_USER_ACTION yylloc.first_line = yylloc.last_line = yylineno;\
 	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
     yycolumn += yyleng;
-
+    extern struct variable_type_info var_type_information;
 	// struct var_info {
 	// 	char var_name[31];
 	// 	YYLTYPE var_decl_loc;
@@ -70,14 +71,16 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 
 {INTVAL} {
 	yylval.intval = atoi(yytext);
+	var_type_information.is_int = 1;
 	ECHO;
- return T_INTVAL;
+ 	return T_INTVAL;
 }
 
 {FLOATVAL} {
 	yylval.floatval = atof(yytext);
+	var_type_information.is_float = 1;
 	ECHO;
- return T_FLOATVAL;
+ 	return T_FLOATVAL;
 }
 
 {BOOLVAL} {
@@ -87,8 +90,9 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 	else {
 		yylval.intval=0;
 	}
+	var_type_information.is_bool = 1;
 	ECHO;
- return T_BOOLVAL;
+ 	return T_BOOLVAL;
 }
 
 {STRINGVAL} {
@@ -96,6 +100,7 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 	//skip starting and ending quote and copy only string content
 	strncpy(temp,yytext+1,yyleng-2);
 	yylval.str=strdup(temp);
+	var_type_information.is_str = 1;
 	ECHO;
  return T_STRINGVAL;	
 }

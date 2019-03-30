@@ -9,6 +9,8 @@ var
 	i : integer;
 	x : integer;
 	y : array [9...25] of boolean;
+	z : uInteger;
+	a : string;
 function max(num1,num2: integer): integer;
 var
    {* local variable declaration *}
@@ -16,6 +18,7 @@ var
    max : integer;
 begin
    max := result;
+   max :=4+5;
 end;
 
 function min(num1,num2: integer): integer;
@@ -29,12 +32,15 @@ begin
 end;
 
 begin
-		x:=x+2;
+	z := 1+10;
 	for i:= 1 to 10 
 	do 
 		writeln("Hello");
 		x:=4;
+
 	while (x>0) do x:=5;
 	writeln("Hello, World!");
+	
+	z := a+10;
 
 end. 
