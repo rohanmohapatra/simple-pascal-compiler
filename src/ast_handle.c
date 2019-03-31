@@ -111,7 +111,16 @@ void print_initial_tree(struct ast_node *root,int level){
                 padding ('\t', level-1);
                 padding ( 45, level );
                 printf("Write:%s\n",node->string );
+                break;
               }  
+    case 'W': {
+                  struct ast_while_node *node = (struct ast_while_node*) root;
+                  print_initial_tree(node->while_branch,level+1);
+                  padding ('\t', level);
+                  padding ( 45, level );
+                  printf("%s\n","While" );
+                  break;
+              }
 
   }
 }
@@ -228,4 +237,17 @@ struct ast_node *new_ast_write_node (
   char *new_name = malloc(strlen(string)+1);
   strcpy(new_name,string);
   ast_node->string = new_name;
+}
+
+struct ast_node *new_ast_while_node (struct ast_node * condition,
+                 struct ast_node * while_branch)
+{
+  struct ast_while_node * ast_node = malloc (sizeof (struct ast_while_node));
+
+  ast_node->node_type = 'W';
+
+  ast_node->condition = condition;
+  ast_node->while_branch = while_branch;
+  
+  return (struct ast_node *) ast_node;
 }

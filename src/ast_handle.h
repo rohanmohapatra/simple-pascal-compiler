@@ -166,3 +166,6 @@ struct ast_node *new_ast_exec_body_node (
 
 struct ast_node *new_ast_write_node (
   char * string);
+
+struct ast_node *new_ast_while_node (struct ast_node * condition,
+                 struct ast_node * while_branch);

@@ -561,7 +561,7 @@ statements :
 
 structured_statements:
 	conditional_statement {$<ast>$ = $<ast>1;}
-	| repetitive_statement {$<ast>$ = NULL;}
+	| repetitive_statement {$<ast>$ =$<ast>1;}
 ;
 
 conditional_statement:
@@ -586,11 +586,12 @@ else_block:
 ;
 
 repetitive_statement:
-	for_statement | while_statement
+	for_statement {$<ast>$ = NULL;}
+	| while_statement {$<ast>$ = $<ast>1;}
 ;
 
 while_statement : 
-	T_WHILE '(' boolean_expression ')' T_DO statements
+	T_WHILE '(' boolean_expression ')' T_DO statements {$<ast>$ = new_ast_while_node($<ast>3,$<ast>6);}
 ;
 
 for_statement:
