@@ -56,6 +56,41 @@ struct ast_uses_node // for Root Node
 
   int n_packages;
 };
+struct ast_structured_stmts_node
+{
+  int node_type;
+
+  struct ast_node * conditional_stmts;
+
+  struct ast_node * repetitive_stmts;
+};
+
+struct ast_exec_body_node
+{
+  int node_type;
+
+  struct ast_node * exec_body;
+
+  struct ast_node * stmts;
+};
+
+struct ast_if_node // for "if/else" statements
+{
+  int node_type;
+
+  struct ast_node * condition;
+
+  struct ast_node * if_branch;
+
+  struct ast_node * else_branch;
+};
+
+struct ast_write_node // for function calls
+{
+  int node_type;
+  
+  char* string;
+};
 
 struct ast_relational_node // for relational operators
 {
@@ -74,16 +109,7 @@ struct ast_function_node // for function calls
   // Needs to be filled
 };
 
-struct ast_if_node // for "if/else" statements
-{
-  int node_type;
 
-  struct ast_node * condition;
-
-  struct ast_node * if_branch;
-
-  struct ast_node * else_branch;
-};
 
 struct ast_while_node // for "while" statements
 {
@@ -125,3 +151,18 @@ struct ast_node *new_ast_program_node (
 struct ast_node *new_ast_uses_node (
   int n_args,
   char **package_names);
+
+struct ast_node *new_ast_if_node (struct ast_node * condition,
+                 struct ast_node * if_branch,
+                 struct ast_node * else_branch);
+
+struct ast_node *new_ast_structured_stmts_node (
+  struct ast_node *conditional_stmts,
+  struct ast_node *repetitive_stmts);
+
+struct ast_node *new_ast_exec_body_node (
+  struct ast_node *exec_body,
+  struct ast_node *stmts);
+
+struct ast_node *new_ast_write_node (
+  char * string);

@@ -545,39 +545,44 @@ more_func_identifiers:
 ;
 
 execution_block:
-	T_BEGIN execution_body T_END 
+	T_BEGIN execution_body T_END {$<ast>$ = $<ast>2;}
 ;	
 
 execution_body:
-	execution_body statements 
-	| epsilon
+	execution_body statements {$<ast>$ = new_ast_exec_body_node($<ast>1,$<ast>2);}
+	| epsilon {$<ast>$ = NULL;}
 ;
 
 statements : 
-	assignment_statements
-	| print_statements
-	| structured_statements
+	assignment_statements {$<ast>$ = NULL;}
+	| structured_statements {$<ast>$ = $<ast>1;}
+	| print_statements {$<ast>$ = $<ast>1;} 
 ;	
 
 structured_statements:
-	conditional_statement
-	| repetitive_statement
+	conditional_statement {$<ast>$ = $<ast>1;}
+	| repetitive_statement {$<ast>$ = NULL;}
 ;
 
 conditional_statement:
 	T_IF '(' boolean_expression ')' T_THEN execution_body if_then_follow
+	{
+		$<ast>$ = new_ast_if_node($<ast>3,$<ast>6,$<ast>7);
+	}
 ;
 
 if_then_follow:
-	else_if_block | else_block | epsilon
+	else_if_block {$<ast>$ = $<ast>1;}
+	| else_block {$<ast>$ = $<ast>1;}
+	| epsilon	{$<ast>$ = NULL;}
 ;
 
 else_if_block:
-	T_ELSE conditional_statement
+	T_ELSE conditional_statement {$<ast>$ = $<ast>2;}
 ;
 
 else_block:
-	T_ELSE execution_body
+	T_ELSE execution_body {$<ast>$ = $<ast>2;}
 ;
 
 repetitive_statement:
@@ -597,7 +602,7 @@ for_list:
 ;
 
 print_statements:
-	T_WRITELN '(' T_STRINGVAL ')' ';'
+	T_WRITELN '(' T_STRINGVAL ')' ';' {$<ast>$=new_ast_write_node($<str>3);}
 ;
 
 assignment_statements:
@@ -739,7 +744,7 @@ boolean_expression:
 
 operator:
 	arithmetic_ops {$<str>$ = $<str>1;}
-	|relational_ops|boolean_ops|bitwise_ops
+	|boolean_ops|bitwise_ops
 ;
 
 assignment_ops:
@@ -871,6 +876,10 @@ double time_elapsed(struct timespec *start, struct timespec *end) {
 }
 
 void set_variable_to_int(char **assignment_name_stack,int assignment_name_stack_top, int int_value,char* curr_scope_level) {
+		if (assignment_name_stack_top == -1)
+	{
+		return;
+	}
 		
 		struct symbol_table *s = NULL;
 		char var_mang_name[31];
@@ -894,6 +903,10 @@ void set_variable_to_int(char **assignment_name_stack,int assignment_name_stack_
 }
 
 void set_variable_to_float(char **assignment_name_stack,int assignment_name_stack_top, float float_value,char* curr_scope_level) {
+		if (assignment_name_stack_top == -1)
+	{
+		return;
+	}
 	struct symbol_table *s = NULL;
 	char var_mang_name[31];
 	strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
@@ -916,6 +929,10 @@ void set_variable_to_float(char **assignment_name_stack,int assignment_name_stac
 }
 
 void set_variable_to_string(char **assignment_name_stack,int assignment_name_stack_top, char *string_value,char* curr_scope_level){
+	if (assignment_name_stack_top == -1)
+	{
+		return;
+	}
 	struct symbol_table *s = NULL;
 	char var_mang_name[31];
 	strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);

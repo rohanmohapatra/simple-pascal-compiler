@@ -41,6 +41,6 @@ begin
 	while (x>0) do x:=5;
 	writeln("Hello, World!");
 	
-	z := a+10;
+	z := z+10;
 
 end. 

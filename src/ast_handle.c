@@ -38,6 +38,8 @@ void print_tree(struct ast_node *root) {
 }
 
 void print_initial_tree(struct ast_node *root,int level){
+  if(root == NULL)
+    return;
   switch(root->node_type){
     case 'R': {
                   struct ast_root_node *node = (struct ast_root_node*) root;
@@ -58,6 +60,7 @@ void print_initial_tree(struct ast_node *root,int level){
                 }
     case 'B': {
                   struct ast_block_node *node = (struct ast_block_node*) root;
+                  print_initial_tree(node->execution_node,level+1);
                   print_initial_tree(node->uses_node,level+1);
                   padding ( 45, level );
                   printf ( "%s\n", "Block" );
@@ -77,7 +80,39 @@ void print_initial_tree(struct ast_node *root,int level){
                   printf ( "%s", "Uses" );
                   printf("\n");
                   break;
-                }    
+                }
+    case 'E': {
+                  struct ast_exec_body_node *node = (struct ast_exec_body_node*) root;
+                  print_initial_tree(node->stmts,level+1);
+                  print_initial_tree(node->exec_body,level+1);
+                  //padding ( 45, level );
+                  //printf("%s\n","Execution" );
+                  break;
+              }
+    case 'I': {
+                  struct ast_if_node *node = (struct ast_if_node*) root;
+                  //print_initial_tree(node->condition,level+1);
+                  //printf("%s\n","If Else1" );
+                  print_initial_tree(node->else_branch,level+1);
+                  padding ('\t', level);
+                  padding ( 45, level );
+                  printf("%s\n","Else" );
+                  print_initial_tree(node->if_branch,level+1);
+                  //printf("%s\n","If Else2" );
+                  
+                  padding ('\t', level);
+                  padding ( 45, level );
+                  printf("%s\n","If" );
+                  break;
+              }
+    case 170: {
+
+                struct ast_write_node *node = (struct ast_write_node*) root;
+                padding ('\t', level-1);
+                padding ( 45, level );
+                printf("Write:%s\n",node->string );
+              }  
+
   }
 }
 
@@ -144,4 +179,53 @@ struct ast_node *new_ast_uses_node (
     //printf("%s\n",package_names[i] );
   }
   return (struct ast_node*) ast_node;
+}
+
+struct ast_node *
+new_ast_if_node (struct ast_node * condition,
+                 struct ast_node * if_branch,
+                 struct ast_node * else_branch)
+{
+  struct ast_if_node * ast_node = malloc (sizeof (struct ast_if_node));
+
+  ast_node->node_type = 'I';
+
+  ast_node->condition = condition;
+  ast_node->if_branch = if_branch;
+  ast_node->else_branch = else_branch;
+  
+  return (struct ast_node *) ast_node;
+}
+
+struct ast_node *new_ast_structured_stmts_node (
+  struct ast_node *conditional_stmts,
+  struct ast_node *repetitive_stmts)
+{
+  struct ast_structured_stmts_node * ast_node = malloc (sizeof (struct ast_structured_stmts_node));
+  ast_node->node_type = 'S' + 'S';
+  ast_node->conditional_stmts = conditional_stmts;
+  ast_node->repetitive_stmts = repetitive_stmts;
+
+  return (struct ast_node *) ast_node;
+}
+
+struct ast_node *new_ast_exec_body_node (
+  struct ast_node *exec_body,
+  struct ast_node *stmts)
+{
+  struct ast_exec_body_node * ast_node = malloc (sizeof (struct ast_exec_body_node));
+  ast_node->node_type = 'E';
+  ast_node->exec_body = exec_body;
+  ast_node->stmts = stmts;
+
+  return (struct ast_node *) ast_node;
+}
+
+struct ast_node *new_ast_write_node (
+  char * string){
+  struct ast_write_node *ast_node = malloc(sizeof(struct ast_write_node));
+  ast_node->node_type = 170;//'W' + 'S';
+  char *new_name = malloc(strlen(string)+1);
+  strcpy(new_name,string);
+  ast_node->string = new_name;
 }
