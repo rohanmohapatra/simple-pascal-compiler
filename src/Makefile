@@ -9,7 +9,7 @@ lexer.c:	lexer.lex
 all:
 	lex --outfile="lexer.c" lexer.lex
 	yacc parser.y -v -d -b  "parser"	
-	gcc -o executable/compiler parser.tab.c lexer.c ast_handle.c -lrt
+	gcc -g -o executable/compiler parser.tab.c lexer.c ast_handle.c var_type.c intermediate_code_generation.c -lrt
 clean:
 	rm lexer.c
 	rm parser.tab.c

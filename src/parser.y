@@ -5,12 +5,14 @@
 	#include <string.h>
 	#include "../uthash/src/uthash.h"
 	#include "ast_handle.h"
+	#include "var_type.h"
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
 	int successful=1;
     int yyerror();
     extern FILE *yyin;
     extern FILE *yyout;
+    
     double time_elapsed(struct timespec *start, struct timespec *end);
     int yylex(void);
 
@@ -27,7 +29,7 @@
 	// 	char type[10];
 	// 	int scope_level;
 	// };
-
+	struct variable_type_info var_type_information;
 	union data {
 		int int_value;
 		float float_value;
@@ -128,6 +130,47 @@
 		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
 		return s->var_value;
 	}
+
+	struct variable_type_info get_identifier_type(char *var_name){
+		struct variable_type_info retval;
+		struct symbol_table *s = NULL;
+		char var_mang_name[31];
+		strcpy(var_mang_name, var_name);
+		strcat(var_mang_name, "$");
+		strcat(var_mang_name, curr_scope_level);
+		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		if(strcmp(s->type,"integer")==0){
+			retval.is_int = 1;
+			retval.is_float = 0;
+			retval.is_str = 0;
+			retval.is_bool = 0;
+		}
+		else
+		if(strcmp(s->type,"real")==0){
+			retval.is_int = 0;
+			retval.is_float = 1;
+			retval.is_str = 0;
+			retval.is_bool = 0;
+		}
+		else
+		if(strcmp(s->type,"string")==0){
+			retval.is_int = 0;
+			retval.is_float = 0;
+			retval.is_str = 1;
+			retval.is_bool = 0;
+		}
+		else
+		if(strcmp(s->type,"boolean")==0){
+			retval.is_int = 0;
+			retval.is_float = 0;
+			retval.is_str = 0;
+			retval.is_bool = 1;
+		}
+		return retval;
+	}
+
+
+
 	int solution(int a,int b, char* operator) {
 		int result;
 		if(strcmp(operator,"+")==0)
@@ -157,6 +200,28 @@
 		}
 		return result;
 	}
+	/********************************
+	*	For Uses Block 	 			*
+	*	We need to add all packages *
+	*	to a Stack and then send 	*
+	*	as a parameter				*
+	********************************/
+	char *uses_identifier_stack[10];
+	int uses_identifier_top = -1;
+
+	/********************************
+	*	For Expression Block		*
+	*	We need to add all packages *
+	*	to a Stack and then send 	*
+	*	as a parameter				*
+	********************************/
+	struct variable_type_info var_type_info_stack[50];
+	int var_type_info_top = -1;
+
+
+	struct ast_node *tree;
+	/*Stores the AST Root*/
+	
 	//int update_variable_value(char* var_name,union data )
 
 
@@ -226,27 +291,48 @@
 %left '*' '/'
 %%
 startPascal:
-	 program
+	 program 	{
+	 				//print_tree($<ast>1);
+	 				tree = $<ast>1;
+	 			}
 ;
 
 program:
-	prog_heading block '.'
+	prog_heading block '.'	{$<ast>$ = new_ast_root_node($<ast>1,$<ast>2);}
 ;
 
 prog_heading:
-	T_PROGRAM T_IDENTIFIER ';' 
+	T_PROGRAM T_IDENTIFIER ';'	{$<ast>$ = new_ast_program_node($<str>2);}
 ;
 
 block:
 	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
+	{
+		$<ast>$ = new_ast_block_node($<ast>1,$<ast>2,$<ast>3,$<ast>4,$<ast>5,$<ast>5,$<ast>6);
+	}
 ;
 
 uses_block:
-	T_USES T_IDENTIFIER more_libs ';'  | epsilon
+	T_USES T_IDENTIFIER 
+	{
+		uses_identifier_top++;
+		uses_identifier_stack[uses_identifier_top] = strdup(yylval.str);
+	}
+	more_libs ';'  
+	{
+		$<ast>$ = new_ast_uses_node(uses_identifier_top,uses_identifier_stack);
+	}
+	| epsilon
 ;
 
 more_libs:
-	',' T_IDENTIFIER more_libs | epsilon
+	',' T_IDENTIFIER
+	{
+		uses_identifier_top++;
+		uses_identifier_stack[uses_identifier_top] = strdup(yylval.str);
+	}
+	more_libs 
+	| epsilon
 ;
 
 constant_block:
@@ -459,47 +545,53 @@ more_func_identifiers:
 ;
 
 execution_block:
-	T_BEGIN execution_body T_END 
+	T_BEGIN execution_body T_END {$<ast>$ = $<ast>2;}
 ;	
 
 execution_body:
-	execution_body statements 
-	| epsilon
+	execution_body statements {$<ast>$ = new_ast_exec_body_node($<ast>1,$<ast>2);}
+	| epsilon {$<ast>$ = NULL;}
 ;
 
 statements : 
-	assignment_statements
-	| print_statements
-	| structured_statements
+	assignment_statements {$<ast>$ = NULL;}
+	| structured_statements {$<ast>$ = $<ast>1;}
+	| print_statements {$<ast>$ = $<ast>1;} 
 ;	
 
 structured_statements:
-	conditional_statement
-	| repetitive_statement
+	conditional_statement {$<ast>$ = $<ast>1;}
+	| repetitive_statement {$<ast>$ =$<ast>1;}
 ;
 
 conditional_statement:
 	T_IF '(' boolean_expression ')' T_THEN execution_body if_then_follow
+	{
+		$<ast>$ = new_ast_if_node($<ast>3,$<ast>6,$<ast>7);
+	}
 ;
 
 if_then_follow:
-	else_if_block | else_block | epsilon
+	else_if_block {$<ast>$ = $<ast>1;}
+	| else_block {$<ast>$ = $<ast>1;}
+	| epsilon	{$<ast>$ = NULL;}
 ;
 
 else_if_block:
-	T_ELSE conditional_statement
+	T_ELSE conditional_statement {$<ast>$ = $<ast>2;}
 ;
 
 else_block:
-	T_ELSE execution_body
+	T_ELSE execution_body {$<ast>$ = $<ast>2;}
 ;
 
 repetitive_statement:
-	for_statement | while_statement
+	for_statement {$<ast>$ = NULL;}
+	| while_statement {$<ast>$ = $<ast>1;}
 ;
 
 while_statement : 
-	T_WHILE expression T_DO statements
+	T_WHILE '(' boolean_expression ')' T_DO statements {$<ast>$ = new_ast_while_node($<ast>3,$<ast>6);}
 ;
 
 for_statement:
@@ -511,7 +603,7 @@ for_list:
 ;
 
 print_statements:
-	T_WRITELN '(' T_STRINGVAL ')' ';'
+	T_WRITELN '(' T_STRINGVAL ')' ';' {$<ast>$=new_ast_write_node($<str>3);}
 ;
 
 assignment_statements:
@@ -534,101 +626,47 @@ assignment_statement:
 		{
 			assignment_name_stack_top++;
 			assignment_name_stack[assignment_name_stack_top] = strdup(yylval.str);
+			
 		}
 	}
-	assignment_ops expression 
-
-	
+	assignment_ops expression
 ;
 
 value:
 	T_INTVAL 
 	{
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(s)
-		{
-			struct symbol_table *temp = NULL;
-			struct symbol_table *r = NULL;
-			temp = malloc(sizeof(struct symbol_table));
-			strcat(temp->var_name, var_mang_name);
-			strcpy(temp->type, s->type);
-			temp->scope_level = s->scope_level;
-			temp->line_no = s->line_no;
-			temp->col_no = s->col_no;
-			temp->var_value.int_value = yylval.intval;
-			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
-		}
+		$<intval>$ = $<intval>1;
+		//printf("Its here %d and %d and %d and %d and %d\n",$<intval>$,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
+		set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
+		var_type_info_top++;
+		var_type_info_stack[var_type_info_top] = var_type_information;
+		clear_variable_type_info(&var_type_information);
 	}
 	| T_FLOATVAL 
 	{
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(s)
-		{
-			struct symbol_table *temp = NULL;
-			struct symbol_table *r = NULL;
-			temp = malloc(sizeof(struct symbol_table));
-			strcat(temp->var_name, var_mang_name);
-			strcpy(temp->type, s->type);
-			temp->scope_level = s->scope_level;
-			temp->line_no = s->line_no;
-			temp->col_no = s->col_no;
-			temp->var_value.float_value = yylval.floatval;
-			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
-		}
+		$<floatval>$ = $<floatval>1;
+		//printf("Its here %f and %d and %d and %d and %d\n",$<floatval>1,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
+		set_variable_to_float(assignment_name_stack,assignment_name_stack_top, $<floatval>1,curr_scope_level);
+		var_type_info_top++;
+		var_type_info_stack[var_type_info_top] = var_type_information;
+		clear_variable_type_info(&var_type_information);
 	}
 	| T_BOOLVAL 
 	{
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(s)
-		{
-			struct symbol_table *temp = NULL;
-			struct symbol_table *r = NULL;
-			temp = malloc(sizeof(struct symbol_table));
-			strcat(temp->var_name, var_mang_name);
-			strcpy(temp->type, s->type);
-			temp->scope_level = s->scope_level;
-			temp->line_no = s->line_no;
-			temp->col_no = s->col_no;
-			temp->var_value.int_value = yylval.intval;
-			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
-		}
+		$<intval>$ = $<intval>1;
+		set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
+		var_type_info_top++;
+		var_type_info_stack[var_type_info_top] = var_type_information;
+		clear_variable_type_info(&var_type_information);
 	}
 	| T_STRINGVAL
 	{
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(s)
-		{
-			struct symbol_table *temp = NULL;
-			struct symbol_table *r = NULL;
-			temp = malloc(sizeof(struct symbol_table));
-			strcat(temp->var_name, var_mang_name);
-			strcpy(temp->type, s->type);
-			temp->scope_level = s->scope_level;
-			temp->line_no = s->line_no;
-			temp->col_no = s->col_no;
-			strcpy(temp->var_value.string_value,yylval.str);
-			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
-		}
+		$<str>$ = $<str>1;
+		set_variable_to_string(assignment_name_stack,assignment_name_stack_top, $<str>1,curr_scope_level);
+		var_type_info_top++;
+		var_type_info_stack[var_type_info_top] = var_type_information;
+		clear_variable_type_info(&var_type_information);
+		
 	}
 ;
 
@@ -637,34 +675,67 @@ expression:
 	{
 		if(check_valid_identifier(yyval.str)){
 			union data variable_value = get_identifier_data(yylval.str);
-			$<intval>$ = variable_value.int_value;
+			struct variable_type_info id_type = get_identifier_type(yylval.str);
+			//printf("Its here in ID and %d and %d and %d and %d\n",id_type.is_int,id_type.is_float,id_type.is_bool,id_type.is_str );
+			var_type_info_top++;
+			var_type_info_stack[var_type_info_top] = id_type;
+			if(id_type.is_int && !(id_type.is_float) && !(id_type.is_str) && !(id_type.is_bool)){
+				$<intval>$ = variable_value.int_value;
+			}
+			else
+			if(!(id_type.is_int) && (id_type.is_float) && !(id_type.is_str) && !(id_type.is_bool)){
+				$<floatval>$ = variable_value.float_value;
+			}
+			else
+			if(!(id_type.is_int) && !(id_type.is_float) && (id_type.is_str) && !(id_type.is_bool)){
+				strcpy($<str>$,variable_value.string_value);
+			}
+			else
+			if(!(id_type.is_int) && !(id_type.is_float) && !(id_type.is_str) && (id_type.is_bool)){
+				$<intval>$ = variable_value.int_value;
+			}
 		}
 	} 
-	| value 
-	| '(' expression ')' 
+	| value {$<intval>$ = $<intval>1;}
+	| '(' expression ')' {$<intval>$ = $<intval>2;}
 	| expression operator expression 
 	{
-		printf("%d and %d and %s\n",$<intval>1,$<intval>3,$<str>2);
-		$<intval>$ = solution($<intval>1,$<intval>3,$<str>2);
-		
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(s)
-		{
-			struct symbol_table *temp = NULL;
-			struct symbol_table *r = NULL;
-			temp = malloc(sizeof(struct symbol_table));
-			strcat(temp->var_name, var_mang_name);
-			strcpy(temp->type, s->type);
-			temp->scope_level = s->scope_level;
-			temp->line_no = s->line_no;
-			temp->col_no = s->col_no;
-			temp->var_value.int_value = $<intval>$;
-			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
+		struct variable_type_info st1,st2;
+		st1 = var_type_info_stack[var_type_info_top-1];
+		st2 = var_type_info_stack[var_type_info_top];
+		if(st1.is_int && st2.is_int){
+			//printf("%d and %d and %s\n",$<intval>1,$<intval>3,$<str>2);
+			$<intval>$ = solution($<intval>1,$<intval>3,$<str>2);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>$,curr_scope_level);
+
+		}
+		else
+		if(st1.is_int && st2.is_float){
+			printf("Warning : Trying to Add Real and Integer. Converting Real to Integer\n");
+			//printf("%d and %f and %s\n",$<intval>1,$<floatval>3,$<str>2);
+			$<intval>$ = solution($<intval>1,(int)$<floatval>3,$<str>2);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>$,curr_scope_level);
+		}
+		else
+		if(st1.is_int && st2.is_bool){
+			yyerror("Abort: Incompatible Datatypes.");
+			exit(1);
+		}
+		else
+		if(st1.is_int && st2.is_str){
+			yyerror("Abort: Incompatible Datatypes.");
+			exit(1);
+		}
+		else
+		if(st1.is_float && st2.is_int){
+			printf("Warning : Trying to Add Integer and Real. Converting Real to Integer\n");
+			//printf("%f and %d and %s\n",$<floatval>1,$<intval>3,$<str>2);
+			$<intval>$ = solution((int)$<floatval>1,(int)$<intval>3,$<str>2);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>$,curr_scope_level);
+		}
+		else{
+			yyerror("Abort: Incompatible Datatypes.");
+			exit(1);
 		}
 	}
 ;
@@ -674,7 +745,7 @@ boolean_expression:
 
 operator:
 	arithmetic_ops {$<str>$ = $<str>1;}
-	|relational_ops|boolean_ops|bitwise_ops
+	|boolean_ops|bitwise_ops
 ;
 
 assignment_ops:
@@ -682,11 +753,11 @@ assignment_ops:
 ;
 
 arithmetic_ops:
-	'+' {strcpy($<str>$,"+");}
-	|'*' {strcpy($<str>$,"*");}
-	|'/' {strcpy($<str>$,"/");}
-	|'-' {strcpy($<str>$,"-");}
-	|'%' {strcpy($<str>$,"%");}
+	'+' {$<str>$=strdup("+");}
+	|'*' {$<str>$=strdup("*");}
+	|'/' {$<str>$=strdup("/");}
+	|'-' {$<str>$=strdup("-");}
+	|'%' {$<str>$=strdup("%");}
 ;
 
 relational_ops:
@@ -748,7 +819,7 @@ int main(int argc,char* argv[]) {
 
 	yyout = (FILE*)fopen(outputfile,"w+");
 	/*End Create Output File*/
-
+	clear_variable_type_info(&var_type_information);
 	clock_gettime(CLOCK_REALTIME, &start);
 	yyparse();
 	clock_gettime(CLOCK_REALTIME, &end);
@@ -779,9 +850,15 @@ int main(int argc,char* argv[]) {
 				}
 
 	        //printf("Index : %-10d\t Identifier : %-20s\t DataType : %-20s\t ScopeLevel : %-20s\t Line_no : %-10d\t Col_no : %-10d\n",i,s->var_name,s->type, //s->scope_level, s->line_no, s->col_no, s->var_value );
+				
+
 	    }
+	    printf("\n\nPrinting the Abstract Syntax Tree : \n\n");
+		print_tree(tree);
 
 	}
+
+	
 	
 
     /*  TYPE BLOCK
@@ -797,4 +874,83 @@ double time_elapsed(struct timespec *start, struct timespec *end) {
 	t = (end->tv_sec - start->tv_sec); // diff in seconds
 	t += (end->tv_nsec - start->tv_nsec) * 0.000000001; //diff in nanoseconds
 	return t;
+}
+
+void set_variable_to_int(char **assignment_name_stack,int assignment_name_stack_top, int int_value,char* curr_scope_level) {
+		if (assignment_name_stack_top == -1)
+	{
+		return;
+	}
+		
+		struct symbol_table *s = NULL;
+		char var_mang_name[31];
+		strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
+		strcat(var_mang_name, "$");
+		strcat(var_mang_name, curr_scope_level);
+		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		if(s)
+		{
+			struct symbol_table *temp = NULL;
+			struct symbol_table *r = NULL;
+			temp = malloc(sizeof(struct symbol_table));
+			strcat(temp->var_name, var_mang_name);
+			strcpy(temp->type, s->type);
+			temp->scope_level = s->scope_level;
+			temp->line_no = s->line_no;
+			temp->col_no = s->col_no;
+			temp->var_value.int_value = int_value;
+			HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
+		}
+}
+
+void set_variable_to_float(char **assignment_name_stack,int assignment_name_stack_top, float float_value,char* curr_scope_level) {
+		if (assignment_name_stack_top == -1)
+	{
+		return;
+	}
+	struct symbol_table *s = NULL;
+	char var_mang_name[31];
+	strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
+	strcat(var_mang_name, "$");
+	strcat(var_mang_name, curr_scope_level);
+	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+	if(s)
+	{
+		struct symbol_table *temp = NULL;
+		struct symbol_table *r = NULL;
+		temp = malloc(sizeof(struct symbol_table));
+		strcat(temp->var_name, var_mang_name);
+		strcpy(temp->type, s->type);
+		temp->scope_level = s->scope_level;
+		temp->line_no = s->line_no;
+		temp->col_no = s->col_no;
+		temp->var_value.float_value = float_value;
+		HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
+	}
+}
+
+void set_variable_to_string(char **assignment_name_stack,int assignment_name_stack_top, char *string_value,char* curr_scope_level){
+	if (assignment_name_stack_top == -1)
+	{
+		return;
+	}
+	struct symbol_table *s = NULL;
+	char var_mang_name[31];
+	strcpy(var_mang_name, assignment_name_stack[assignment_name_stack_top]);
+	strcat(var_mang_name, "$");
+	strcat(var_mang_name, curr_scope_level);
+	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+	if(s)
+	{
+		struct symbol_table *temp = NULL;
+		struct symbol_table *r = NULL;
+		temp = malloc(sizeof(struct symbol_table));
+		strcat(temp->var_name, var_mang_name);
+		strcpy(temp->type, s->type);
+		temp->scope_level = s->scope_level;
+		temp->line_no = s->line_no;
+		temp->col_no = s->col_no;
+		strcpy(temp->var_value.string_value,string_value);
+		HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
+	}
 }

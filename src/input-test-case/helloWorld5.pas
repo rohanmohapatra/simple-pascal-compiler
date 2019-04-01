@@ -4,6 +4,7 @@ type
 	uReal = real;
 	uString = string;
 	uInteger = integer;
+{* Here the main program block starts *}
 var
 	i : integer;
 	x : integer;
@@ -12,7 +13,8 @@ var
 	a : string;
 function max(num1,num2: integer): integer;
 var
-      result: integer;
+   {* local variable declaration *}
+   result: integer;
    max : integer;
 begin
    max := result;
@@ -36,7 +38,7 @@ begin
 		writeln("Hello");
 		x:=4;
 
-	while (x>0) do x:=5;
+	while (x>0) do writeln("While");
 	writeln("Hello, World!");
 	
 	z := z+10;
