@@ -146,9 +146,9 @@ Grammar
    79 assignment_statements: assignment_statement ';' assignment_statements
    80                      | epsilon
 
-   81 $@15: %empty
+   81 @15: %empty
 
-   82 assignment_statement: T_IDENTIFIER $@15 assignment_ops expression
+   82 assignment_statement: T_IDENTIFIER @15 assignment_ops expression
 
    83 value: T_INTVAL
    84      | T_FLOATVAL
@@ -377,7 +377,7 @@ assignment_statements (114)
     on left: 79 80, on right: 61 79
 assignment_statement (115)
     on left: 82, on right: 79
-$@15 (116)
+@15 (116)
     on left: 81, on right: 82
 value (117)
     on left: 83 84 85 86, on right: 88
@@ -1198,11 +1198,11 @@ State 88
 
 State 89
 
-   82 assignment_statement: T_IDENTIFIER . $@15 assignment_ops expression
+   82 assignment_statement: T_IDENTIFIER . @15 assignment_ops expression
 
-    $default  reduce using rule 81 ($@15)
+    $default  reduce using rule 81 (@15)
 
-    $@15  go to state 119
+    @15  go to state 119
 
 
 State 90
@@ -1436,7 +1436,7 @@ State 118
 
 State 119
 
-   82 assignment_statement: T_IDENTIFIER $@15 . assignment_ops expression
+   82 assignment_statement: T_IDENTIFIER @15 . assignment_ops expression
 
     T_ASOP     shift, and go to state 144
     T_AS_PE    shift, and go to state 145
@@ -1729,7 +1729,7 @@ State 148
 
 State 149
 
-   82 assignment_statement: T_IDENTIFIER $@15 assignment_ops . expression
+   82 assignment_statement: T_IDENTIFIER @15 assignment_ops . expression
 
     T_IDENTIFIER  shift, and go to state 132
     T_INTVAL      shift, and go to state 133
@@ -2112,7 +2112,7 @@ State 192
 
 State 193
 
-   82 assignment_statement: T_IDENTIFIER $@15 assignment_ops expression .
+   82 assignment_statement: T_IDENTIFIER @15 assignment_ops expression .
    90 expression: expression . operator expression
 
     T_BOOL_AND  shift, and go to state 163

@@ -1,4 +1,5 @@
 #include "ast_handle.h"
+#include "symbol_table.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -84,9 +85,9 @@ void print_initial_tree(struct ast_node *root,int level){
     case 'E': {
                   struct ast_exec_body_node *node = (struct ast_exec_body_node*) root;
                   print_initial_tree(node->stmts,level+1);
-                  print_initial_tree(node->exec_body,level+1);
-                  //padding ( 45, level );
-                  //printf("%s\n","Execution" );
+                  print_initial_tree(node->exec_body,level);
+                  padding ( 45, level );
+                  printf("%s\n","Execution" );
                   break;
               }
     case 'I': {
@@ -121,7 +122,50 @@ void print_initial_tree(struct ast_node *root,int level){
                   printf("%s\n","While" );
                   break;
               }
-
+    case ('A'+'S'): {
+                  struct ast_assignment_stmts_node *node = (struct ast_assignment_stmts_node*) root;
+                  
+                 //printf("%s\n","Assignment Statements" );
+                  print_initial_tree(node->assignment_stmts_node,level);
+                  print_initial_tree(node->assignment_node,level+1);
+                  break;
+              }
+    case 'A':  {
+                  struct ast_assignment_node *node = (struct ast_assignment_node*) root;
+                  
+                  padding ('\t', level);
+                  padding ( 45, level );
+                  char *var = strtok(node->symbol->var_name,"$");
+                  printf("Variable Name: %s\n",var );
+                  padding ('\t', level);
+                  padding ( 45, level );
+                  printf("%s\n","Assignment" );
+                  print_initial_tree(node->value,level+1);
+                  break;
+              }
+    case 'N': {
+                struct ast_number_node *node = (struct ast_number_node *) root;
+                padding ('\t', level);
+                padding ( 45, level );
+                printf("Value : %d\n",node->value);
+                break;
+              }
+    case 'S': {
+                struct ast_symbol_reference_node *node = (struct ast_symbol_reference_node *) root;
+                padding ('\t', level);
+                padding ( 45, level );
+                char *var = strtok(node->symbol->var_name,"$");
+                printf("%s\n",var);
+                break;
+              }
+    default :  {
+                print_initial_tree(root->right,level+1);
+                padding ('\t', level);
+                padding ( 45, level );
+                printf("  %c\n",root->node_type );
+                print_initial_tree(root->left,level+1);
+              }
+    
   }
 }
 
@@ -249,5 +293,65 @@ struct ast_node *new_ast_while_node (struct ast_node * condition,
   ast_node->condition = condition;
   ast_node->while_branch = while_branch;
   
+  return (struct ast_node *) ast_node;
+}
+
+struct ast_node *new_ast_assignment_stmts_node(
+  struct ast_node *assignment_node,
+  struct ast_node *assignment_stmts_node)
+{
+  struct ast_assignment_stmts_node * ast_node = malloc(sizeof(struct ast_assignment_stmts_node));
+
+  ast_node->node_type = 'A' + 'S';
+  ast_node->assignment_node = assignment_node;
+  ast_node->assignment_stmts_node = assignment_stmts_node;
+
+  return (struct ast_node *) ast_node;
+}
+
+struct ast_node *new_ast_assignment_node(
+  struct symbol_table *symbol,
+  struct ast_node *value)
+{
+  struct ast_assignment_node * ast_node = malloc(sizeof(struct ast_assignment_node));
+
+  ast_node->node_type = 'A';
+  ast_node->symbol = symbol;
+  ast_node->value = value;
+}
+
+struct ast_node * new_ast_node (
+  char* node_type,
+  struct ast_node * left,
+  struct ast_node * right)
+{
+  struct ast_node * ast_node = malloc (sizeof (struct ast_node));
+
+  ast_node->node_type = node_type[0];
+
+  ast_node->left = left;
+  ast_node->right = right;
+
+  return ast_node;
+}
+
+struct ast_node *new_ast_number_node (int value)
+{
+  struct ast_number_node * ast_node = malloc (sizeof (struct ast_number_node));
+
+  ast_node->node_type = 'N';
+
+  ast_node->value = value;
+
+  return (struct ast_node *) ast_node;
+}
+struct ast_node *new_ast_symbol_reference_node (struct symbol_table * symbol)
+{
+  struct ast_symbol_reference_node * ast_node =malloc (sizeof (struct ast_symbol_reference_node));
+
+  ast_node->node_type = 'S';
+
+  ast_node->symbol = symbol;
+
   return (struct ast_node *) ast_node;
 }

@@ -4,6 +4,7 @@
 	#include <time.h> //link with -lrt
 	#include <string.h>
 	#include "../uthash/src/uthash.h"
+	#include "symbol_table.h"
 	#include "ast_handle.h"
 	#include "var_type.h"
 	#include "spc/utils.h"
@@ -30,30 +31,14 @@
 	// 	int scope_level;
 	// };
 	struct variable_type_info var_type_information;
-	union data {
-		int int_value;
-		float float_value;
-		char string_value[256];
-	};
-
-	struct symbol_table {
-		char var_name[31]; //Holds the Name of the Identifier
-		// struct var_info var;
-		// YYLTYPE var_decl_loc;
-		char type[10]; //Holds the DataType of Identifier
-		char *scope_level;
-		//int current_size; //Size of the Symbol Table
-		int line_no;
-		int col_no;
-		union data var_value;
-		UT_hash_handle hh; //Hash Structure for Optimized Access
-	};
+	
 
 
 	struct symbol_table *SYMBOL_TABLE = NULL; /*Generic Symbol Table*/
 
 	char *type_identifier_stack[10];
 	int type_identifier_top = -1;
+
 	struct type_table{
 		char user_defined_name[31];
 		char actual_type_name[31];
@@ -64,7 +49,7 @@
 	int dump_stack_in_symbol_table(char *type, int line_no, int col_no);
 	int check_valid_identifier(char* var_name);
 	union data get_identifier_data(char *var_name);
-
+	struct symbol_table *get_symbol_node(char *var_name,char *curr_scope_level);
 	struct variable_type_info get_identifier_type(char *var_name);
 	int solution(int a,int b, char* operator);
 
@@ -424,7 +409,7 @@ execution_body:
 ;
 
 statements : 
-	assignment_statements {$<ast>$ = NULL;}
+	assignment_statements {$<ast>$ =$<ast>1;}
 	| structured_statements {$<ast>$ = $<ast>1;}
 	| print_statements {$<ast>$ = $<ast>1;} 
 ;	
@@ -477,8 +462,8 @@ print_statements:
 ;
 
 assignment_statements:
-	assignment_statement ';'  assignment_statements
-	| epsilon
+	assignment_statement ';'  assignment_statements {$<ast>$ = new_ast_assignment_stmts_node($<ast>1,$<ast>3);}
+	| epsilon {$<ast>$ = NULL;}
 ;
 
 assignment_statement:
@@ -499,13 +484,18 @@ assignment_statement:
 			
 		}
 	}
-	assignment_ops expression
+	assignment_ops expression 
+	{
+		struct symbol_table *symbol_node = get_symbol_node($<str>1,curr_scope_level);
+		$<ast>$ = new_ast_assignment_node(symbol_node,$<ast>2);
+	}
 ;
 
 value:
 	T_INTVAL 
 	{
 		$<intval>$ = $<intval>1;
+		$<ast>$ = new_ast_number_node($<intval>1);
 		//printf("Its here %d and %d and %d and %d and %d\n",$<intval>$,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
 		if(!is_rel_op){
 			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
@@ -518,6 +508,7 @@ value:
 	| T_FLOATVAL 
 	{
 		$<floatval>$ = $<floatval>1;
+		$<ast>$ = NULL;
 		//printf("Its here %f and %d and %d and %d and %d\n",$<floatval>1,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
 		if(!is_rel_op){
 			set_variable_to_float(assignment_name_stack,assignment_name_stack_top, $<floatval>1,curr_scope_level);
@@ -529,6 +520,7 @@ value:
 	| T_BOOLVAL 
 	{
 		$<intval>$ = $<intval>1;
+		$<ast>$ = NULL;
 		if(!is_rel_op){
 			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
 			var_type_info_top++;
@@ -540,6 +532,7 @@ value:
 	| T_STRINGVAL
 	{
 		$<str>$ = $<str>1;
+		$<ast>$ = NULL;
 		if(!is_rel_op){
 			set_variable_to_string(assignment_name_stack,assignment_name_stack_top, $<str>1,curr_scope_level);
 			var_type_info_top++;
@@ -575,10 +568,16 @@ expression:
 			if(!(id_type.is_int) && !(id_type.is_float) && !(id_type.is_str) && (id_type.is_bool)){
 				$<intval>$ = variable_value.int_value;
 			}
+			struct symbol_table *symbol_node = get_symbol_node(yylval.str,curr_scope_level);
+			$<ast>$ = new_ast_symbol_reference_node(symbol_node);
 		}
 	} 
-	| value {$<intval>$ = $<intval>1;}
-	| '(' expression ')' {$<intval>$ = $<intval>2;}
+	| value 
+	{
+		$<ast>$ = $<ast>1;
+		$<intval>$ = $<intval>1;
+	}
+	| '(' expression ')' {$<intval>$ = $<intval>2;$<ast>$ = $<ast>2;}
 	| expression operator expression 
 	{
 		struct variable_type_info st1,st2;
@@ -618,6 +617,7 @@ expression:
 			yyerror("Abort: Incompatible Datatypes.");
 			exit(1);
 		}
+		$<ast>$ = new_ast_node($<str>2,$<ast>1,$<ast>3);
 	}
 ;
 boolean_expression:
@@ -893,6 +893,17 @@ int check_valid_identifier(char* var_name){
 	return 1;
 
 }
+
+struct symbol_table *get_symbol_node(char *var_name,char *curr_scope_level) {
+	struct symbol_table *s = NULL;
+	char var_mang_name[31];
+	strcpy(var_mang_name, var_name);
+	strcat(var_mang_name, "$");
+	strcat(var_mang_name, curr_scope_level);
+	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+	return s;
+}
+
 union data get_identifier_data(char *var_name){
 	struct symbol_table *s = NULL;
 	char var_mang_name[31];
