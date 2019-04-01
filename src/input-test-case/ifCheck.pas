@@ -10,7 +10,8 @@ var
 begin
    writeln("What");
    a:=100;
-   if (a=100) then writeln("Value of a is 10");
+   if (a=100) then 
+      writeln("Value of a is 10");
 
    else if ( a = 20 ) then
       writeln("Value of a is 20");

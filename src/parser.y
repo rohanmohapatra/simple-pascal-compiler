@@ -68,7 +68,7 @@
 	struct variable_type_info get_identifier_type(char *var_name);
 	int solution(int a,int b, char* operator);
 
-	
+
 	/********************************
 	*	For Uses Block 	 			*
 	*	We need to add all packages *
@@ -87,6 +87,7 @@
 	struct variable_type_info var_type_info_stack[50];
 	int var_type_info_top = -1;
 
+	int is_rel_op =0;
 
 	struct ast_node *tree;
 	/*Stores the AST Root*/
@@ -506,35 +507,46 @@ value:
 	{
 		$<intval>$ = $<intval>1;
 		//printf("Its here %d and %d and %d and %d and %d\n",$<intval>$,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
-		set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
-		var_type_info_top++;
-		var_type_info_stack[var_type_info_top] = var_type_information;
-		clear_variable_type_info(&var_type_information);
+		if(!is_rel_op){
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
+			var_type_info_top++;
+			var_type_info_stack[var_type_info_top] = var_type_information;
+			clear_variable_type_info(&var_type_information);
+		}
+		
 	}
 	| T_FLOATVAL 
 	{
 		$<floatval>$ = $<floatval>1;
 		//printf("Its here %f and %d and %d and %d and %d\n",$<floatval>1,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
-		set_variable_to_float(assignment_name_stack,assignment_name_stack_top, $<floatval>1,curr_scope_level);
-		var_type_info_top++;
-		var_type_info_stack[var_type_info_top] = var_type_information;
-		clear_variable_type_info(&var_type_information);
+		if(!is_rel_op){
+			set_variable_to_float(assignment_name_stack,assignment_name_stack_top, $<floatval>1,curr_scope_level);
+			var_type_info_top++;
+			var_type_info_stack[var_type_info_top] = var_type_information;
+			clear_variable_type_info(&var_type_information);
+		}
 	}
 	| T_BOOLVAL 
 	{
 		$<intval>$ = $<intval>1;
-		set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
-		var_type_info_top++;
-		var_type_info_stack[var_type_info_top] = var_type_information;
-		clear_variable_type_info(&var_type_information);
+		if(!is_rel_op){
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
+			var_type_info_top++;
+			var_type_info_stack[var_type_info_top] = var_type_information;
+			clear_variable_type_info(&var_type_information);
+		}
+		
 	}
 	| T_STRINGVAL
 	{
 		$<str>$ = $<str>1;
-		set_variable_to_string(assignment_name_stack,assignment_name_stack_top, $<str>1,curr_scope_level);
-		var_type_info_top++;
-		var_type_info_stack[var_type_info_top] = var_type_information;
-		clear_variable_type_info(&var_type_information);
+		if(!is_rel_op){
+			set_variable_to_string(assignment_name_stack,assignment_name_stack_top, $<str>1,curr_scope_level);
+			var_type_info_top++;
+			var_type_info_stack[var_type_info_top] = var_type_information;
+			clear_variable_type_info(&var_type_information);
+		}
+		
 		
 	}
 ;
@@ -610,6 +622,9 @@ expression:
 ;
 boolean_expression:
 	expression relational_ops expression
+	{
+		is_rel_op = 1;
+	}
 ;
 
 operator:
@@ -866,94 +881,94 @@ int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 		var_name_stack_top = -1;
 		return 1;
 	}
-	int check_valid_identifier(char* var_name){
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, var_name);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(!s)
-			return 0;
-		return 1;
+int check_valid_identifier(char* var_name){
+	struct symbol_table *s = NULL;
+	char var_mang_name[31];
+	strcpy(var_mang_name, var_name);
+	strcat(var_mang_name, "$");
+	strcat(var_mang_name, curr_scope_level);
+	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+	if(!s)
+		return 0;
+	return 1;
+
+}
+union data get_identifier_data(char *var_name){
+	struct symbol_table *s = NULL;
+	char var_mang_name[31];
+	strcpy(var_mang_name, var_name);
+	strcat(var_mang_name, "$");
+	strcat(var_mang_name, curr_scope_level);
+	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+	return s->var_value;
+}
+
+struct variable_type_info get_identifier_type(char *var_name){
+	struct variable_type_info retval;
+	struct symbol_table *s = NULL;
+	char var_mang_name[31];
+	strcpy(var_mang_name, var_name);
+	strcat(var_mang_name, "$");
+	strcat(var_mang_name, curr_scope_level);
+	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+	if(strcmp(s->type,"integer")==0){
+		retval.is_int = 1;
+		retval.is_float = 0;
+		retval.is_str = 0;
+		retval.is_bool = 0;
+	}
+	else
+	if(strcmp(s->type,"real")==0){
+		retval.is_int = 0;
+		retval.is_float = 1;
+		retval.is_str = 0;
+		retval.is_bool = 0;
+	}
+	else
+	if(strcmp(s->type,"string")==0){
+		retval.is_int = 0;
+		retval.is_float = 0;
+		retval.is_str = 1;
+		retval.is_bool = 0;
+	}
+	else
+	if(strcmp(s->type,"boolean")==0){
+		retval.is_int = 0;
+		retval.is_float = 0;
+		retval.is_str = 0;
+		retval.is_bool = 1;
+	}
+	return retval;
+}
+
+
+
+int solution(int a,int b, char* operator) {
+	int result;
+	if(strcmp(operator,"+")==0)
+	{
+		result = a+b;
 
 	}
-	union data get_identifier_data(char *var_name){
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, var_name);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		return s->var_value;
+	if(strcmp(operator,"*")==0)
+	{
+		result = a*b;
+
 	}
+	if(strcmp(operator,"/")==0)
+	{
+		result = a/b;
 
-	struct variable_type_info get_identifier_type(char *var_name){
-		struct variable_type_info retval;
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, var_name);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(strcmp(s->type,"integer")==0){
-			retval.is_int = 1;
-			retval.is_float = 0;
-			retval.is_str = 0;
-			retval.is_bool = 0;
-		}
-		else
-		if(strcmp(s->type,"real")==0){
-			retval.is_int = 0;
-			retval.is_float = 1;
-			retval.is_str = 0;
-			retval.is_bool = 0;
-		}
-		else
-		if(strcmp(s->type,"string")==0){
-			retval.is_int = 0;
-			retval.is_float = 0;
-			retval.is_str = 1;
-			retval.is_bool = 0;
-		}
-		else
-		if(strcmp(s->type,"boolean")==0){
-			retval.is_int = 0;
-			retval.is_float = 0;
-			retval.is_str = 0;
-			retval.is_bool = 1;
-		}
-		return retval;
 	}
+	if(strcmp(operator,"-")==0)
+	{
+		result = a-b;
 
-
-
-	int solution(int a,int b, char* operator) {
-		int result;
-		if(strcmp(operator,"+")==0)
-		{
-			result = a+b;
-
-		}
-		if(strcmp(operator,"*")==0)
-		{
-			result = a*b;
-
-		}
-		if(strcmp(operator,"/")==0)
-		{
-			result = a/b;
-
-		}
-		if(strcmp(operator,"-")==0)
-		{
-			result = a-b;
-
-		}
-		if(strcmp(operator,"%")==0)
-		{
-			result = a%b;
-
-		}
-		return result;
 	}
+	if(strcmp(operator,"%")==0)
+	{
+		result = a%b;
+
+	}
+	return result;
+}
