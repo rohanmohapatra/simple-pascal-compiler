@@ -6,6 +6,7 @@
 	#include "../uthash/src/uthash.h"
 	#include "ast_handle.h"
 	#include "var_type.h"
+	#include "spc/utils.h"
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
 	int successful=1;
@@ -13,7 +14,6 @@
     extern FILE *yyin;
     extern FILE *yyout;
     
-    double time_elapsed(struct timespec *start, struct timespec *end);
     int yylex(void);
 
 	char *var_name_stack[10];
@@ -61,145 +61,14 @@
 	};
 	struct type_table *TYPE_TABLE = NULL;
 
-	int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
-		for(int i = 0; i <= var_name_stack_top; i++)
-		{
-			struct symbol_table *s = NULL;
-			char var_mang_name[31];
-			strcpy(var_mang_name, var_name_stack[i]);
-			strcat(var_mang_name, "$");
-			strcat(var_mang_name, curr_scope_level);
-			HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-			if(!s)
-			{
-				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
-				s = malloc(sizeof(struct symbol_table));
-				strcat(s->var_name, var_mang_name);
-				strcpy(s->type, type);
-				//printf("Type : %d\n",strcmp(type,"integer"));
-				s->scope_level = strdup(curr_scope_level);
-				s->line_no = line_no;
-				s->col_no = col_no;
-				if(strcmp(type,"string")==0){
+	int dump_stack_in_symbol_table(char *type, int line_no, int col_no);
+	int check_valid_identifier(char* var_name);
+	union data get_identifier_data(char *var_name);
 
-					strcpy(s->var_value.string_value, "");
-				}
-				else if(strcmp(type,"integer")==0){
-					s->var_value.int_value = 0;
-				}
-				else if(strcmp(type,"real")==0){
-					s->var_value.float_value = 0.0;
-				}
-				else if(strcmp(type,"boolean")==0){
-					s->var_value.int_value = 0;
-				}
-				else if(strcmp(type,"array")==0){
-					strcpy(s->var_value.string_value, "00000x54");
-				}
-				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
-				//SYMBOL_TABLE->current_size++;
-			}
-			else
-			{
-				printf("Error : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
-				return 0;
-			}
-			var_name_stack[i] = NULL;
-		}
-		var_name_stack_top = -1;
-		return 1;
-	}
-	int check_valid_identifier(char* var_name){
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, var_name);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(!s)
-			return 0;
-		return 1;
+	struct variable_type_info get_identifier_type(char *var_name);
+	int solution(int a,int b, char* operator);
 
-	}
-	union data get_identifier_data(char *var_name){
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, var_name);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		return s->var_value;
-	}
-
-	struct variable_type_info get_identifier_type(char *var_name){
-		struct variable_type_info retval;
-		struct symbol_table *s = NULL;
-		char var_mang_name[31];
-		strcpy(var_mang_name, var_name);
-		strcat(var_mang_name, "$");
-		strcat(var_mang_name, curr_scope_level);
-		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
-		if(strcmp(s->type,"integer")==0){
-			retval.is_int = 1;
-			retval.is_float = 0;
-			retval.is_str = 0;
-			retval.is_bool = 0;
-		}
-		else
-		if(strcmp(s->type,"real")==0){
-			retval.is_int = 0;
-			retval.is_float = 1;
-			retval.is_str = 0;
-			retval.is_bool = 0;
-		}
-		else
-		if(strcmp(s->type,"string")==0){
-			retval.is_int = 0;
-			retval.is_float = 0;
-			retval.is_str = 1;
-			retval.is_bool = 0;
-		}
-		else
-		if(strcmp(s->type,"boolean")==0){
-			retval.is_int = 0;
-			retval.is_float = 0;
-			retval.is_str = 0;
-			retval.is_bool = 1;
-		}
-		return retval;
-	}
-
-
-
-	int solution(int a,int b, char* operator) {
-		int result;
-		if(strcmp(operator,"+")==0)
-		{
-			result = a+b;
-
-		}
-		if(strcmp(operator,"*")==0)
-		{
-			result = a*b;
-
-		}
-		if(strcmp(operator,"/")==0)
-		{
-			result = a/b;
-
-		}
-		if(strcmp(operator,"-")==0)
-		{
-			result = a-b;
-
-		}
-		if(strcmp(operator,"%")==0)
-		{
-			result = a%b;
-
-		}
-		return result;
-	}
+	
 	/********************************
 	*	For Uses Block 	 			*
 	*	We need to add all packages *
@@ -820,6 +689,7 @@ int main(int argc,char* argv[]) {
 	yyout = (FILE*)fopen(outputfile,"w+");
 	/*End Create Output File*/
 	clear_variable_type_info(&var_type_information);
+	print_license();
 	clock_gettime(CLOCK_REALTIME, &start);
 	yyparse();
 	clock_gettime(CLOCK_REALTIME, &end);
@@ -867,13 +737,6 @@ int main(int argc,char* argv[]) {
     for(t=TYPE_TABLE,i=0; t != NULL,i<HASH_COUNT(TYPE_TABLE); t=t->hh.next,i++) {
         printf("Index : %d\t Identifier : %s\t DataType : %s\n",i,t->user_defined_name,t->actual_type_name);
     }*/
-}
-
-double time_elapsed(struct timespec *start, struct timespec *end) {
-	double t;
-	t = (end->tv_sec - start->tv_sec); // diff in seconds
-	t += (end->tv_nsec - start->tv_nsec) * 0.000000001; //diff in nanoseconds
-	return t;
 }
 
 void set_variable_to_int(char **assignment_name_stack,int assignment_name_stack_top, int int_value,char* curr_scope_level) {
@@ -954,3 +817,143 @@ void set_variable_to_string(char **assignment_name_stack,int assignment_name_sta
 		HASH_REPLACE_STR( SYMBOL_TABLE, var_name, temp,r );  /* var_name: name of key field */
 	}
 }
+
+int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
+		for(int i = 0; i <= var_name_stack_top; i++)
+		{
+			struct symbol_table *s = NULL;
+			char var_mang_name[31];
+			strcpy(var_mang_name, var_name_stack[i]);
+			strcat(var_mang_name, "$");
+			strcat(var_mang_name, curr_scope_level);
+			HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+			if(!s)
+			{
+				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
+				s = malloc(sizeof(struct symbol_table));
+				strcat(s->var_name, var_mang_name);
+				strcpy(s->type, type);
+				//printf("Type : %d\n",strcmp(type,"integer"));
+				s->scope_level = strdup(curr_scope_level);
+				s->line_no = line_no;
+				s->col_no = col_no;
+				if(strcmp(type,"string")==0){
+
+					strcpy(s->var_value.string_value, "");
+				}
+				else if(strcmp(type,"integer")==0){
+					s->var_value.int_value = 0;
+				}
+				else if(strcmp(type,"real")==0){
+					s->var_value.float_value = 0.0;
+				}
+				else if(strcmp(type,"boolean")==0){
+					s->var_value.int_value = 0;
+				}
+				else if(strcmp(type,"array")==0){
+					strcpy(s->var_value.string_value, "00000x54");
+				}
+				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				//SYMBOL_TABLE->current_size++;
+			}
+			else
+			{
+				printf("Error : Variable '%s' already declared with '%s' type.\n",s->var_name, s->type);
+				return 0;
+			}
+			var_name_stack[i] = NULL;
+		}
+		var_name_stack_top = -1;
+		return 1;
+	}
+	int check_valid_identifier(char* var_name){
+		struct symbol_table *s = NULL;
+		char var_mang_name[31];
+		strcpy(var_mang_name, var_name);
+		strcat(var_mang_name, "$");
+		strcat(var_mang_name, curr_scope_level);
+		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		if(!s)
+			return 0;
+		return 1;
+
+	}
+	union data get_identifier_data(char *var_name){
+		struct symbol_table *s = NULL;
+		char var_mang_name[31];
+		strcpy(var_mang_name, var_name);
+		strcat(var_mang_name, "$");
+		strcat(var_mang_name, curr_scope_level);
+		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		return s->var_value;
+	}
+
+	struct variable_type_info get_identifier_type(char *var_name){
+		struct variable_type_info retval;
+		struct symbol_table *s = NULL;
+		char var_mang_name[31];
+		strcpy(var_mang_name, var_name);
+		strcat(var_mang_name, "$");
+		strcat(var_mang_name, curr_scope_level);
+		HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
+		if(strcmp(s->type,"integer")==0){
+			retval.is_int = 1;
+			retval.is_float = 0;
+			retval.is_str = 0;
+			retval.is_bool = 0;
+		}
+		else
+		if(strcmp(s->type,"real")==0){
+			retval.is_int = 0;
+			retval.is_float = 1;
+			retval.is_str = 0;
+			retval.is_bool = 0;
+		}
+		else
+		if(strcmp(s->type,"string")==0){
+			retval.is_int = 0;
+			retval.is_float = 0;
+			retval.is_str = 1;
+			retval.is_bool = 0;
+		}
+		else
+		if(strcmp(s->type,"boolean")==0){
+			retval.is_int = 0;
+			retval.is_float = 0;
+			retval.is_str = 0;
+			retval.is_bool = 1;
+		}
+		return retval;
+	}
+
+
+
+	int solution(int a,int b, char* operator) {
+		int result;
+		if(strcmp(operator,"+")==0)
+		{
+			result = a+b;
+
+		}
+		if(strcmp(operator,"*")==0)
+		{
+			result = a*b;
+
+		}
+		if(strcmp(operator,"/")==0)
+		{
+			result = a/b;
+
+		}
+		if(strcmp(operator,"-")==0)
+		{
+			result = a-b;
+
+		}
+		if(strcmp(operator,"%")==0)
+		{
+			result = a%b;
+
+		}
+		return result;
+	}
