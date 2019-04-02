@@ -70,14 +70,14 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 }
 
 {INTVAL} {
-	yylval.intval = atoi(yytext);
+	yylval.s.intval = atoi(yytext);
 	var_type_information.is_int = 1;
 	ECHO;
  	return T_INTVAL;
 }
 
 {FLOATVAL} {
-	yylval.floatval = atof(yytext);
+	yylval.s.floatval = atof(yytext);
 	var_type_information.is_float = 1;
 	ECHO;
  	return T_FLOATVAL;
@@ -85,10 +85,10 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 
 {BOOLVAL} {
 	if(strcmp(yytext,"true")==0) {
-		yylval.intval=1;
+		yylval.s.intval=1;
 	}
 	else {
-		yylval.intval=0;
+		yylval.s.intval=0;
 	}
 	var_type_information.is_bool = 1;
 	ECHO;
@@ -99,7 +99,7 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 	char temp[yyleng-2];
 	//skip starting and ending quote and copy only string content
 	strncpy(temp,yytext+1,yyleng-2);
-	yylval.str=strdup(temp);
+	yylval.s.str=strdup(temp);
 	var_type_information.is_str = 1;
 	ECHO;
  return T_STRINGVAL;	
@@ -206,7 +206,7 @@ downto {
 {WHITESPACE} {ECHO;}
 
 {DATATYPES}	{
-	yylval.type = strdup(yytext);
+	yylval.s.type = strdup(yytext);
 	ECHO;
  return T_DATATYPE;
 }
@@ -217,8 +217,8 @@ downto {
 	}
 	char temp[32];
 	strncpy(temp,yytext,31);
-	yylval.str = strdup(temp);
-	//printf("%s\n", yylval.str);
+	yylval.s.str = strdup(temp);
+	//printf("%s\n", yylval.s.str);
 	ECHO;
  return T_IDENTIFIER;
 }

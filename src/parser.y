@@ -83,11 +83,14 @@
 %}
 %locations
 %union {
-	char *str;
-	char *type;
-	int intval;
-	float floatval;
-	struct ast_node * ast;
+	struct parse_node
+	{
+		char *str;
+		char *type;
+		int intval;
+		float floatval;
+		struct ast_node * ast;
+	}s;
 }
 
 %start startPascal
@@ -133,13 +136,13 @@
 %token T_ARRAY
 
 %token T_INDEXTYPE
-%token <str> T_IDENTIFIER
-%token <type> T_DATATYPE
+%token <s.str> T_IDENTIFIER
+%token <s.type> T_DATATYPE
 
-%token <intval> T_INTVAL
-%token <floatval> T_FLOATVAL
-%token <intval> T_BOOLVAL
-%token <str> T_STRINGVAL
+%token <s.intval> T_INTVAL
+%token <s.floatval> T_FLOATVAL
+%token <s.intval> T_BOOLVAL
+%token <s.str> T_STRINGVAL
 
 %define parse.error verbose
 %left '+' '-'
@@ -147,23 +150,23 @@
 %%
 startPascal:
 	 program 	{
-	 				//print_tree($<ast>1);
-	 				tree = $<ast>1;
+	 				//print_tree($<s.ast>1);
+	 				tree = $<s.ast>1;
 	 			}
 ;
 
 program:
-	prog_heading block '.'	{$<ast>$ = new_ast_root_node($<ast>1,$<ast>2);}
+	prog_heading block '.'	{$<s.ast>$ = new_ast_root_node($<s.ast>1,$<s.ast>2);}
 ;
 
 prog_heading:
-	T_PROGRAM T_IDENTIFIER ';'	{$<ast>$ = new_ast_program_node($<str>2);}
+	T_PROGRAM T_IDENTIFIER ';'	{$<s.ast>$ = new_ast_program_node($<s.str>2);}
 ;
 
 block:
 	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
 	{
-		$<ast>$ = new_ast_block_node($<ast>1,$<ast>2,$<ast>3,$<ast>4,$<ast>5,$<ast>5,$<ast>6);
+		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>5,$<s.ast>6);
 	}
 ;
 
@@ -171,11 +174,11 @@ uses_block:
 	T_USES T_IDENTIFIER 
 	{
 		uses_identifier_top++;
-		uses_identifier_stack[uses_identifier_top] = strdup(yylval.str);
+		uses_identifier_stack[uses_identifier_top] = strdup(yylval.s.str);
 	}
 	more_libs ';'  
 	{
-		$<ast>$ = new_ast_uses_node(uses_identifier_top,uses_identifier_stack);
+		$<s.ast>$ = new_ast_uses_node(uses_identifier_top,uses_identifier_stack);
 	}
 	| epsilon
 ;
@@ -184,7 +187,7 @@ more_libs:
 	',' T_IDENTIFIER
 	{
 		uses_identifier_top++;
-		uses_identifier_stack[uses_identifier_top] = strdup(yylval.str);
+		uses_identifier_stack[uses_identifier_top] = strdup(yylval.s.str);
 	}
 	more_libs 
 	| epsilon
@@ -210,7 +213,7 @@ type_definition:
 	T_IDENTIFIER 
 	{
 		type_identifier_top++;
-		type_identifier_stack[type_identifier_top] = strdup(yylval.str);
+		type_identifier_stack[type_identifier_top] = strdup(yylval.s.str);
 	}
 	more_type_identifiers T_SINGLEEQ T_DATATYPE 
 	{
@@ -222,7 +225,7 @@ type_definition:
 			{
 				s = malloc(sizeof(struct type_table));
 				strcpy(s->user_defined_name, type_identifier_stack[i]);
-				strcpy(s->actual_type_name, yylval.type);
+				strcpy(s->actual_type_name, yylval.s.type);
 				HASH_ADD_STR( TYPE_TABLE, user_defined_name, s );  /* var_name: name of key field */
 			}
 			else
@@ -244,7 +247,7 @@ variable_declaration:
 	T_IDENTIFIER 
 	{
 		var_name_stack_top++;
-		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+		var_name_stack[var_name_stack_top] = strdup(yylval.s.str);
 		//printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
 		//printf("top of stack: %d\n", var_name_stack_top);
 	}
@@ -256,8 +259,8 @@ data_type:
 	T_DATATYPE
 	
 	{
-		//printf("Hit the type part of line %s\n", yylval.type);
-		int result = dump_stack_in_symbol_table(yylval.type, yylloc.first_line, yylloc.first_column);
+		//printf("Hit the type part of line %s\n", yylval.s.type);
+		int result = dump_stack_in_symbol_table(yylval.s.type, yylloc.first_line, yylloc.first_column);
 		if(!result){
 			//printf("DumpBck in Variable: %d\n",result);
 			yyerror("Abort: Variable already declared.");
@@ -268,7 +271,7 @@ data_type:
 	| T_IDENTIFIER 
 	{
 		struct type_table *t = NULL;
-		HASH_FIND_STR(TYPE_TABLE,yylval.str,t);
+		HASH_FIND_STR(TYPE_TABLE,yylval.s.str,t);
 		//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
 		if(t)
 		{
@@ -280,14 +283,14 @@ data_type:
 		}
 		else
 		{
-			printf("Alert : Type %s is not defined.",yylval.str);
+			printf("Alert : Type %s is not defined.",yylval.s.str);
 			YYABORT;
 		}
 
 	}
 	| T_ARRAY '['T_INDEXTYPE']' T_OF T_DATATYPE
 	{
-		//printf("Hit the type part of line %s\n", yylval.type);
+		//printf("Hit the type part of line %s\n", yylval.s.type);
 		int result = dump_stack_in_symbol_table("array", yylloc.first_line, yylloc.first_column);
 		if(!result){
 			//printf("DumpBck in Variable: %d\n",result);
@@ -303,7 +306,7 @@ more_type_identifiers:
 	',' T_IDENTIFIER 
 	{
 		type_identifier_top++;
-		type_identifier_stack[type_identifier_top] = strdup(yylval.str);
+		type_identifier_stack[type_identifier_top] = strdup(yylval.s.str);
 	}
 	more_type_identifiers | epsilon
 ;
@@ -312,7 +315,7 @@ more_var_identifiers:
 	',' T_IDENTIFIER
 	{
 		var_name_stack_top++;
-		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+		var_name_stack[var_name_stack_top] = strdup(yylval.s.str);
 		//printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
 		//printf("top of stack: %d\n", var_name_stack_top);
 	}
@@ -328,13 +331,13 @@ function_and_procedure_block:
 procedure_block:
 	T_PROCEDURE T_IDENTIFIER
 	{
-		curr_scope_level = strdup(yylval.str);
+		curr_scope_level = strdup(yylval.s.str);
 		printf("Entering the Procedure %s\n", curr_scope_level);
 	}
 	';'  block ';'
 	| T_PROCEDURE T_IDENTIFIER 
 	{
-		curr_scope_level = strdup(yylval.str);
+		curr_scope_level = strdup(yylval.s.str);
 		printf("Entering the Procedure %s\n", curr_scope_level);
 	}
 	'(' param_list ')' ';'  block ';'
@@ -349,7 +352,7 @@ param_list:
 function_block:
 	T_FUNCTION T_IDENTIFIER
 	{
-		curr_scope_level = strdup(yylval.str);
+		curr_scope_level = strdup(yylval.s.str);
 		printf("Entering the Function %s\n", curr_scope_level);
 	}
 	':' T_DATATYPE ';'  block ';' 
@@ -359,7 +362,7 @@ function_block:
 	}
 	| T_FUNCTION T_IDENTIFIER 
 	{
-		curr_scope_level = strdup(yylval.str);
+		curr_scope_level = strdup(yylval.s.str);
 	}
 	'(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
 	{
@@ -372,11 +375,11 @@ function_param_list:
 	T_IDENTIFIER 
 	{
 		var_name_stack_top++;
-		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+		var_name_stack[var_name_stack_top] = strdup(yylval.s.str);
 	}
 	more_func_identifiers ':' T_DATATYPE 
 	{
-	int result = dump_stack_in_symbol_table(yylval.type, yylloc.first_line, yylloc.first_column);
+	int result = dump_stack_in_symbol_table(yylval.s.type, yylloc.first_line, yylloc.first_column);
 	if(!result){
 			yyerror("Abort: Variable already declared.");
 			exit(1);
@@ -394,59 +397,59 @@ more_func_identifiers:
 	',' T_IDENTIFIER
 	{
 		var_name_stack_top++;
-		var_name_stack[var_name_stack_top] = strdup(yylval.str);
+		var_name_stack[var_name_stack_top] = strdup(yylval.s.str);
 	}
 	more_func_identifiers | epsilon
 ;
 
 execution_block:
-	T_BEGIN execution_body T_END {$<ast>$ = $<ast>2;}
+	T_BEGIN execution_body T_END {$<s.ast>$ = $<s.ast>2;}
 ;	
 
 execution_body:
-	execution_body statements {$<ast>$ = new_ast_exec_body_node($<ast>1,$<ast>2);}
-	| epsilon {$<ast>$ = NULL;}
+	execution_body statements {$<s.ast>$ = new_ast_exec_body_node($<s.ast>1,$<s.ast>2);}
+	| epsilon {$<s.ast>$ = NULL;}
 ;
 
 statements : 
-	assignment_statements {$<ast>$ =$<ast>1;}
-	| structured_statements {$<ast>$ = $<ast>1;}
-	| print_statements {$<ast>$ = $<ast>1;} 
+	assignment_statements {$<s.ast>$ =$<s.ast>1;}
+	| structured_statements {$<s.ast>$ = $<s.ast>1;}
+	| print_statements {$<s.ast>$ = $<s.ast>1;} 
 ;	
 
 structured_statements:
-	conditional_statement {$<ast>$ = $<ast>1;}
-	| repetitive_statement {$<ast>$ =$<ast>1;}
+	conditional_statement {$<s.ast>$ = $<s.ast>1;}
+	| repetitive_statement {$<s.ast>$ =$<s.ast>1;}
 ;
 
 conditional_statement:
 	T_IF '(' boolean_expression ')' T_THEN execution_body if_then_follow
 	{
-		$<ast>$ = new_ast_if_node($<ast>3,$<ast>6,$<ast>7);
+		$<s.ast>$ = new_ast_if_node($<s.ast>3,$<s.ast>6,$<s.ast>7);
 	}
 ;
 
 if_then_follow:
-	else_if_block {$<ast>$ = $<ast>1;}
-	| else_block {$<ast>$ = $<ast>1;}
-	| epsilon	{$<ast>$ = NULL;}
+	else_if_block {$<s.ast>$ = $<s.ast>1;}
+	| else_block {$<s.ast>$ = $<s.ast>1;}
+	| epsilon	{$<s.ast>$ = NULL;}
 ;
 
 else_if_block:
-	T_ELSE conditional_statement {$<ast>$ = $<ast>2;}
+	T_ELSE conditional_statement {$<s.ast>$ = $<s.ast>2;}
 ;
 
 else_block:
-	T_ELSE execution_body {$<ast>$ = $<ast>2;}
+	T_ELSE execution_body {$<s.ast>$ = $<s.ast>2;}
 ;
 
 repetitive_statement:
-	for_statement {$<ast>$ = NULL;}
-	| while_statement {$<ast>$ = $<ast>1;}
+	for_statement {$<s.ast>$ = NULL;}
+	| while_statement {$<s.ast>$ = $<s.ast>1;}
 ;
 
 while_statement : 
-	T_WHILE '(' boolean_expression ')' T_DO statements {$<ast>$ = new_ast_while_node($<ast>3,$<ast>6);}
+	T_WHILE '(' boolean_expression ')' T_DO statements {$<s.ast>$ = new_ast_while_node($<s.ast>3,$<s.ast>6);}
 ;
 
 for_statement:
@@ -458,47 +461,47 @@ for_list:
 ;
 
 print_statements:
-	T_WRITELN '(' T_STRINGVAL ')' ';' {$<ast>$=new_ast_write_node($<str>3);}
+	T_WRITELN '(' T_STRINGVAL ')' ';' {$<s.ast>$=new_ast_write_node($<s.str>3);}
 ;
 
 assignment_statements:
-	assignment_statement ';'  assignment_statements {$<ast>$ = new_ast_assignment_stmts_node($<ast>1,$<ast>3);}
-	| epsilon {$<ast>$ = NULL;}
+	assignment_statement ';'  assignment_statements {$<s.ast>$ = new_ast_assignment_stmts_node($<s.ast>1,$<s.ast>3);}
+	| epsilon {$<s.ast>$ = NULL;}
 ;
 
 assignment_statement:
 	T_IDENTIFIER 
 	{
-		//printf("Variable Being Checked : %s ",yylval.str);
-		if(!check_valid_identifier(yylval.str)){
+		//printf("Variable Being Checked : %s ",yylval.s.str);
+		if(!check_valid_identifier(yylval.s.str)){
 			char error[1000];
 			//printf("Scope Level : %s ",curr_scope_level);
-			sprintf(error,"Abort: Variable %s is not declared.",yylval.str);
+			sprintf(error,"Abort: Variable %s is not declared.",yylval.s.str);
 			yyerror(error);
 			exit(1);
 		}
 		else
 		{
 			assignment_name_stack_top++;
-			assignment_name_stack[assignment_name_stack_top] = strdup(yylval.str);
+			assignment_name_stack[assignment_name_stack_top] = strdup(yylval.s.str);
 			
 		}
 	}
 	assignment_ops expression 
 	{
-		struct symbol_table *symbol_node = get_symbol_node($<str>1,curr_scope_level);
-		$<ast>$ = new_ast_assignment_node(symbol_node,$<ast>2);
+		struct symbol_table *symbol_node = get_symbol_node($<s.str>1,curr_scope_level);
+		$<s.ast>$ = new_ast_assignment_node(symbol_node,$<s.ast>2);
 	}
 ;
 
 value:
 	T_INTVAL 
 	{
-		$<intval>$ = $<intval>1;
-		$<ast>$ = new_ast_number_node($<intval>1);
-		//printf("Its here %d and %d and %d and %d and %d\n",$<intval>$,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
+		$<s.intval>$ = $<s.intval>1;
+		$<s.ast>$ = new_ast_number_node($<s.intval>1);
+		//printf("Its here %d and %d and %d and %d and %d\n",$<s.intval>$,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
 		if(!is_rel_op){
-			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<s.intval>1,curr_scope_level);
 			var_type_info_top++;
 			var_type_info_stack[var_type_info_top] = var_type_information;
 			clear_variable_type_info(&var_type_information);
@@ -507,11 +510,11 @@ value:
 	}
 	| T_FLOATVAL 
 	{
-		$<floatval>$ = $<floatval>1;
-		$<ast>$ = NULL;
-		//printf("Its here %f and %d and %d and %d and %d\n",$<floatval>1,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
+		$<s.floatval>$ = $<s.floatval>1;
+		$<s.ast>$ = NULL;
+		//printf("Its here %f and %d and %d and %d and %d\n",$<s.floatval>1,var_type_information.is_int,var_type_information.is_float,var_type_information.is_bool,var_type_information.is_str );
 		if(!is_rel_op){
-			set_variable_to_float(assignment_name_stack,assignment_name_stack_top, $<floatval>1,curr_scope_level);
+			set_variable_to_float(assignment_name_stack,assignment_name_stack_top, $<s.floatval>1,curr_scope_level);
 			var_type_info_top++;
 			var_type_info_stack[var_type_info_top] = var_type_information;
 			clear_variable_type_info(&var_type_information);
@@ -519,10 +522,10 @@ value:
 	}
 	| T_BOOLVAL 
 	{
-		$<intval>$ = $<intval>1;
-		$<ast>$ = NULL;
+		$<s.intval>$ = $<s.intval>1;
+		$<s.ast>$ = NULL;
 		if(!is_rel_op){
-			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>1,curr_scope_level);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<s.intval>1,curr_scope_level);
 			var_type_info_top++;
 			var_type_info_stack[var_type_info_top] = var_type_information;
 			clear_variable_type_info(&var_type_information);
@@ -531,10 +534,10 @@ value:
 	}
 	| T_STRINGVAL
 	{
-		$<str>$ = $<str>1;
-		$<ast>$ = NULL;
+		$<s.str>$ = $<s.str>1;
+		$<s.ast>$ = NULL;
 		if(!is_rel_op){
-			set_variable_to_string(assignment_name_stack,assignment_name_stack_top, $<str>1,curr_scope_level);
+			set_variable_to_string(assignment_name_stack,assignment_name_stack_top, $<s.str>1,curr_scope_level);
 			var_type_info_top++;
 			var_type_info_stack[var_type_info_top] = var_type_information;
 			clear_variable_type_info(&var_type_information);
@@ -547,54 +550,54 @@ value:
 expression:
 	T_IDENTIFIER
 	{
-		if(check_valid_identifier(yyval.str)){
-			union data variable_value = get_identifier_data(yylval.str);
-			struct variable_type_info id_type = get_identifier_type(yylval.str);
+		if(check_valid_identifier(yylval.s.str)){
+			union data variable_value = get_identifier_data(yylval.s.str);
+			struct variable_type_info id_type = get_identifier_type(yylval.s.str);
 			//printf("Its here in ID and %d and %d and %d and %d\n",id_type.is_int,id_type.is_float,id_type.is_bool,id_type.is_str );
 			var_type_info_top++;
 			var_type_info_stack[var_type_info_top] = id_type;
 			if(id_type.is_int && !(id_type.is_float) && !(id_type.is_str) && !(id_type.is_bool)){
-				$<intval>$ = variable_value.int_value;
+				$<s.intval>$ = variable_value.int_value;
 			}
 			else
 			if(!(id_type.is_int) && (id_type.is_float) && !(id_type.is_str) && !(id_type.is_bool)){
-				$<floatval>$ = variable_value.float_value;
+				$<s.floatval>$ = variable_value.float_value;
 			}
 			else
 			if(!(id_type.is_int) && !(id_type.is_float) && (id_type.is_str) && !(id_type.is_bool)){
-				strcpy($<str>$,variable_value.string_value);
+				strcpy($<s.str>$,variable_value.string_value);
 			}
 			else
 			if(!(id_type.is_int) && !(id_type.is_float) && !(id_type.is_str) && (id_type.is_bool)){
-				$<intval>$ = variable_value.int_value;
+				$<s.intval>$ = variable_value.int_value;
 			}
-			struct symbol_table *symbol_node = get_symbol_node(yylval.str,curr_scope_level);
-			$<ast>$ = new_ast_symbol_reference_node(symbol_node);
+			struct symbol_table *symbol_node = get_symbol_node(yylval.s.str,curr_scope_level);
+			$<s.ast>$ = new_ast_symbol_reference_node(symbol_node);
 		}
 	} 
 	| value 
 	{
-		$<ast>$ = $<ast>1;
-		$<intval>$ = $<intval>1;
+		$<s.ast>$ = $<s.ast>1;
+		$<s.intval>$ = $<s.intval>1;
 	}
-	| '(' expression ')' {$<intval>$ = $<intval>2;$<ast>$ = $<ast>2;}
+	| '(' expression ')' {$<s.intval>$ = $<s.intval>2;$<s.ast>$ = $<s.ast>2;}
 	| expression operator expression 
 	{
 		struct variable_type_info st1,st2;
 		st1 = var_type_info_stack[var_type_info_top-1];
 		st2 = var_type_info_stack[var_type_info_top];
 		if(st1.is_int && st2.is_int){
-			//printf("%d and %d and %s\n",$<intval>1,$<intval>3,$<str>2);
-			$<intval>$ = solution($<intval>1,$<intval>3,$<str>2);
-			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>$,curr_scope_level);
+			//printf("%d and %d and %s\n",$<s.intval>1,$<s.intval>3,$<s.str>2);
+			$<s.intval>$ = solution($<s.intval>1,$<s.intval>3,$<s.str>2);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<s.intval>$,curr_scope_level);
 
 		}
 		else
 		if(st1.is_int && st2.is_float){
 			printf("Warning : Trying to Add Real and Integer. Converting Real to Integer\n");
-			//printf("%d and %f and %s\n",$<intval>1,$<floatval>3,$<str>2);
-			$<intval>$ = solution($<intval>1,(int)$<floatval>3,$<str>2);
-			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>$,curr_scope_level);
+			//printf("%d and %f and %s\n",$<s.intval>1,$<s.floatval>3,$<s.str>2);
+			$<s.intval>$ = solution($<s.intval>1,(int)$<s.floatval>3,$<s.str>2);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<s.intval>$,curr_scope_level);
 		}
 		else
 		if(st1.is_int && st2.is_bool){
@@ -609,15 +612,15 @@ expression:
 		else
 		if(st1.is_float && st2.is_int){
 			printf("Warning : Trying to Add Integer and Real. Converting Real to Integer\n");
-			//printf("%f and %d and %s\n",$<floatval>1,$<intval>3,$<str>2);
-			$<intval>$ = solution((int)$<floatval>1,(int)$<intval>3,$<str>2);
-			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<intval>$,curr_scope_level);
+			//printf("%f and %d and %s\n",$<s.floatval>1,$<s.intval>3,$<s.str>2);
+			$<s.intval>$ = solution((int)$<s.floatval>1,(int)$<s.intval>3,$<s.str>2);
+			set_variable_to_int(assignment_name_stack,assignment_name_stack_top, $<s.intval>$,curr_scope_level);
 		}
 		else{
 			yyerror("Abort: Incompatible Datatypes.");
 			exit(1);
 		}
-		$<ast>$ = new_ast_node($<str>2,$<ast>1,$<ast>3);
+		$<s.ast>$ = new_ast_node($<s.str>2,$<s.ast>1,$<s.ast>3);
 	}
 ;
 boolean_expression:
@@ -628,7 +631,7 @@ boolean_expression:
 ;
 
 operator:
-	arithmetic_ops {$<str>$ = $<str>1;}
+	arithmetic_ops {$<s.str>$ = $<s.str>1;}
 	|boolean_ops|bitwise_ops
 ;
 
@@ -637,11 +640,11 @@ assignment_ops:
 ;
 
 arithmetic_ops:
-	'+' {$<str>$=strdup("+");}
-	|'*' {$<str>$=strdup("*");}
-	|'/' {$<str>$=strdup("/");}
-	|'-' {$<str>$=strdup("-");}
-	|'%' {$<str>$=strdup("%");}
+	'+' {$<s.str>$=strdup("+");}
+	|'*' {$<s.str>$=strdup("*");}
+	|'/' {$<s.str>$=strdup("/");}
+	|'-' {$<s.str>$=strdup("-");}
+	|'%' {$<s.str>$=strdup("%");}
 ;
 
 relational_ops:
