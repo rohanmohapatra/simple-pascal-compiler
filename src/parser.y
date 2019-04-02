@@ -6,6 +6,7 @@
 	#include "../uthash/src/uthash.h"
 	#include "symbol_table.h"
 	#include "ast_handle.h"
+	#include "intermediate_code_generation.h"
 	#include "var_type.h"
 	#include "spc/utils.h"
 	#define YYPARSE_PARAM scanner
@@ -45,6 +46,9 @@
 		UT_hash_handle hh;
 	};
 	struct type_table *TYPE_TABLE = NULL;
+
+
+	/*Function Declarartions*/
 
 	int dump_stack_in_symbol_table(char *type, int line_no, int col_no);
 	int check_valid_identifier(char* var_name);
