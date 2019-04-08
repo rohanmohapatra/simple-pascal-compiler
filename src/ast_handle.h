@@ -35,9 +35,11 @@ struct ast_block_node // for Block Node
 
   struct ast_node *variable_node;
 
-  struct ast_node *function_node;
+//  struct ast_node *function_node;
 
-  struct ast_node *procedure_node;
+//  struct ast_node *procedure_node;
+
+  struct ast_node *func_proc_list_node;
 
   struct ast_node *execution_node;
 };
@@ -104,10 +106,20 @@ struct ast_relational_node // for relational operators
   struct ast_node * right;
 };
 
-struct ast_function_node // for function calls
+struct ast_func_proc_list_node
 {
   int node_type;
-  // Needs to be filled
+
+  int n_func_proc;
+
+  struct ast_func_or_proc_node* func_or_proc_node_list[10]; 
+};
+
+struct ast_func_or_proc_node // for function calls
+{
+  int node_type;
+
+  char* func_or_proc_name;
 };
 
 
@@ -166,8 +178,7 @@ struct ast_node *new_ast_block_node (
   struct ast_node *constant_node,
   struct ast_node *type_node,
   struct ast_node *variable_node,
-  struct ast_node *function_node,
-  struct ast_node *procedure_node,
+  struct ast_node *func_proc_list_node,
   struct ast_node *execution_node);
 
 struct ast_node *new_ast_program_node (
@@ -211,3 +222,7 @@ struct ast_node * new_ast_node (
 struct ast_node *new_ast_number_node (int value);
 
 struct ast_node *new_ast_symbol_reference_node (struct symbol_table * symbol);
+
+struct ast_node *new_ast_func_proc_list_node (int, struct ast_func_or_proc_node**);
+
+struct ast_node *new_ast_func_or_proc_node (char* func_or_proc_name);

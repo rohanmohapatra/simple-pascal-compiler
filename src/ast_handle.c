@@ -188,8 +188,7 @@ struct ast_node *new_ast_block_node (
   struct ast_node *constant_node,
   struct ast_node *type_node,
   struct ast_node *variable_node,
-  struct ast_node *function_node,
-  struct ast_node *procedure_node,
+  struct ast_node *func_proc_list_node,
   struct ast_node *execution_node)
 {
   struct ast_block_node *ast_node;
@@ -200,8 +199,7 @@ struct ast_node *new_ast_block_node (
   ast_node->constant_node = constant_node;
   ast_node->type_node = type_node;
   ast_node->variable_node = variable_node;
-  ast_node->function_node =  function_node;
-  ast_node->procedure_node = procedure_node;
+  ast_node->func_proc_list_node =  func_proc_list_node;
   ast_node->execution_node = execution_node;
 
   return (struct ast_node*) ast_node;
@@ -354,4 +352,28 @@ struct ast_node *new_ast_symbol_reference_node (struct symbol_table * symbol)
   ast_node->symbol = symbol;
 
   return (struct ast_node *) ast_node;
+}
+struct ast_node *new_ast_func_proc_list_node (int ast_func_or_proc_node_top, struct ast_func_or_proc_node** ast_func_or_proc_node_list)
+{
+  struct ast_func_proc_list_node* ast_node = malloc(sizeof(struct ast_func_proc_list_node));
+
+  for(int i = 0; i < ast_func_or_proc_node_top; ++i)
+  {
+    ast_node->func_or_proc_node_list[i] =  ast_func_or_proc_node_list[i];
+  }
+
+  ast_node->node_type = 'F'+'P'+'B';
+
+  return (struct ast_node *) ast_node;
+}
+
+struct ast_node* new_ast_func_or_proc_node (char* func_or_proc_name)
+{
+  struct ast_func_or_proc_node* ast_node = malloc (sizeof(struct ast_func_or_proc_node));
+
+  ast_node->node_type = 'F'+'P';
+
+  ast_node->func_or_proc_name = strdup(func_or_proc_name);
+
+  return (struct ast_node* ) ast_node;
 }
