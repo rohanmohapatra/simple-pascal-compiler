@@ -748,10 +748,20 @@ int main(int argc,char* argv[]) {
 	    printf("\n\nPrinting the Abstract Syntax Tree : \n\n");
 		print_tree(tree);
 
+
+
+		/*Intermediate Code Generation*/
+		char *icg_file = strtok(inputfile,".");
+		char outputicg[40] = "intermediate_code/";
+		strcat(outputicg,icg_file);
+		strcat(outputicg,".icg");
+		FILE *fp = fopen(outputicg,"w+");
+		generate_icg(&fp);
+		fclose(fp);
+		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+
 	}
 
-	
-	
 
     /*  TYPE BLOCK
     struct type_table *t;
