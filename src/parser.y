@@ -73,7 +73,7 @@
 	int var_type_info_top = -1;
 
 	struct ast_func_or_proc_node* ast_func_or_proc_list[10];
-	int ast_func_or_proc_node_top = -1;
+	int ast_func_or_proc_list_top = -1;
 
 	int is_rel_op =0;
 
@@ -167,7 +167,8 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
+	uses_block constant_block type_block variable_block function_and_procedure_block{printf("PRINTING SAAHI\n");$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);}
+        execution_block
 	{
 		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>6);
 	}
@@ -329,9 +330,6 @@ function_and_procedure_block:
 	function_block function_and_procedure_block 
 	| procedure_block function_and_procedure_block 
 	| epsilon
-{
-	$<s.ast>$ = new_ast_func_proc_list_node(ast_func_or_proc_node_top, ast_func_or_proc_list);
-}
 ;
 
 procedure_block:
@@ -339,16 +337,16 @@ procedure_block:
 	{
 		curr_scope_level = strdup(yylval.s.str);
 		printf("Entering the Procedure %s\n", curr_scope_level);
-		++ast_func_or_proc_node_top;
-		ast_func_or_proc_list[ast_func_or_proc_node_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
+		++ast_func_or_proc_list_top;
+		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
 	';'  block ';'
 	| T_PROCEDURE T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.s.str);
 		printf("Entering the Procedure %s\n", curr_scope_level);
-		++ast_func_or_proc_node_top;
-		ast_func_or_proc_list[ast_func_or_proc_node_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
+		++ast_func_or_proc_list_top;
+		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
 	'(' param_list ')' ';'  block ';'
 ;
@@ -364,8 +362,8 @@ function_block:
 	{
 		curr_scope_level = strdup(yylval.s.str);
 		printf("Entering the Function %s\n", curr_scope_level);
-		++ast_func_or_proc_node_top;
-		ast_func_or_proc_list[ast_func_or_proc_node_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
+		++ast_func_or_proc_list_top;
+		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
 	':' T_DATATYPE ';'  block ';' 
 	{
@@ -375,8 +373,8 @@ function_block:
 	| T_FUNCTION T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.s.str);
-		++ast_func_or_proc_node_top;
-		ast_func_or_proc_list[ast_func_or_proc_node_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
+		++ast_func_or_proc_list_top;
+		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
 	'(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
 	{
