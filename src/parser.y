@@ -6,6 +6,7 @@
 	#include "../uthash/src/uthash.h"
 	#include "symbol_table.h"
 	#include "ast_handle.h"
+	#include "intermediate_code_generation.h"
 	#include "var_type.h"
 	#include "spc/utils.h"
 	#define YYPARSE_PARAM scanner
@@ -45,6 +46,9 @@
 		UT_hash_handle hh;
 	};
 	struct type_table *TYPE_TABLE = NULL;
+
+
+	/*Function Declarartions*/
 
 	int dump_stack_in_symbol_table(char *type, int line_no, int col_no);
 	int check_valid_identifier(char* var_name);
@@ -756,10 +760,20 @@ int main(int argc,char* argv[]) {
 	    printf("\n\nPrinting the Abstract Syntax Tree : \n\n");
 		print_tree(tree);
 
+
+
+		/*Intermediate Code Generation*/
+		char *icg_file = strtok(inputfile,".");
+		char outputicg[40] = "intermediate_code/";
+		strcat(outputicg,icg_file);
+		strcat(outputicg,".icg");
+		FILE *fp = fopen(outputicg,"w+");
+		generate_icg(&fp);
+		fclose(fp);
+		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+
 	}
 
-	
-	
 
     /*  TYPE BLOCK
     struct type_table *t;
