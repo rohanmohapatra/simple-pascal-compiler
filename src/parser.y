@@ -171,9 +171,14 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block variable_block function_and_procedure_block{printf("PRINTING SAAHI\n");$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);}
-        execution_block
+	uses_block constant_block type_block variable_block function_and_procedure_block
 	{
+		printf("PRINTING SAAHI\n");
+		//$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top,ast_func_or_proc_list);
+	}
+	execution_block
+	{
+		printf("PRINTING SAAHI\n");
 		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>6);
 	}
 ;
@@ -770,7 +775,7 @@ int main(int argc,char* argv[]) {
 		FILE *fp = fopen(outputicg,"w+");
 		generate_icg(&fp);
 		fclose(fp);
-		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+		printf("\n\nIntermediate Code is Generated at:%s\n",outputicg);
 
 	}
 

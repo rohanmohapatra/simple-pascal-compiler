@@ -8,6 +8,4 @@ var
    a : integer;
 begin
    writeln("What");
-   a:=100;
-   if (a=100) then 
-      begin
+   a

@@ -4,3 +4,4 @@ src/parser.tab.h
 uthash/*
 src/executable/*
 src/output/*.output
+src/core

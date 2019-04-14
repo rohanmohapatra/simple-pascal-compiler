@@ -90,6 +90,15 @@ void print_initial_tree(struct ast_node *root,int level){
                   printf("%s\n","Execution" );
                   break;
               }
+
+    case ('F'+'P'+'B'): {
+                  printf("%s\n","FPB" );
+                  break;
+              }
+    case ('F'+'P'): {
+                  printf("%s\n","FP" );
+                  break;
+              }
     case 'I': {
                   struct ast_if_node *node = (struct ast_if_node*) root;
                   //print_initial_tree(node->condition,level+1);
