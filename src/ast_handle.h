@@ -1,3 +1,4 @@
+
 /* All Definations to be Added Here
 node_type : Stores the type of the node , eg: +,-,/ etc
 left :Left Child of Node
@@ -120,13 +121,37 @@ struct ast_while_node // for "while" statements
   struct ast_node * while_branch;
 };
 
+
+struct ast_assignment_stmts_node // for assignment statements
+{
+  int node_type;
+
+  struct ast_node * assignment_node;
+
+  struct ast_node * assignment_stmts_node;
+};
+
 struct ast_assignment_node // for assignment expressions
 {
   int node_type;
 
-  struct symbol_node * symbol;
+  struct symbol_table * symbol;
 
   struct ast_node * value;
+};
+
+struct ast_number_node // for constant integer numbers
+{
+  int node_type;
+
+  int value;
+};
+
+struct ast_symbol_reference_node // for symbol references
+{
+  int node_type;
+
+  struct symbol_table * symbol;
 };
 
 void print_initial_tree(struct ast_node *root,int level);
@@ -169,3 +194,20 @@ struct ast_node *new_ast_write_node (
 
 struct ast_node *new_ast_while_node (struct ast_node * condition,
                  struct ast_node * while_branch);
+
+struct ast_node *new_ast_assignment_stmts_node(
+  struct ast_node *assignment_node,
+  struct ast_node *assignment_stmts_node);
+
+struct ast_node *new_ast_assignment_node(
+  struct symbol_table *symbol,
+  struct ast_node *value);
+
+struct ast_node * new_ast_node (
+  char* node_type,
+  struct ast_node * left,
+  struct ast_node * right);
+
+struct ast_node *new_ast_number_node (int value);
+
+struct ast_node *new_ast_symbol_reference_node (struct symbol_table * symbol);
