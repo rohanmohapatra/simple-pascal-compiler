@@ -772,7 +772,7 @@ int main(int argc,char* argv[]) {
 		strcat(outputicg,".icg");
 		FILE *fp = fopen(outputicg,"w+");
 		generate_icg(&fp);
-		fclose(fp);
+		//fclose(fp);
 		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
 
 	}

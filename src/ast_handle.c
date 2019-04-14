@@ -63,6 +63,8 @@ void print_initial_tree(struct ast_node *root,int level){
                   struct ast_block_node *node = (struct ast_block_node*) root;
                   print_initial_tree(node->execution_node,level+1);
                   print_initial_tree(node->uses_node,level+1);
+//		  print_initial_tree(node->variable_node, level+1);
+		  print_initial_tree(node->func_proc_list_node, level+1);
                   padding ( 45, level );
                   printf ( "%s\n", "Block" );
                   break;
@@ -158,9 +160,11 @@ void print_initial_tree(struct ast_node *root,int level){
                 printf("%s\n",var);
                 break;
               }
+	     
     case 'F'+'P': {
 			struct ast_func_or_proc_node *node = (struct ast_func_or_proc_node *) root;
 		  	padding('\t', level);
+                  	padding ( 45, level );
 			printf("%s\n", node->func_or_proc_name);
 		  }
     case 'F'+'P'+'B': {
