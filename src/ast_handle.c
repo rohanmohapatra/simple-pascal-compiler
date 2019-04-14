@@ -158,6 +158,18 @@ void print_initial_tree(struct ast_node *root,int level){
                 printf("%s\n",var);
                 break;
               }
+    case 'F'+'P': {
+			struct ast_func_or_proc_node *node = (struct ast_func_or_proc_node *) root;
+		  	padding('\t', level);
+			printf("%s\n", node->func_or_proc_name);
+		  }
+    case 'F'+'P'+'B': {
+		struct ast_func_proc_list_node* node = (struct ast_func_proc_list_node *) root;
+		for(int i = 0; i < node->n_func_proc; ++i){
+ 			print_initial_tree((struct ast_node *)node->func_or_proc_node_list[i], level+1);
+		}
+		break;
+		}
     default :  {
                 print_initial_tree(root->right,level+1);
                 padding ('\t', level);
@@ -353,17 +365,18 @@ struct ast_node *new_ast_symbol_reference_node (struct symbol_table * symbol)
 
   return (struct ast_node *) ast_node;
 }
-struct ast_node *new_ast_func_proc_list_node (int ast_func_or_proc_node_top, struct ast_func_or_proc_node** ast_func_or_proc_node_list)
+struct ast_node *new_ast_func_proc_list_node (int ast_func_or_proc_list_top, struct ast_func_or_proc_node** ast_func_or_proc_node_list)
 {
   struct ast_func_proc_list_node* ast_node = malloc(sizeof(struct ast_func_proc_list_node));
-
-  for(int i = 0; i < ast_func_or_proc_node_top; ++i)
+  printf("HEY I AM HERE\n");
+  for(int i = 0; i <= ast_func_or_proc_list_top; ++i)
   {
+    printf("%s\n", ast_func_or_proc_node_list[i]->func_or_proc_name);
     ast_node->func_or_proc_node_list[i] =  ast_func_or_proc_node_list[i];
   }
-
+  printf("Done for now\n");
   ast_node->node_type = 'F'+'P'+'B';
-
+  ast_node->n_func_proc = ast_func_or_proc_list_top+1;
   return (struct ast_node *) ast_node;
 }
 

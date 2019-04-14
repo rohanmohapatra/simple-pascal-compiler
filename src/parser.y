@@ -340,7 +340,7 @@ procedure_block:
 		++ast_func_or_proc_list_top;
 		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
-	';'  block ';'
+	';'  fp_block ';'
 	| T_PROCEDURE T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.s.str);
@@ -348,7 +348,7 @@ procedure_block:
 		++ast_func_or_proc_list_top;
 		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
-	'(' param_list ')' ';'  block ';'
+	'(' param_list ')' ';'  fp_block ';'
 ;
 
 param_list:
@@ -365,7 +365,7 @@ function_block:
 		++ast_func_or_proc_list_top;
 		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
-	':' T_DATATYPE ';'  block ';' 
+	':' T_DATATYPE ';'  fp_block ';' 
 	{
 		strcpy(curr_scope_level,"global");
 
@@ -376,7 +376,7 @@ function_block:
 		++ast_func_or_proc_list_top;
 		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
-	'(' function_param_list ')' ':' T_DATATYPE ';'  block ';' 
+	'(' function_param_list ')' ':' T_DATATYPE ';'  fp_block ';' 
 	{
 		char s[10] = "global";
 		curr_scope_level = strdup(s);
@@ -413,6 +413,9 @@ more_func_identifiers:
 	}
 	more_func_identifiers | epsilon
 ;
+
+fp_block:
+	variable_block execution_block;
 
 execution_block:
 	T_BEGIN execution_body T_END {$<s.ast>$ = $<s.ast>2;}
