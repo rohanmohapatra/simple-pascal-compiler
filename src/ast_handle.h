@@ -120,6 +120,10 @@ struct ast_func_or_proc_node // for function calls
   int node_type;
 
   char* func_or_proc_name;
+
+//  struct ast_exec_body_node *var_body; dont know which ast struct definition to call
+
+  struct ast_node *exec_body;
 };
 
 

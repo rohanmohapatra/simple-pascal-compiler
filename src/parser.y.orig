@@ -171,9 +171,21 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
+<<<<<<< HEAD
+	uses_block constant_block type_block variable_block function_and_procedure_block
 	{
+		printf("PRINTING SAAHI\n");
+		
 		$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);
+		printf("Top: %d\n",ast_func_or_proc_list_top);
+		printf("Name:%s\n",ast_func_or_proc_list[ast_func_or_proc_list_top]->func_or_proc_name);
+	}
+    execution_block
+=======
+	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
+>>>>>>> saahitya
+	{
+		$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);printf("PRINTING SAAHI %p\n", $<s.ast>$);
 
 		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>6);
 	}
@@ -334,7 +346,7 @@ more_var_identifiers:
 function_and_procedure_block:
 	function_block function_and_procedure_block 
 	| procedure_block function_and_procedure_block 
-	| epsilon
+	| epsilon 
 ;
 
 procedure_block:
@@ -378,6 +390,7 @@ function_block:
 	| T_FUNCTION T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.s.str);
+		printf("Entering the Function : %s\n", curr_scope_level);
 		++ast_func_or_proc_list_top;
 		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
@@ -500,6 +513,7 @@ assignment_statement:
 		//printf("Variable Being Checked : %s ",yylval.s.str);
 		if(!check_valid_identifier(yylval.s.str)){
 			char error[1000];
+			//printf("Scope Level : %s ",curr_scope_level);
 			sprintf(error,"Abort: Variable %s is not declared.",yylval.s.str);
 			yyerror(error);
 			exit(1);
@@ -731,9 +745,7 @@ int main(int argc,char* argv[]) {
 	yyout = (FILE*)fopen(outputfile,"w+");
 	/*End Create Output File*/
 	clear_variable_type_info(&var_type_information);
-	print_figlet();
 	print_license();
-
 	clock_gettime(CLOCK_REALTIME, &start);
 	yyparse();
 	clock_gettime(CLOCK_REALTIME, &end);
@@ -779,8 +791,13 @@ int main(int argc,char* argv[]) {
 		strcat(outputicg,".icg");
 		FILE *fp = fopen(outputicg,"w+");
 		generate_icg(&fp);
+<<<<<<< HEAD
 		fclose(fp);
 		printf("\n\nIntermediate Code is Generated at:%s\n",outputicg);
+=======
+		//fclose(fp);
+		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+>>>>>>> saahitya
 
 	}
 
@@ -926,7 +943,6 @@ int check_valid_identifier(char* var_name){
 	strcpy(var_mang_name, var_name);
 	strcat(var_mang_name, "$");
 	strcat(var_mang_name, curr_scope_level);
-	//printf("in CHeck: %s\n",var_mang_name);
 	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
 	if(!s)
 		return 0;
