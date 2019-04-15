@@ -360,6 +360,7 @@ struct ast_node *new_ast_func_proc_list_node (int ast_func_or_proc_node_top, str
   for(int i = 0; i < ast_func_or_proc_node_top; ++i)
   {
     ast_node->func_or_proc_node_list[i] =  ast_func_or_proc_node_list[i];
+    printf(" In Function with Name =%s\n",ast_func_or_proc_node_list[i]->func_or_proc_name );
   }
 
   ast_node->node_type = 'F'+'P'+'B';

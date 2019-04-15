@@ -171,8 +171,15 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block variable_block function_and_procedure_block{printf("PRINTING SAAHI\n");$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);}
-        execution_block
+	uses_block constant_block type_block variable_block function_and_procedure_block
+	{
+		printf("PRINTING SAAHI\n");
+		
+		$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);
+		printf("Top: %d\n",ast_func_or_proc_list_top);
+		printf("Name:%s\n",ast_func_or_proc_list[ast_func_or_proc_list_top]->func_or_proc_name);
+	}
+    execution_block
 	{
 		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>6);
 	}
@@ -333,7 +340,7 @@ more_var_identifiers:
 function_and_procedure_block:
 	function_block function_and_procedure_block 
 	| procedure_block function_and_procedure_block 
-	| epsilon
+	| epsilon 
 ;
 
 procedure_block:
@@ -377,6 +384,7 @@ function_block:
 	| T_FUNCTION T_IDENTIFIER 
 	{
 		curr_scope_level = strdup(yylval.s.str);
+		printf("Entering the Function : %s\n", curr_scope_level);
 		++ast_func_or_proc_list_top;
 		ast_func_or_proc_list[ast_func_or_proc_list_top] = (struct ast_func_or_proc_node*) new_ast_func_or_proc_node(curr_scope_level);
 	}
@@ -770,7 +778,7 @@ int main(int argc,char* argv[]) {
 		FILE *fp = fopen(outputicg,"w+");
 		generate_icg(&fp);
 		fclose(fp);
-		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+		printf("\n\nIntermediate Code is Generated at:%s\n",outputicg);
 
 	}
 
