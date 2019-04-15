@@ -8,6 +8,8 @@
 	#include "ast_handle.h"
 	#include "intermediate_code_generation.h"
 	#include "var_type.h"
+	#include "type.h"
+	#include "var.h"
 	#include "spc/utils.h"
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
@@ -80,6 +82,9 @@
 
 	struct ast_node *tree;
 	/*Stores the AST Root*/
+
+	struct ast_node* next;
+	char *last_type;
 	
 	//int update_variable_value(char* var_name,union data )
 
@@ -210,7 +215,24 @@ more_const_definition:
 ;
 
 type_block:
-	T_TYPE  type_definition | epsilon
+	T_TYPE type_definition
+	{
+		printf("\nType block action");
+
+		struct ast_typedef_node* temp = (struct ast_typedef_node*)($<s.ast>2);
+		if(temp==NULL){
+			printf("\n\t$2 is Null\n");
+		}
+		else{
+			printf("\n\tStack size: %d\n",temp->stack_size);
+		}
+		$<s.ast>$ = new_ast_type_node($<s.ast>2);
+	}
+	
+	| epsilon
+	{
+		$<s.ast>$ = NULL;
+	}
 ;
 
 type_definition:
@@ -221,6 +243,13 @@ type_definition:
 	}
 	more_type_identifiers T_SINGLEEQ T_DATATYPE 
 	{
+		char** new_types = (char**)malloc(sizeof(char*)*10);
+
+		for(int i = 0; i <= type_identifier_top; i++)
+		{
+			new_types[i] = strdup(type_identifier_stack[i]);
+		}
+
 		for(int i = 0; i <= type_identifier_top; i++)
 		{
 			struct type_table *s = NULL;
@@ -238,13 +267,39 @@ type_definition:
 			}
 			type_identifier_stack[i] = NULL;
 		}
+		
+		struct type_node_info new_type_entry;
+		new_type_entry.new_types = new_types;
+		new_type_entry.type_identifier_top = type_identifier_top;
+		new_type_entry.actual_type = yylval.s.type;
+		type_node_stack[++type_node_stack_top] = new_type_entry;
+
 		type_identifier_top = -1;
 	}
-	';'  type_definition | epsilon
+	';'  
+	
+	type_definition
+	{
+		struct type_node_info curr = type_node_stack[type_node_stack_top--];
+		$<s.ast>$ = new_ast_typedef_node(curr.new_types, curr.type_identifier_top+1, curr.actual_type, next);
+		next = $<s.ast>$;
+	}
+	| epsilon {
+		$<s.ast>$ = NULL;
+		next = NULL;
+	}
 ;	
 
 variable_block:
-	T_VAR  variable_declaration | epsilon
+	T_VAR  variable_declaration 
+	{
+		printf("\nVariable block action");
+		$<s.ast>$ = new_ast_var_node($<s.ast>2);
+	}
+	| epsilon
+	{
+		$<s.ast>$ = NULL;
+	}
 ;
 
 variable_declaration:
@@ -255,8 +310,33 @@ variable_declaration:
 		//printf("In var decl: %s\n", var_name_stack[var_name_stack_top]);
 		//printf("top of stack: %d\n", var_name_stack_top);
 	}
-	more_var_identifiers ':' data_type ';'  variable_declaration
-	| epsilon
+	more_var_identifiers ':' data_type
+	{
+		char** new_vars = (char**)malloc(sizeof(char*)*10);
+
+		for(int i = 0; i <= var_name_stack_top; i++)
+		{
+			new_vars[i] = strdup(var_name_stack[i]);
+		}
+		
+		struct var_node_info new_var_entry;
+		new_var_entry.new_vars = new_vars;
+		new_var_entry.var_name_stack_top = var_name_stack_top;
+		new_var_entry.data_type = last_type;
+		var_node_stack[++var_node_stack_top] = new_var_entry;
+	}
+	';'
+	variable_declaration
+	{
+		struct var_node_info curr = var_node_stack[var_node_stack_top--];
+		$<s.ast>$ = new_ast_vardef_node(curr.new_vars, curr.var_name_stack_top+1, curr.data_type, next);
+		next = $<s.ast>$;
+	}
+	| epsilon {
+		$<s.ast>$ = NULL;
+		next = NULL;
+	}
+
 ;
 
 data_type:
@@ -264,6 +344,7 @@ data_type:
 	
 	{
 		//printf("Hit the type part of line %s\n", yylval.s.type);
+		last_type = yylval.s.type;
 		int result = dump_stack_in_symbol_table(yylval.s.type, yylloc.first_line, yylloc.first_column);
 		if(!result){
 			//printf("DumpBck in Variable: %d\n",result);
@@ -279,6 +360,7 @@ data_type:
 		//printf("\nTypeSeen:%s and t:%s\n",t->user_defined_name,t);
 		if(t)
 		{
+			last_type = yylval.s.str;
 			int result = dump_stack_in_symbol_table(t->actual_type_name, yylloc.first_line, yylloc.first_column);
 			if(!result){
 			yyerror("Abort: Variable already declared.");
@@ -295,6 +377,7 @@ data_type:
 	| T_ARRAY '['T_INDEXTYPE']' T_OF T_DATATYPE
 	{
 		//printf("Hit the type part of line %s\n", yylval.s.type);
+		last_type = yylval.s.type;
 		int result = dump_stack_in_symbol_table("array", yylloc.first_line, yylloc.first_column);
 		if(!result){
 			//printf("DumpBck in Variable: %d\n",result);
@@ -751,6 +834,7 @@ int main(int argc,char* argv[]) {
 
 
 		/*Intermediate Code Generation*/
+		/*
 		char *icg_file = strtok(inputfile,".");
 		char outputicg[40] = "intermediate_code/";
 		strcat(outputicg,icg_file);
@@ -759,6 +843,7 @@ int main(int argc,char* argv[]) {
 		generate_icg(&fp);
 		fclose(fp);
 		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+		*/
 
 	}
 

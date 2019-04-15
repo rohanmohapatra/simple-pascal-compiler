@@ -1,4 +1,4 @@
-program hello;
+	program hello;
 uses crt;
 type
 	uReal = real;
