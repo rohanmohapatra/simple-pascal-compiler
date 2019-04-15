@@ -171,9 +171,10 @@ prog_heading:
 ;
 
 block:
-	uses_block constant_block type_block variable_block function_and_procedure_block{printf("PRINTING SAAHI\n");$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);}
-        execution_block
+	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
 	{
+		$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);printf("PRINTING SAAHI %p\n", $<s.ast>$);
+
 		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>6);
 	}
 ;
@@ -333,7 +334,7 @@ more_var_identifiers:
 function_and_procedure_block:
 	function_block function_and_procedure_block 
 	| procedure_block function_and_procedure_block 
-	| epsilon
+	| epsilon 
 ;
 
 procedure_block:
@@ -419,7 +420,12 @@ more_func_identifiers:
 ;
 
 fp_block:
-	variable_block execution_block;
+	variable_block execution_block
+	{
+//		ast_func_or_proc_list[ast_func_or_proc_list_top]->var_body;
+		ast_func_or_proc_list[ast_func_or_proc_list_top]->exec_body = $<s.ast>2;
+	}
+;
 
 execution_block:
 	T_BEGIN execution_body T_END {$<s.ast>$ = $<s.ast>2;}

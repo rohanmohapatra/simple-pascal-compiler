@@ -66,7 +66,7 @@ void print_initial_tree(struct ast_node *root,int level){
 //		  print_initial_tree(node->variable_node, level+1);
 		  print_initial_tree(node->func_proc_list_node, level+1);
                   padding ( 45, level );
-                  printf ( "%s\n", "Block" );
+                  printf ( "%s %p\n", "Block", node->func_proc_list_node );
                   break;
                 }    
     case 'U': {
@@ -78,7 +78,7 @@ void print_initial_tree(struct ast_node *root,int level){
                     padding ( 45, level );
                     printf("%s\n",node->package_names[i] );
                   }
-                  //printf("\n");
+                  printf("\n");
                   padding ( 45, level );
                   printf ( "%s", "Uses" );
                   printf("\n");
@@ -165,7 +165,8 @@ void print_initial_tree(struct ast_node *root,int level){
 			struct ast_func_or_proc_node *node = (struct ast_func_or_proc_node *) root;
 		  	padding('\t', level);
                   	padding ( 45, level );
-			printf("%s\n", node->func_or_proc_name);
+			printf("Function/Procedure Name: %s\n", node->func_or_proc_name);
+			print_initial_tree(node->exec_body, level+1);
 		  }
     case 'F'+'P'+'B': {
 		struct ast_func_proc_list_node* node = (struct ast_func_proc_list_node *) root;
@@ -209,7 +210,7 @@ struct ast_node *new_ast_block_node (
 {
   struct ast_block_node *ast_node;
   ast_node = (struct ast_block_node*) malloc(sizeof(struct ast_block_node));
-
+  printf("Hey I am here %p\n", func_proc_list_node);
   ast_node->node_type = 'B';
   ast_node->uses_node = uses_node;
   ast_node->constant_node = constant_node;
