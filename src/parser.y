@@ -18,7 +18,7 @@
     
     int yylex(void);
 
-	char *var_name_stack[10];
+	char *var_name_stack[100];
 	int var_name_stack_top = -1;
 
 	char *assignment_name_stack[31];
@@ -885,7 +885,7 @@ int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 			{
 				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
 				s = malloc(sizeof(struct symbol_table));
-				strcat(s->var_name, var_mang_name);
+				strcpy(s->var_name, var_mang_name);
 				strcpy(s->type, type);
 				//printf("Type : %d\n",strcmp(type,"integer"));
 				s->scope_level = strdup(curr_scope_level);
@@ -908,6 +908,8 @@ int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 					strcpy(s->var_value.string_value, "00000x54");
 				}
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				//HASH_FIND_STR(SYMBOL_TABLE,var_name,s);
+
 				//SYMBOL_TABLE->current_size++;
 			}
 			else
@@ -926,7 +928,6 @@ int check_valid_identifier(char* var_name){
 	strcpy(var_mang_name, var_name);
 	strcat(var_mang_name, "$");
 	strcat(var_mang_name, curr_scope_level);
-	//printf("in CHeck: %s\n",var_mang_name);
 	HASH_FIND_STR(SYMBOL_TABLE, var_mang_name, s);
 	if(!s)
 		return 0;

@@ -295,6 +295,7 @@ struct ast_node *new_ast_write_node (
   ast_node->node_type = 170;//'W' + 'S';
   char *new_name = malloc(strlen(string)+1);
   strcpy(new_name,string);
+  new_name[strlen(new_name)] = '\0';
   ast_node->string = new_name;
 }
 
