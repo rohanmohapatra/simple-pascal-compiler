@@ -8,8 +8,8 @@ type
 var
    a : integer;
 begin
-   writeln("What");
    a:=100;
+   writeln("What");
    if (a=100) then 
       writeln("Value of a is 10");
 

@@ -17,5 +17,18 @@ void print_license() {
 	printf("*\t\t\tCopyright (c) 2019.\t\t\t*\n");
 	printf("*\t\t\t\tAuthors\t\t\t\t*\n");
 	printf("*   Rohan Mohapatra, Rohan R. Talesara and Saahitya Edamadaka   *\n");
-	printf("*****************************************************************\n\n\n");
+	printf("*****************************************************************\n\n");
+}
+
+void print_figlet() {
+	FILE *fp;
+	fp = fopen("spc/FIGLET.txt","r");
+	char c;
+	c = fgetc(fp); 
+    while (c != EOF) 
+    { 
+        printf ("%c", c); 
+        c = fgetc(fp); 
+    } 
+    fclose(fp);
 }
