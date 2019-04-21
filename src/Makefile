@@ -1,9 +1,9 @@
 compiler:	parser.tab.c parser.tab.h lexer.c
-	gcc -g -o executable/compiler parser.tab.c lexer.c -lrt
-parser.tab.c:	parser.y
-	yacc parser.y -d -b "parser"
-parser.tab.h:	parser.y
-	yacc parser.y -d -b "parser"
+	gcc -g -o executable/compiler parser_icg.tab.c lexer.c -lrt
+parser_icg.tab.c:	parser_icg.y
+	yacc parser_icg.y -d -b "parser_icg"
+parser_icg.tab.h:	parser_icg.y
+	yacc parser_icg.y -d -b "parser_icg"
 lexer.c:	lexer.lex	
 	lex --outfile="lexer.c" lexer.lex
 ast_handle.o: ast_handle.c
@@ -16,7 +16,7 @@ intermediate_code_generation.o:	intermediate_code_generation.c
 	gcc -g -c intermediate_code_generation.c
 all: ast_handle.o var_type.o utils.o intermediate_code_generation.o
 	lex --outfile="lexer.c" lexer.lex
-	yacc parser.y -v -d -b  "parser"	
-	gcc -g -o executable/compiler parser.tab.c lexer.c ast_handle.o var_type.o intermediate_code_generation.o utils.o -lrt
+	yacc parser_icg.y -v -d -b  "parser_icg"	
+	gcc -g -o executable/compiler parser_icg.tab.c lexer.c ast_handle.o var_type.o intermediate_code_generation.o utils.o -lrt
 clean:
-	rm lexer.c;rm parser.tab.c;rm parser.tab.h;rm *.o
+	rm lexer.c;rm parser_icg.tab.c;rm parser_icg.tab.h;rm *.o

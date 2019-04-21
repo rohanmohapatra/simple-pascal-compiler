@@ -1,7 +1,7 @@
 %{
 	#include <stdio.h>
 	#include <string.h>
-	#include "parser.tab.h"
+	#include "parser_icg.tab.h"
 	#include "../uthash/src/uthash.h"
 	#include "var_type.h"
 	int yyerror();

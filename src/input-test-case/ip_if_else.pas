@@ -7,20 +7,13 @@ type
 {* Here the main program block starts *}
 var
    a : integer;
+   b : integer;
 begin
    writeln("What");
    a:=100;
-   if (a=100) then 
-      writeln("Value of a is 10");
-
-   else if ( a = 20 ) then
-      writeln("Value of a is 20");
-
-   else if( a <= 30 ) then 
-      writeln("Value of a is 30");
-   
+   if (a<=100) then 
+   	a:=10;
    else
-      writeln("None of the values is matching");
-      
+     b := -100; 
    writeln("Exact value of a is: ");
 end.

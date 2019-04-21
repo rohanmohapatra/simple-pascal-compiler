@@ -5,7 +5,7 @@
 //char temporary_variable[2] = "t";
 //char index_[2] = "0";
 
-
+/*
 int generate_icg(FILE **file_id){
 	return 0;
 }
@@ -35,3 +35,4 @@ void generate_code_for_assigment_statement(){
 void generate_code(){
 		;
 }
+*/
