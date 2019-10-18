@@ -39,8 +39,8 @@ void print_tree(struct ast_node *root) {
 }
 
 void print_initial_tree(struct ast_node *root,int level){
-  if(root == NULL)
-    return;
+  if(root == NULL) return;
+
   switch(root->node_type){
     case 'R': {
                   struct ast_root_node *node = (struct ast_root_node*) root;
@@ -59,9 +59,51 @@ void print_initial_tree(struct ast_node *root,int level){
                   printf ( "%s\n", node->program_name );
                   break;
                 }
+    case 'T': {
+                  struct ast_type_node *node = (struct ast_type_node*) root;
+                  struct ast_typedef_node *node2 = (struct ast_typedef_node*) node->next_typedef;
+                  //if(node->next_typedef!=NULL){printf("\nactual type: %d and %s",node2->node_type,node2->actual_type);}
+                  print_initial_tree(node->next_typedef, level+1);
+                  padding ( 45, level );
+                  printf ( "%s\n", "Type" );
+                  break;
+                }
+    case ('T'+'D'): {
+    			  struct ast_typedef_node *node = (struct ast_typedef_node*) root;
+            padding ('\t', level-1);
+    			  padding (45, level);
+    			  printf("%s: ",node->actual_type);
+    			  for(int i=0; i<node->stack_size; i++){
+    			  	printf("%s, ", node->new_types[i]);
+    			  }
+    			  printf("\n");
+            print_initial_tree(node->next_typedef, level);
+    			  break;
+    }
+    case 'V': {
+                  struct ast_var_node *node = (struct ast_var_node*) root;
+                  struct ast_vardef_node *node2 = (struct ast_vardef_node*) node->next_vardef;
+                  //if(node->next_typedef!=NULL){printf("\nactual type: %d and %s",node2->node_type,node2->actual_type);}
+                  print_initial_tree(node->next_vardef, level+1);
+                  padding ( 45, level );
+                  printf ( "%s\n", "Var" );
+                  break;
+                }
+    case ('V'+'D'): {
+            struct ast_vardef_node *node = (struct ast_vardef_node*) root;
+            padding (45, level);
+            printf("%s: ",node->data_type);
+            for(int i=0; i<node->stack_size; i++){
+              printf("%s, ", node->new_vars[i]);
+            }
+            printf("\n");
+            print_initial_tree(node->next_vardef, level);
+            break;
+    }
     case 'B': {
                   struct ast_block_node *node = (struct ast_block_node*) root;
                   print_initial_tree(node->execution_node,level+1);
+                  print_initial_tree(node->type_node, level+1);
                   print_initial_tree(node->uses_node,level+1);
 //		  print_initial_tree(node->variable_node, level+1);
 		  print_initial_tree(node->func_proc_list_node, level+1);
@@ -246,6 +288,66 @@ struct ast_node *new_ast_uses_node (
   {
     //printf("%s\n",package_names[i] );
   }
+  return (struct ast_node*) ast_node;
+}
+
+struct ast_node *new_ast_type_node(
+  struct ast_node *typedef_node)
+{
+  struct ast_type_node *ast_node;
+  ast_node = (struct ast_type_node*)malloc(sizeof(struct ast_type_node));
+
+  ast_node->node_type = 'T';
+  ast_node->next_typedef = typedef_node;
+
+  return (struct ast_node*) ast_node;
+}
+
+struct ast_node *new_ast_typedef_node(
+  char** new_types,
+  int stack_size,
+  char *actual_type,
+  struct ast_node *next_typedef)
+{
+  struct ast_typedef_node *ast_node;
+  ast_node = (struct ast_typedef_node*)malloc(sizeof(struct ast_typedef_node));
+
+  ast_node->node_type = 'T'+'D';
+  ast_node->new_types = new_types;
+  ast_node->stack_size=stack_size;
+  ast_node->actual_type = actual_type;
+  ast_node->next_typedef = next_typedef;
+
+  return (struct ast_node*) ast_node;
+}
+
+struct ast_node *new_ast_var_node(
+  struct ast_node *vardef_node)
+{
+  struct ast_var_node *ast_node;
+  ast_node = (struct ast_var_node*)malloc(sizeof(struct ast_var_node));
+
+  ast_node->node_type = 'V';
+  ast_node->next_vardef = vardef_node;
+
+  return (struct ast_node*) ast_node;
+}
+
+struct ast_node *new_ast_vardef_node(
+  char** new_vars,
+  int stack_size,
+  char *data_type,
+  struct ast_node *next_typedef)
+{
+  struct ast_vardef_node *ast_node;
+  ast_node = (struct ast_vardef_node*)malloc(sizeof(struct ast_vardef_node));
+
+  ast_node->node_type = 'V'+'D';
+  ast_node->new_vars = new_vars;
+  ast_node->stack_size=stack_size;
+  ast_node->data_type = data_type;
+  ast_node->next_vardef = next_typedef;
+
   return (struct ast_node*) ast_node;
 }
 

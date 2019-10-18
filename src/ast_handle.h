@@ -59,6 +59,47 @@ struct ast_uses_node // for Root Node
 
   int n_packages;
 };
+
+struct ast_type_node //for type node
+{
+  int node_type;
+
+  struct ast_node *next_typedef;
+};
+
+struct ast_typedef_node
+{
+  int node_type;
+
+  int stack_size;
+
+  char *actual_type;
+
+  struct ast_node *next_typedef;
+
+  char **new_types;
+};
+
+struct ast_var_node //for var node
+{
+  int node_type;
+
+  struct ast_node *next_vardef;
+};
+
+struct ast_vardef_node
+{
+  int node_type;
+
+  int stack_size;
+
+  char *data_type;
+
+  struct ast_node *next_vardef;
+
+  char **new_vars;
+};
+
 struct ast_structured_stmts_node
 {
   int node_type;
@@ -191,6 +232,25 @@ struct ast_node *new_ast_program_node (
 struct ast_node *new_ast_uses_node (
   int n_args,
   char **package_names);
+
+struct ast_node *new_ast_type_node(
+  struct ast_node *typedef_node
+  );
+
+struct ast_node *new_ast_typedef_node(
+  char** new_types,
+  int stack_size,
+  char *actual_type,
+  struct ast_node *next_typedef);
+
+struct ast_node *new_ast_var_node(
+  struct ast_node *vardef_node);
+
+struct ast_node *new_ast_vardef_node(
+  char** new_vars,
+  int stack_size,
+  char *data_type,
+  struct ast_node *next_typedef);
 
 struct ast_node *new_ast_if_node (struct ast_node * condition,
                  struct ast_node * if_branch,

@@ -8,8 +8,8 @@
 	#include "ast_handle.h"
 	#include "intermediate_code_generation.h"
 	#include "var_type.h"
-	#include "var.h"
 	#include "type.h"
+	#include "var.h"
 	#include "spc/utils.h"
 	#define YYPARSE_PARAM scanner
     #define YYLEX_PARAM   scanner
@@ -583,7 +583,6 @@ assignment_statement:
 		//printf("Variable Being Checked : %s ",yylval.s.str);
 		if(!check_valid_identifier(yylval.s.str)){
 			char error[1000];
-			//printf("Scope Level : %s ",curr_scope_level);
 			sprintf(error,"Abort: Variable %s is not declared.",yylval.s.str);
 			yyerror(error);
 			exit(1);
@@ -857,6 +856,7 @@ int main(int argc,char* argv[]) {
 
 
 		/*Intermediate Code Generation*/
+		/*
 		char *icg_file = strtok(inputfile,".");
 		char outputicg[40] = "intermediate_code/";
 		strcat(outputicg,icg_file);
@@ -864,7 +864,12 @@ int main(int argc,char* argv[]) {
 		FILE *fp = fopen(outputicg,"w+");
 		generate_icg(&fp);
 		fclose(fp);
+<<<<<<< HEAD
+		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+		*/
+=======
 		printf("\n\nIntermediate Code is Generated at:%s\n",outputicg);
+>>>>>>> rohan-mohapatra
 
 	}
 
@@ -992,6 +997,8 @@ int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 					strcpy(s->var_value.string_value, "00000x54");
 				}
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				//HASH_FIND_STR(SYMBOL_TABLE,var_name,s);
+
 				//SYMBOL_TABLE->current_size++;
 			}
 			else
