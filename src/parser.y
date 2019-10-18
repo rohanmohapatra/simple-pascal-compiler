@@ -18,7 +18,7 @@
     
     int yylex(void);
 
-	char *var_name_stack[10];
+	char *var_name_stack[100];
 	int var_name_stack_top = -1;
 
 	char *assignment_name_stack[31];
@@ -173,7 +173,7 @@ prog_heading:
 block:
 	uses_block constant_block type_block variable_block function_and_procedure_block execution_block
 	{
-		$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);printf("PRINTING SAAHI %p\n", $<s.ast>$);
+		$<s.ast>5 = new_ast_func_proc_list_node(ast_func_or_proc_list_top, ast_func_or_proc_list);
 
 		$<s.ast>$ = new_ast_block_node($<s.ast>1,$<s.ast>2,$<s.ast>3,$<s.ast>4,$<s.ast>5,$<s.ast>6);
 	}
@@ -334,7 +334,7 @@ more_var_identifiers:
 function_and_procedure_block:
 	function_block function_and_procedure_block 
 	| procedure_block function_and_procedure_block 
-	| epsilon 
+	| epsilon
 ;
 
 procedure_block:
@@ -500,7 +500,6 @@ assignment_statement:
 		//printf("Variable Being Checked : %s ",yylval.s.str);
 		if(!check_valid_identifier(yylval.s.str)){
 			char error[1000];
-			//printf("Scope Level : %s ",curr_scope_level);
 			sprintf(error,"Abort: Variable %s is not declared.",yylval.s.str);
 			yyerror(error);
 			exit(1);
@@ -732,7 +731,9 @@ int main(int argc,char* argv[]) {
 	yyout = (FILE*)fopen(outputfile,"w+");
 	/*End Create Output File*/
 	clear_variable_type_info(&var_type_information);
+	print_figlet();
 	print_license();
+
 	clock_gettime(CLOCK_REALTIME, &start);
 	yyparse();
 	clock_gettime(CLOCK_REALTIME, &end);
@@ -778,8 +779,8 @@ int main(int argc,char* argv[]) {
 		strcat(outputicg,".icg");
 		FILE *fp = fopen(outputicg,"w+");
 		generate_icg(&fp);
-		//fclose(fp);
-		printf("\n\n Intermediate Code is Generated at:%sand\n",outputicg);
+		fclose(fp);
+		printf("\n\nIntermediate Code is Generated at:%s\n",outputicg);
 
 	}
 
@@ -884,7 +885,7 @@ int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 			{
 				printf("Alert : Inserting Variable '%s' in to the Symbol Table.\n", var_mang_name);
 				s = malloc(sizeof(struct symbol_table));
-				strcat(s->var_name, var_mang_name);
+				strcpy(s->var_name, var_mang_name);
 				strcpy(s->type, type);
 				//printf("Type : %d\n",strcmp(type,"integer"));
 				s->scope_level = strdup(curr_scope_level);
@@ -907,6 +908,8 @@ int dump_stack_in_symbol_table(char *type, int line_no, int col_no) {
 					strcpy(s->var_value.string_value, "00000x54");
 				}
 				HASH_ADD_STR( SYMBOL_TABLE, var_name, s );  /* var_name: name of key field */
+				//HASH_FIND_STR(SYMBOL_TABLE,var_name,s);
+
 				//SYMBOL_TABLE->current_size++;
 			}
 			else

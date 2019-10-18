@@ -66,7 +66,7 @@ void print_initial_tree(struct ast_node *root,int level){
 //		  print_initial_tree(node->variable_node, level+1);
 		  print_initial_tree(node->func_proc_list_node, level+1);
                   padding ( 45, level );
-                  printf ( "%s %p\n", "Block", node->func_proc_list_node );
+                  printf ( "%s \n", "Block");
                   break;
                 }    
     case 'U': {
@@ -88,8 +88,8 @@ void print_initial_tree(struct ast_node *root,int level){
                   struct ast_exec_body_node *node = (struct ast_exec_body_node*) root;
                   print_initial_tree(node->stmts,level+1);
                   print_initial_tree(node->exec_body,level);
-                  padding ( 45, level );
-                  printf("%s\n","Execution" );
+                  //padding ( 45, level );
+                  //printf("%s\n","Execution" );
                   break;
               }
     case 'I': {
@@ -210,7 +210,7 @@ struct ast_node *new_ast_block_node (
 {
   struct ast_block_node *ast_node;
   ast_node = (struct ast_block_node*) malloc(sizeof(struct ast_block_node));
-  printf("Hey I am here %p\n", func_proc_list_node);
+  //printf("Hey I am here %p\n", func_proc_list_node);
   ast_node->node_type = 'B';
   ast_node->uses_node = uses_node;
   ast_node->constant_node = constant_node;
@@ -295,6 +295,7 @@ struct ast_node *new_ast_write_node (
   ast_node->node_type = 170;//'W' + 'S';
   char *new_name = malloc(strlen(string)+1);
   strcpy(new_name,string);
+  new_name[strlen(new_name)] = '\0';
   ast_node->string = new_name;
 }
 
@@ -373,13 +374,13 @@ struct ast_node *new_ast_symbol_reference_node (struct symbol_table * symbol)
 struct ast_node *new_ast_func_proc_list_node (int ast_func_or_proc_list_top, struct ast_func_or_proc_node** ast_func_or_proc_node_list)
 {
   struct ast_func_proc_list_node* ast_node = malloc(sizeof(struct ast_func_proc_list_node));
-  printf("HEY I AM HERE\n");
+  //printf("HEY I AM HERE\n");
   for(int i = 0; i <= ast_func_or_proc_list_top; ++i)
   {
     printf("%s\n", ast_func_or_proc_node_list[i]->func_or_proc_name);
     ast_node->func_or_proc_node_list[i] =  ast_func_or_proc_node_list[i];
+    //printf(" In Function with Name =%s\n",ast_func_or_proc_node_list[i]->func_or_proc_name );
   }
-  printf("Done for now\n");
   ast_node->node_type = 'F'+'P'+'B';
   ast_node->n_func_proc = ast_func_or_proc_list_top+1;
   return (struct ast_node *) ast_node;

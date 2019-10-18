@@ -99,7 +99,9 @@ INDEXTYPE [0-9]\.\.\.[0-9]+
 	char temp[yyleng-2];
 	//skip starting and ending quote and copy only string content
 	strncpy(temp,yytext+1,yyleng-2);
+	temp[yyleng-2]='\0';
 	yylval.s.str=strdup(temp);
+	//printf("yylval.str : %s and len : %d\n",temp,(int)strlen(yylval.s.str));
 	var_type_information.is_str = 1;
 	ECHO;
  return T_STRINGVAL;	
