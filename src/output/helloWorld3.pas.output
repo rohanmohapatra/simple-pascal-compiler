@@ -14,19 +14,4 @@ var
    begin
    end;
 begin
-   max := result;
-end;
-
-function min(num1,num2: integer): integer;
-var
-	result : uInteger;
-	
-begin
-	min := result;
-end;
-
-begin
-	for i:= 1 to 10 do writeln("Hello");
-	while (x>0) do x:=5;
-	writeln("Hello, World!");
-end. 
+   max
